@@ -24,6 +24,29 @@
     font-family: var(--font-inter), Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
+  /*
+   * Firm watermark — per Brian's spec.
+   * Drop the firm logo PNG at apps/web/public/logo-full.png and it goes live
+   * automatically. Until that file exists, no image is painted (no fallback).
+   */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vw;
+    height: 80vh;
+    background-image: url('/logo-full.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.08;
+    z-index: 0;
+    pointer-events: none;
+  }
+
   h1, h2, h3, h4 {
     font-family: var(--font-cormorant), "Cormorant Garamond", serif;
     letter-spacing: 0.01em;
@@ -39,17 +62,6 @@
 }
 
 @layer components {
-  /* faded logo watermark, fixed behind all content */
-  .aa-watermark {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.08;
-  }
   .aa-card {
     background-color: var(--aa-card);
     border: 1px solid var(--aa-card-border);

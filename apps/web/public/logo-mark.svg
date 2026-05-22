@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Armstrong Arikat — AA twin-peak monogram.
+  Each peak is one compound path (outer triangle + inner triangle, fill-rule
+  evenodd) so the "A" hollow is true transparency rather than painted black —
+  the mark looks correct on any background.
+
+  Per Brian's spec the lettermark is sized at 1.5x the baseline proportion:
+  peaks fill the viewBox height rather than sitting in a padded field.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 188 168"
+     role="img"
+     aria-label="Armstrong Arikat">
+  <title>Armstrong Arikat</title>
+  <defs>
+    <linearGradient id="aaGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#EFE2B6"/>
+      <stop offset="42%"  stop-color="#C9A961"/>
+      <stop offset="100%" stop-color="#9C7F42"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Back peak (left) -->
+  <path d="M70 30 L34 156 L106 156 Z  M70 62 L52 148 L88 148 Z"
+        fill="url(#aaGold)" fill-rule="evenodd"
+        stroke="#8A7548" stroke-width="1" stroke-linejoin="miter"/>
+
+  <!-- Front peak (right, taller) -->
+  <path d="M122 14 L86 156 L158 156 Z  M122 48 L104 148 L140 148 Z"
+        fill="url(#aaGold)" fill-rule="evenodd"
+        stroke="#7A6336" stroke-width="1" stroke-linejoin="miter"/>
+</svg>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
-import { LogoWatermark } from "@/components/logo-watermark";
 import { Toolbar } from "@/components/toolbar";
 import "./globals.css";
 
@@ -36,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-ink text-cream antialiased">
-        <LogoWatermark />
+        {/* Firm watermark is rendered by body::before in globals.css */}
         <Toolbar />
 
         <main className="relative z-10 mx-auto max-w-screen-2xl px-4 py-8 sm:px-6">
