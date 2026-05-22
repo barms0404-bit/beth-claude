@@ -19,10 +19,12 @@ from datetime import datetime, timezone
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
 from app.agents.registry import roster_for
+from app.agents.verifier import verify_high_conviction
 from app.engine.top50 import engine
 from app.schemas import (
     ChartSpec,
     Recommendation,
+    RecommendationVerification,
     Report,
     ReportSlot,
     SpecialistReport,
@@ -98,7 +100,12 @@ class Beth:
     ) -> Report:
         outputs = await self.dispatch(slot, market_brief=market_brief)
 
-        charts = await self._render_charts(outputs)
+        # Charts and PSV run concurrently — both are LLM-heavy, neither blocks
+        # the other.
+        charts, verifications = await asyncio.gather(
+            self._render_charts(outputs),
+            self._verify_high_conviction(outputs),
+        )
 
         # Feed the Top 50 engine and read the ranking back — single source.
         engine.ingest(outputs)
@@ -114,6 +121,7 @@ class Beth:
             recommendations=recommendations,
             charts=charts,
             specialist_reports=outputs,
+            verifications=verifications,
             disclaimer=DISCLAIMER,
             generated_at=datetime.now(timezone.utc),
         )
@@ -126,6 +134,26 @@ class Beth:
         return await engine.rebuild()
 
     # -- pipeline stages ----------------------------------------------------
+    @staticmethod
+    async def _verify_high_conviction(
+        outputs: list[SpecialistReport],
+    ) -> list[RecommendationVerification]:
+        """PSV runs only on `new_ideas` with conviction>=8. One task per specialist."""
+        jobs = [
+            verify_high_conviction(
+                sr.new_ideas, agent_key=sr.agent_key, persona=sr.specialist
+            )
+            for sr in outputs
+        ]
+        nested = await asyncio.gather(*jobs, return_exceptions=True)
+        flat: list[RecommendationVerification] = []
+        for result in nested:
+            if isinstance(result, list):
+                flat.extend(result)
+            elif isinstance(result, Exception):
+                logger.warning("Verifier batch failed: %s", result)
+        return flat
+
     async def _render_charts(self, outputs: list[SpecialistReport]) -> list[ChartSpec]:
         jobs = [
             self.chart_specialist.render(

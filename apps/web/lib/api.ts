@@ -73,6 +73,49 @@ export interface ArchivedReport {
   url: string;
 }
 
+export type ClaimType =
+  | "earnings"
+  | "guidance"
+  | "analyst_rating"
+  | "patent"
+  | "regulatory"
+  | "ma"
+  | "insider"
+  | "institutional"
+  | "industry"
+  | "other";
+
+export type VerificationStatus =
+  | "verified"
+  | "discrepancy"
+  | "unverified"
+  | "source_unavailable"
+  | "skipped";
+
+export type OverallVerification = "verified" | "caveat_required" | "skipped";
+
+export interface ClaimVerification {
+  claim_text: string;
+  claim_type: ClaimType;
+  status: VerificationStatus;
+  primary_source_url: string | null;
+  exact_quote: string | null;
+  verification_timestamp: string;
+  discrepancies_found: string | null;
+  notes: string;
+}
+
+export interface RecommendationVerification {
+  agent_key: string;
+  persona: string;
+  ticker: string;
+  conviction_1_10: number;
+  thesis: string;
+  overall: OverallVerification;
+  claims: ClaimVerification[];
+  verified_at: string;
+}
+
 export interface ReportSummary {
   id: string;
   slot: "market_prep" | "mid_day" | "market_close";
@@ -147,4 +190,6 @@ export const api = {
   marketSnapshot: () => getJson<IndexQuote[]>("/api/market/snapshot", 15),
   activity: () => getJson<ActivityItem[]>("/api/activity", 30),
   reportArchive: () => getJson<ArchivedReport[]>("/api/reports/archive", 60),
+  tickerVerifications: (symbol: string) =>
+    getJson<RecommendationVerification[]>(`/api/verifications/${symbol}`, 60),
 };

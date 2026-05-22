@@ -135,6 +135,31 @@ create table if not exists top_50_snapshots (
 create index if not exists idx_top50_time on top_50_snapshots (snapshot_time desc, rank);
 
 -- ---------------------------------------------------------------------------
+-- claim_verifications — Primary Source Verification results.
+-- One row per claim. Recommendations with overall=caveat_required have one or
+-- more rows where status != 'verified'.
+-- ---------------------------------------------------------------------------
+create table if not exists claim_verifications (
+  id                  uuid primary key default gen_random_uuid(),
+  report_id           uuid references reports(id) on delete cascade,
+  ticker              text not null,
+  agent_key           text not null,
+  persona             text,
+  conviction_1_10     int check (conviction_1_10 between 1 and 10),
+  thesis              text,
+  claim_text          text not null,
+  claim_type          text not null,
+  status              text not null,
+  primary_source_url  text,
+  exact_quote         text,
+  discrepancies_found text,
+  notes               text,
+  verified_at         timestamptz not null default now()
+);
+create index if not exists idx_verif_ticker on claim_verifications (ticker, verified_at desc);
+create index if not exists idx_verif_report on claim_verifications (report_id);
+
+-- ---------------------------------------------------------------------------
 -- specialist_notes — per-ticker commentary from each specialist
 -- ---------------------------------------------------------------------------
 create table if not exists specialist_notes (
@@ -196,21 +221,23 @@ alter table reports
 --   The FastAPI backend uses the Supabase service-role key (bypasses RLS).
 --   The Next.js frontend uses the anon key — grant it read-only on public data.
 -- ---------------------------------------------------------------------------
-alter table securities        enable row level security;
-alter table price_snapshots   enable row level security;
-alter table reports           enable row level security;
-alter table recommendations   enable row level security;
-alter table top_50_snapshots  enable row level security;
-alter table specialist_notes  enable row level security;
-alter table chart_specs       enable row level security;
-alter table disclaimers       enable row level security;
+alter table securities          enable row level security;
+alter table price_snapshots     enable row level security;
+alter table reports             enable row level security;
+alter table recommendations     enable row level security;
+alter table top_50_snapshots    enable row level security;
+alter table specialist_notes    enable row level security;
+alter table chart_specs         enable row level security;
+alter table claim_verifications enable row level security;
+alter table disclaimers         enable row level security;
 
 do $$
 declare t text;
 begin
   foreach t in array array[
     'securities','price_snapshots','reports','recommendations',
-    'top_50_snapshots','specialist_notes','chart_specs','disclaimers'
+    'top_50_snapshots','specialist_notes','chart_specs',
+    'claim_verifications','disclaimers'
   ] loop
     execute format(
       'create policy %I on %I for select to anon using (true);',

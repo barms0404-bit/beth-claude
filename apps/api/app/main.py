@@ -28,6 +28,7 @@ from app.schemas import (
     NewsItem,
     PriceBar,
     Recommendation,
+    RecommendationVerification,
     Report,
     ReportSlot,
     ReportSummary,
@@ -308,6 +309,22 @@ async def ticker_news(symbol: str) -> list[NewsItem]:
         for n in raw
         if n.get("title")
     ]
+
+
+@app.get(
+    "/api/verifications/{ticker}",
+    response_model=list[RecommendationVerification],
+)
+async def ticker_verifications(ticker: str) -> list[RecommendationVerification]:
+    """Every cached PSV result for one ticker, newest first."""
+    sym = ticker.upper()
+    matches: list[RecommendationVerification] = []
+    for report in _LATEST.values():
+        for v in report.verifications:
+            if v.ticker == sym:
+                matches.append(v)
+    matches.sort(key=lambda v: v.verified_at, reverse=True)
+    return matches
 
 
 @app.get("/api/tickers/{symbol}/history", response_model=list[PriceBar])

@@ -7,10 +7,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PriceChart } from "@/components/price-chart";
+import { Verifications } from "@/components/verifications";
 import {
   api,
   type NewsItem,
   type PriceBar,
+  type RecommendationVerification,
   type TickerDetail,
 } from "@/lib/api";
 import { changeTone, cn, formatPct, formatUsd } from "@/lib/utils";
@@ -19,18 +21,20 @@ interface StockData {
   detail: TickerDetail | null;
   news: NewsItem[];
   history: PriceBar[];
+  verifications: RecommendationVerification[];
 }
 
 async function safeLoad(symbol: string): Promise<StockData> {
   try {
-    const [detail, news, history] = await Promise.all([
+    const [detail, news, history, verifications] = await Promise.all([
       api.ticker(symbol),
       api.tickerNews(symbol).catch(() => [] as NewsItem[]),
       api.tickerHistory(symbol).catch(() => [] as PriceBar[]),
+      api.tickerVerifications(symbol).catch(() => [] as RecommendationVerification[]),
     ]);
-    return { detail, news, history };
+    return { detail, news, history, verifications };
   } catch {
-    return { detail: null, news: [], history: [] };
+    return { detail: null, news: [], history: [], verifications: [] };
   }
 }
 
@@ -48,7 +52,7 @@ export default async function StockPage({
   params: { ticker: string };
 }) {
   const symbol = params.ticker.toUpperCase();
-  const { detail, news, history } = await safeLoad(symbol);
+  const { detail, news, history, verifications } = await safeLoad(symbol);
 
   return (
     <div className="space-y-6">
@@ -116,6 +120,12 @@ export default async function StockPage({
                 ))}
               </div>
             )}
+          </section>
+
+          {/* Section 2.5 — Primary Source Verification (conviction>=8 only) */}
+          <section className="space-y-4">
+            <h2 className="font-serif text-2xl text-gold">Primary Source Verification</h2>
+            <Verifications items={verifications} />
           </section>
 
           {/* Section 3 — interactive price chart */}

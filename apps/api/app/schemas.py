@@ -182,6 +182,62 @@ class ArchivedReport(BaseModel):
     url: str              # static-mounted path, e.g. /reports/2026-05-22/market_prep.html
 
 
+# --------------------------------------------------------------------------
+# Primary Source Verification (PSV) — high-conviction recommendations only
+# --------------------------------------------------------------------------
+class ClaimType(str, Enum):
+    earnings = "earnings"            # revenue / EPS / margin claims -> 10-K, 10-Q, 8-K
+    guidance = "guidance"            # forward outlook -> press release, transcript
+    analyst_rating = "analyst_rating"  # broker upgrade/downgrade
+    patent = "patent"                # IP claim -> USPTO
+    regulatory = "regulatory"        # FDA/FCC/FTC approval / action
+    ma = "ma"                        # M&A -> 8-K, press release
+    insider = "insider"              # insider trade -> Form 4
+    institutional = "institutional"  # 13F position
+    industry = "industry"            # industry stat -> trade association
+    other = "other"
+
+
+class VerificationStatus(str, Enum):
+    verified = "verified"                # claim matches primary source quote
+    discrepancy = "discrepancy"          # source contradicts the claim
+    unverified = "unverified"            # source searched, claim not found
+    source_unavailable = "source_unavailable"  # source category not reachable (paywalled / unstructured)
+    skipped = "skipped"                  # PSV did not run (e.g. no Anthropic key)
+
+
+class ClaimVerification(BaseModel):
+    """Result of one verification pass against a primary source."""
+
+    claim_text: str
+    claim_type: ClaimType
+    status: VerificationStatus
+    primary_source_url: str | None = None
+    exact_quote: str | None = None
+    verification_timestamp: datetime
+    discrepancies_found: str | None = None
+    notes: str = ""
+
+
+class OverallVerification(str, Enum):
+    verified = "verified"               # all claims verified
+    caveat_required = "caveat_required" # 1+ claims unverified / discrepant / unavailable
+    skipped = "skipped"
+
+
+class RecommendationVerification(BaseModel):
+    """One high-conviction `new_idea` after PSV. Keyed by (agent_key, ticker)."""
+
+    agent_key: str
+    persona: str
+    ticker: str
+    conviction_1_10: int
+    thesis: str
+    overall: OverallVerification
+    claims: list[ClaimVerification] = []
+    verified_at: datetime
+
+
 class ReportSummary(BaseModel):
     id: str
     slot: ReportSlot
@@ -203,5 +259,6 @@ class Report(BaseModel):
     recommendations: list[Recommendation] = []
     charts: list[ChartSpec] = []
     specialist_reports: list[SpecialistReport] = []  # raw filings, retained for drill-down
+    verifications: list["RecommendationVerification"] = []  # PSV results, conviction>=8 only
     disclaimer: str
     generated_at: datetime
