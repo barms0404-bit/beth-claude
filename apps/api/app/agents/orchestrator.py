@@ -1,15 +1,12 @@
 """BETH — the Chief-of-Staff orchestrator.
 
-Pipeline for one report:
-  1. Build a market brief for the window.
-  2. Dispatch the specialist roster concurrently (one bad specialist never kills
-     the report — failures are logged and skipped).
-  3. Route every specialist chart request to the Chart Specialist.
-  4. Aggregate specialist `new_ideas` into a ranked Top 50, resolving duplicate
-     coverage by conviction score (1-10).
-  5. Run Beth's own synthesis turn — executive summary, conflict adjudication,
-     and escalation of specialist risk flags.
-  6. Return a Report; persistence + email happen downstream.
+Two entry points, one specialist-dispatch core:
+
+  generate_report(slot)  — full report: dispatch -> charts -> Top 50 -> synthesis.
+  refresh_top50()        — the 15-minute engine poll: dispatch -> ingest -> re-rank.
+
+The Top 50 ranking is owned entirely by `app.engine.top50` — Beth feeds it and
+reads it back, so there is one ranking algorithm, not two.
 """
 
 from __future__ import annotations
@@ -22,14 +19,15 @@ from datetime import datetime, timezone
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
 from app.agents.registry import roster_for
+from app.engine.top50 import engine
 from app.schemas import (
     ChartSpec,
     Recommendation,
     Report,
     ReportSlot,
     SpecialistReport,
+    Top50Snapshot,
 )
-from app.services import market_data
 
 logger = logging.getLogger("beth")
 
@@ -67,19 +65,20 @@ _SLOT_TITLES = {
 
 
 class Beth:
-    """The orchestrator. One instance per process is fine; runs are stateless."""
+    """The orchestrator. One instance per call is fine; ranking state lives in the engine."""
 
     def __init__(self) -> None:
         self.chart_specialist = ChartSpecialist()
 
-    async def generate_report(
+    # -- specialist dispatch (shared core) ----------------------------------
+    async def dispatch(
         self, slot: ReportSlot, *, market_brief: str | None = None
-    ) -> Report:
+    ) -> list[SpecialistReport]:
+        """Run the slot's specialist roster concurrently; isolate failures."""
         brief = market_brief or self._default_brief(slot)
         roster = roster_for(slot)
         logger.info("BETH dispatching %d specialists for %s", len(roster), slot.value)
 
-        # 2. Dispatch specialists concurrently; isolate failures.
         context = build_context(slot=slot, market_brief=brief)
         results = await asyncio.gather(
             *(spec.run(context) for spec in roster),
@@ -91,14 +90,21 @@ class Beth:
                 logger.warning("Specialist %s failed: %s", spec.key, res)
             else:
                 outputs.append(res)
+        return outputs
 
-        # 3. Charts.
+    # -- full report --------------------------------------------------------
+    async def generate_report(
+        self, slot: ReportSlot, *, market_brief: str | None = None
+    ) -> Report:
+        outputs = await self.dispatch(slot, market_brief=market_brief)
+
         charts = await self._render_charts(outputs)
 
-        # 4. Aggregate the Top 50.
-        recommendations = await self._rank_recommendations(outputs)
+        # Feed the Top 50 engine and read the ranking back — single source.
+        engine.ingest(outputs)
+        snapshot = await engine.rebuild()
+        recommendations = self._recommendations_from(snapshot)
 
-        # 5. BETH synthesis.
         title, summary = await self._synthesize(slot, outputs)
 
         return Report(
@@ -111,6 +117,13 @@ class Beth:
             disclaimer=DISCLAIMER,
             generated_at=datetime.now(timezone.utc),
         )
+
+    # -- 15-minute Top 50 poll ---------------------------------------------
+    async def refresh_top50(self) -> Top50Snapshot:
+        """Poll specialists and re-rank the Top 50. Driven by the scheduler."""
+        outputs = await self.dispatch(ReportSlot.mid_day)
+        engine.ingest(outputs)
+        return await engine.rebuild()
 
     # -- pipeline stages ----------------------------------------------------
     async def _render_charts(self, outputs: list[SpecialistReport]) -> list[ChartSpec]:
@@ -126,40 +139,24 @@ class Beth:
         done = await asyncio.gather(*jobs, return_exceptions=True)
         return [c for c in done if isinstance(c, ChartSpec)]
 
-    async def _rank_recommendations(
-        self, outputs: list[SpecialistReport]
-    ) -> list[Recommendation]:
-        """Dedup by ticker (keep the highest-conviction sponsor), rank, take Top 50."""
-        # ticker -> (conviction_1_10, thesis, sponsoring persona)
-        best: dict[str, tuple[int, str, str]] = {}
-        for out in outputs:
-            for idea in out.new_ideas:
-                sym = idea.ticker.upper()
-                if sym not in best or idea.conviction_1_10 > best[sym][0]:
-                    best[sym] = (idea.conviction_1_10, idea.thesis, out.specialist)
-
-        ranked = sorted(best.items(), key=lambda kv: kv[1][0], reverse=True)[:50]
-        quotes = await market_data.get_quotes([sym for sym, _ in ranked])
-        now = datetime.now(timezone.utc)
-
-        recs: list[Recommendation] = []
-        for i, (sym, (conviction, thesis, persona)) in enumerate(ranked, start=1):
-            q = quotes.get(sym)
-            recs.append(
-                Recommendation(
-                    rank=i,
-                    symbol=sym,
-                    name=sym,  # TODO(step 2 wiring): resolve from the `securities` table
-                    price=q.price if q else None,
-                    dailyPct=q.daily_pct if q else None,
-                    ytdPct=q.ytd_pct if q else None,
-                    conviction=conviction,
-                    thesis=thesis,
-                    leadSpecialist=persona,
-                    lastUpdated=now,
-                )
+    @staticmethod
+    def _recommendations_from(snapshot: Top50Snapshot) -> list[Recommendation]:
+        """Map engine Top 50 entries onto the API-facing Recommendation model."""
+        return [
+            Recommendation(
+                rank=e.rank,
+                symbol=e.ticker,
+                name=e.company_name,
+                price=e.price,
+                dailyPct=e.day_change_pct,
+                ytdPct=e.ytd_change_pct,
+                conviction=max(1, min(10, round(e.conviction_avg))),
+                thesis=e.thesis_summary,
+                leadSpecialist=e.lead_specialist,
+                lastUpdated=snapshot.snapshot_time,
             )
-        return recs
+            for e in snapshot.entries
+        ]
 
     async def _synthesize(
         self, slot: ReportSlot, outputs: list[SpecialistReport]

@@ -44,9 +44,14 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(4px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "flash-gold": {
+          "0%": { backgroundColor: "rgba(201, 169, 97, 0.28)" },
+          "100%": { backgroundColor: "transparent" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
+        "flash-gold": "flash-gold 1.8s ease-out",
       },
     },
   },

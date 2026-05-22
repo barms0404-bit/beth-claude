@@ -9,12 +9,14 @@ import {
   api,
   type ActivityItem,
   type IndexQuote,
-  type Recommendation,
   type ReportFull,
+  type Top50Snapshot,
 } from "@/lib/api";
 
+const EMPTY_TOP50: Top50Snapshot = { snapshot_time: "", entries: [] };
+
 interface DashboardData {
-  recs: Recommendation[];
+  top50: Top50Snapshot;
   latest: ReportFull | null;
   snapshot: IndexQuote[];
   activity: ActivityItem[];
@@ -24,20 +26,20 @@ interface DashboardData {
 // The backend may be offline during local work — degrade gracefully.
 async function safeLoad(): Promise<DashboardData> {
   try {
-    const [recs, latest, snapshot, activity] = await Promise.all([
-      api.topRecommendations(),
+    const [top50, latest, snapshot, activity] = await Promise.all([
+      api.top50(),
       api.latestReport(),
       api.marketSnapshot(),
       api.activity(),
     ]);
-    return { recs, latest, snapshot, activity, online: true };
+    return { top50, latest, snapshot, activity, online: true };
   } catch {
-    return { recs: [], latest: null, snapshot: [], activity: [], online: false };
+    return { top50: EMPTY_TOP50, latest: null, snapshot: [], activity: [], online: false };
   }
 }
 
 export default async function DashboardPage() {
-  const { recs, latest, snapshot, activity, online } = await safeLoad();
+  const { top50, latest, snapshot, activity, online } = await safeLoad();
   const chart = latest?.charts?.[0] ?? null;
 
   return (
@@ -72,7 +74,7 @@ export default async function DashboardPage() {
             </p>
           </CardHeader>
           <CardContent className="px-0">
-            <Top50Table initial={recs} />
+            <Top50Table initial={top50} />
           </CardContent>
         </Card>
       </FadeIn>

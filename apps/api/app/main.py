@@ -8,13 +8,17 @@ persistence is wired (see docs/ROADMAP.md, step 2 wiring).
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.orchestrator import Beth
 from app.agents.registry import SPECIALISTS
 from app.config import get_settings
+from app.engine.scheduler import start_scheduler, stop_scheduler
+from app.engine.top50 import engine
 from app.schemas import (
     ActivityItem,
     GenerateReportRequest,
@@ -27,13 +31,57 @@ from app.schemas import (
     ReportSummary,
     SpecialistNote,
     TickerDetail,
+    Top50Snapshot,
 )
 from app.services import market_data
 
 logging.basicConfig(level=logging.INFO)
 
 settings = get_settings()
-app = FastAPI(title="Armstrong Arikat Research Terminal", version="0.1.0")
+
+
+class ConnectionManager:
+    """Tracks /ws/top-50 clients and broadcasts ranking snapshots to all of them."""
+
+    def __init__(self) -> None:
+        self._clients: set[WebSocket] = set()
+
+    async def connect(self, ws: WebSocket) -> None:
+        await ws.accept()
+        self._clients.add(ws)
+
+    def disconnect(self, ws: WebSocket) -> None:
+        self._clients.discard(ws)
+
+    async def broadcast(self, snapshot: Top50Snapshot) -> None:
+        payload = snapshot.model_dump(mode="json")
+        dead: list[WebSocket] = []
+        for ws in self._clients:
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self._clients.discard(ws)
+
+
+manager = ConnectionManager()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # Push every engine re-rank to connected WebSocket clients.
+    engine.on_update = manager.broadcast
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(
+    title="Armstrong Arikat Research Terminal",
+    version="0.1.0",
+    lifespan=lifespan,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -104,11 +152,44 @@ async def latest_report() -> Report | None:
 
 @app.get("/api/recommendations/top", response_model=list[Recommendation])
 async def top_recommendations() -> list[Recommendation]:
-    """Most recent report's Top 50. Picks the freshest slot if several are cached."""
+    """Most recent report's Top 50 snapshot. See /api/top-50 for the live engine."""
     if not _LATEST:
         return []
     freshest = max(_LATEST.values(), key=lambda r: r.generated_at)
     return freshest.recommendations
+
+
+@app.get("/api/top-50", response_model=Top50Snapshot)
+async def top_50() -> Top50Snapshot:
+    """The live Top 50 ranking from the recommendation engine."""
+    snapshot = engine.current()
+    if snapshot is None:
+        return Top50Snapshot(snapshot_time=datetime.now(timezone.utc), entries=[])
+    return snapshot
+
+
+@app.post("/api/top-50/refresh", response_model=Top50Snapshot)
+async def refresh_top_50() -> Top50Snapshot:
+    """Manually poll specialists and re-rank — the scheduler does this every 15 min."""
+    if not settings.has_anthropic:
+        raise HTTPException(503, "ANTHROPIC_API_KEY not configured — see apps/api/.env.example")
+    return await beth.refresh_top50()
+
+
+@app.websocket("/ws/top-50")
+async def ws_top_50(ws: WebSocket) -> None:
+    """Pushes a full Top50Snapshot to the client whenever the ranking changes."""
+    await manager.connect(ws)
+    try:
+        current = engine.current()
+        if current is not None:
+            await ws.send_json(current.model_dump(mode="json"))
+        while True:
+            await ws.receive_text()  # client keep-alive pings; payload ignored
+    except WebSocketDisconnect:
+        manager.disconnect(ws)
+    except Exception:
+        manager.disconnect(ws)
 
 
 @app.get("/api/market/snapshot", response_model=list[IndexQuote])

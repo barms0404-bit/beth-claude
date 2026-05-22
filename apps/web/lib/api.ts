@@ -45,6 +45,27 @@ export interface PriceBar {
   volume: number;
 }
 
+export interface Top50Entry {
+  rank: number;
+  previous_rank: number | null;
+  ticker: string;
+  company_name: string;
+  price: number | null;
+  day_change_pct: number | null;
+  ytd_change_pct: number | null;
+  composite_score: number;
+  lead_specialist: string;
+  contributing_specialists: string[];
+  thesis_summary: string;
+  conviction_avg: number;
+  time_horizon: string;
+}
+
+export interface Top50Snapshot {
+  snapshot_time: string;
+  entries: Top50Entry[];
+}
+
 export interface ReportSummary {
   id: string;
   slot: "market_prep" | "mid_day" | "market_close";
@@ -115,6 +136,7 @@ export const api = {
     getJson<PriceBar[]>(`/api/tickers/${symbol}/history`, 300),
   reports: () => getJson<ReportSummary[]>("/api/reports"),
   latestReport: () => getJson<ReportFull | null>("/api/reports/latest", 120),
+  top50: () => getJson<Top50Snapshot>("/api/top-50", 15),
   marketSnapshot: () => getJson<IndexQuote[]>("/api/market/snapshot", 15),
   activity: () => getJson<ActivityItem[]>("/api/activity", 30),
 };

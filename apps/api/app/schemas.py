@@ -148,6 +148,31 @@ class PriceBar(BaseModel):
     volume: int
 
 
+class Top50Entry(BaseModel):
+    """One row of the live Top 50 ranking — mirrors the top_50_snapshots table."""
+
+    rank: int
+    previous_rank: int | None = None     # None => new entry this cycle
+    ticker: str
+    company_name: str
+    price: float | None = None
+    day_change_pct: float | None = None
+    ytd_change_pct: float | None = None
+    composite_score: float
+    lead_specialist: str
+    contributing_specialists: list[str] = []
+    thesis_summary: str
+    conviction_avg: float
+    time_horizon: str
+
+
+class Top50Snapshot(BaseModel):
+    """A full ranking captured at one point in time."""
+
+    snapshot_time: datetime
+    entries: list[Top50Entry] = []
+
+
 class ReportSummary(BaseModel):
     id: str
     slot: ReportSlot

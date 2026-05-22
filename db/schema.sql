@@ -112,6 +112,29 @@ create table if not exists recommendations (
 create index if not exists idx_recs_report on recommendations (report_id, rank);
 
 -- ---------------------------------------------------------------------------
+-- top_50_snapshots — time series of the Top 50 engine ranking (15-min cadence).
+-- One snapshot = 50 rows sharing a snapshot_time.
+-- ---------------------------------------------------------------------------
+create table if not exists top_50_snapshots (
+  id                       uuid primary key default gen_random_uuid(),
+  snapshot_time            timestamptz not null default now(),
+  rank                     int not null check (rank between 1 and 50),
+  ticker                   text not null,
+  company_name             text,
+  price                    numeric(14,4),
+  day_change_pct           numeric(8,4),
+  ytd_change_pct           numeric(8,4),
+  composite_score          numeric(14,4) not null,
+  lead_specialist          text,
+  contributing_specialists text[],
+  thesis_summary           text,
+  conviction_avg           numeric(5,2),
+  time_horizon             text,
+  unique (snapshot_time, rank)
+);
+create index if not exists idx_top50_time on top_50_snapshots (snapshot_time desc, rank);
+
+-- ---------------------------------------------------------------------------
 -- specialist_notes — per-ticker commentary from each specialist
 -- ---------------------------------------------------------------------------
 create table if not exists specialist_notes (
@@ -177,6 +200,7 @@ alter table securities        enable row level security;
 alter table price_snapshots   enable row level security;
 alter table reports           enable row level security;
 alter table recommendations   enable row level security;
+alter table top_50_snapshots  enable row level security;
 alter table specialist_notes  enable row level security;
 alter table chart_specs       enable row level security;
 alter table disclaimers       enable row level security;
@@ -186,7 +210,7 @@ declare t text;
 begin
   foreach t in array array[
     'securities','price_snapshots','reports','recommendations',
-    'specialist_notes','chart_specs','disclaimers'
+    'top_50_snapshots','specialist_notes','chart_specs','disclaimers'
   ] loop
     execute format(
       'create policy %I on %I for select to anon using (true);',
