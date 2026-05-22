@@ -173,6 +173,15 @@ class Top50Snapshot(BaseModel):
     entries: list[Top50Entry] = []
 
 
+class ArchivedReport(BaseModel):
+    """One archived report HTML on disk, surfaced to the dashboard."""
+
+    slot: str             # e.g. 'market_prep'
+    date: str             # YYYY-MM-DD folder name
+    generated_at: datetime
+    url: str              # static-mounted path, e.g. /reports/2026-05-22/market_prep.html
+
+
 class ReportSummary(BaseModel):
     id: str
     slot: ReportSlot

@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.agents.orchestrator import Beth
 from app.agents.registry import SPECIALISTS
@@ -21,6 +22,7 @@ from app.engine.scheduler import start_scheduler, stop_scheduler
 from app.engine.top50 import engine
 from app.schemas import (
     ActivityItem,
+    ArchivedReport,
     GenerateReportRequest,
     IndexQuote,
     NewsItem,
@@ -34,6 +36,7 @@ from app.schemas import (
     Top50Snapshot,
 )
 from app.services import market_data
+from app.services.email_send import archive_root, list_archive, send_report
 
 logging.basicConfig(level=logging.INFO)
 
@@ -94,6 +97,9 @@ beth = Beth()
 # In-memory report store, keyed by slot. Replaced by Supabase in a later step.
 _LATEST: dict[ReportSlot, Report] = {}
 
+# Mount the archived-report HTMLs at /reports for the dashboard's archive links.
+app.mount("/reports", StaticFiles(directory=str(archive_root())), name="reports")
+
 
 @app.get("/health")
 async def health() -> dict:
@@ -101,6 +107,7 @@ async def health() -> dict:
         "status": "ok",
         "anthropic_configured": settings.has_anthropic,
         "polygon_configured": bool(settings.polygon_api_key),
+        "resend_configured": bool(settings.resend_api_key),
         "reports_cached": [s.value for s in _LATEST],
     }
 
@@ -127,6 +134,23 @@ async def generate_report(req: GenerateReportRequest) -> Report:
     if not req.dry_run:
         _LATEST[req.slot] = report
     return report
+
+
+@app.post("/api/reports/run/{slot}")
+async def run_and_send_report(slot: ReportSlot) -> dict:
+    """Generate a report, archive it, and email it via Resend. Used by the scheduler
+    via the equivalent in-process path; this endpoint is the manual trigger."""
+    if not settings.has_anthropic:
+        raise HTTPException(503, "ANTHROPIC_API_KEY not configured — see apps/api/.env.example")
+    report = await beth.generate_report(slot)
+    _LATEST[slot] = report
+    return await send_report(report)
+
+
+@app.get("/api/reports/archive", response_model=list[ArchivedReport])
+async def reports_archive() -> list[ArchivedReport]:
+    """Recent archived HTML reports on disk — the dashboard archive widget."""
+    return [ArchivedReport(**item) for item in list_archive(limit=30)]
 
 
 @app.get("/api/reports", response_model=list[ReportSummary])

@@ -66,6 +66,13 @@ export interface Top50Snapshot {
   entries: Top50Entry[];
 }
 
+export interface ArchivedReport {
+  slot: string;
+  date: string;
+  generated_at: string;
+  url: string;
+}
+
 export interface ReportSummary {
   id: string;
   slot: "market_prep" | "mid_day" | "market_close";
@@ -139,4 +146,5 @@ export const api = {
   top50: () => getJson<Top50Snapshot>("/api/top-50", 15),
   marketSnapshot: () => getJson<IndexQuote[]>("/api/market/snapshot", 15),
   activity: () => getJson<ActivityItem[]>("/api/activity", 30),
+  reportArchive: () => getJson<ArchivedReport[]>("/api/reports/archive", 60),
 };

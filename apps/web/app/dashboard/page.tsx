@@ -5,9 +5,11 @@ import { Top50Table } from "@/components/top50-table";
 import { LatestReport } from "@/components/latest-report";
 import { ActivityFeed } from "@/components/activity-feed";
 import { ChartOfTheDay } from "@/components/chart-of-the-day";
+import { ReportArchive } from "@/components/report-archive";
 import {
   api,
   type ActivityItem,
+  type ArchivedReport,
   type IndexQuote,
   type ReportFull,
   type Top50Snapshot,
@@ -20,26 +22,35 @@ interface DashboardData {
   latest: ReportFull | null;
   snapshot: IndexQuote[];
   activity: ActivityItem[];
+  archive: ArchivedReport[];
   online: boolean;
 }
 
 // The backend may be offline during local work — degrade gracefully.
 async function safeLoad(): Promise<DashboardData> {
   try {
-    const [top50, latest, snapshot, activity] = await Promise.all([
+    const [top50, latest, snapshot, activity, archive] = await Promise.all([
       api.top50(),
       api.latestReport(),
       api.marketSnapshot(),
       api.activity(),
+      api.reportArchive(),
     ]);
-    return { top50, latest, snapshot, activity, online: true };
+    return { top50, latest, snapshot, activity, archive, online: true };
   } catch {
-    return { top50: EMPTY_TOP50, latest: null, snapshot: [], activity: [], online: false };
+    return {
+      top50: EMPTY_TOP50,
+      latest: null,
+      snapshot: [],
+      activity: [],
+      archive: [],
+      online: false,
+    };
   }
 }
 
 export default async function DashboardPage() {
-  const { top50, latest, snapshot, activity, online } = await safeLoad();
+  const { top50, latest, snapshot, activity, archive, online } = await safeLoad();
   const chart = latest?.charts?.[0] ?? null;
 
   return (
@@ -111,6 +122,21 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartOfTheDay chart={chart} />
+          </CardContent>
+        </Card>
+      </FadeIn>
+
+      {/* Row 6 — report archive */}
+      <FadeIn>
+        <Card>
+          <CardHeader>
+            <CardTitle>Report Archive</CardTitle>
+            <p className="text-xs text-gold-muted">
+              HTML archives of every sent report. Click to open.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <ReportArchive items={archive} />
           </CardContent>
         </Card>
       </FadeIn>
