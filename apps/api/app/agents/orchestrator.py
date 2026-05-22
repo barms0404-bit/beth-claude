@@ -140,9 +140,10 @@ class Beth:
 
         ranked = sorted(best.items(), key=lambda kv: kv[1][0], reverse=True)[:50]
         quotes = await market_data.get_quotes([sym for sym, _ in ranked])
+        now = datetime.now(timezone.utc)
 
         recs: list[Recommendation] = []
-        for i, (sym, (_conviction, thesis, persona)) in enumerate(ranked, start=1):
+        for i, (sym, (conviction, thesis, persona)) in enumerate(ranked, start=1):
             q = quotes.get(sym)
             recs.append(
                 Recommendation(
@@ -152,8 +153,10 @@ class Beth:
                     price=q.price if q else None,
                     dailyPct=q.daily_pct if q else None,
                     ytdPct=q.ytd_pct if q else None,
+                    conviction=conviction,
                     thesis=thesis,
                     leadSpecialist=persona,
+                    lastUpdated=now,
                 )
             )
         return recs

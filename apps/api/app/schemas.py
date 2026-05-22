@@ -88,8 +88,37 @@ class Recommendation(BaseModel):
     price: float | None = None
     dailyPct: float | None = None
     ytdPct: float | None = None
+    conviction: int = Field(ge=1, le=10)
     thesis: str
     leadSpecialist: str                # human persona name
+    lastUpdated: datetime
+
+
+class IndexQuote(BaseModel):
+    """One Row-1 market-snapshot tile."""
+
+    label: str                          # display label, e.g. "S&P 500"
+    symbol: str                         # display symbol, e.g. "SPY"
+    price: float | None = None
+    changePct: float | None = None
+
+
+class NewsItem(BaseModel):
+    title: str
+    url: str
+    publisher: str = ""
+    publishedAt: datetime | None = None
+    summary: str = ""
+
+
+class ActivityItem(BaseModel):
+    """One entry in the specialist activity feed."""
+
+    persona: str
+    agentKey: str
+    slot: ReportSlot
+    keyTakeaway: str
+    timestamp: datetime
 
 
 class SpecialistNote(BaseModel):
@@ -105,7 +134,18 @@ class TickerDetail(BaseModel):
     price: float | None = None
     dailyPct: float | None = None
     ytdPct: float | None = None
+    marketCap: float | None = None
+    employees: int | None = None
+    homepage: str | None = None
+    sector: str | None = None
+    listDate: str | None = None
     notes: list[SpecialistNote] = []
+
+
+class PriceBar(BaseModel):
+    date: str        # YYYY-MM-DD
+    close: float
+    volume: int
 
 
 class ReportSummary(BaseModel):

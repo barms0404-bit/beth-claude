@@ -16,7 +16,11 @@ from app.agents.orchestrator import Beth
 from app.agents.registry import SPECIALISTS
 from app.config import get_settings
 from app.schemas import (
+    ActivityItem,
     GenerateReportRequest,
+    IndexQuote,
+    NewsItem,
+    PriceBar,
     Recommendation,
     Report,
     ReportSlot,
@@ -90,6 +94,14 @@ async def list_reports() -> list[ReportSummary]:
     ]
 
 
+@app.get("/api/reports/latest", response_model=Report | None)
+async def latest_report() -> Report | None:
+    """The freshest cached report — feeds the dashboard's Row-3 preview."""
+    if not _LATEST:
+        return None
+    return max(_LATEST.values(), key=lambda r: r.generated_at)
+
+
 @app.get("/api/recommendations/top", response_model=list[Recommendation])
 async def top_recommendations() -> list[Recommendation]:
     """Most recent report's Top 50. Picks the freshest slot if several are cached."""
@@ -97,6 +109,59 @@ async def top_recommendations() -> list[Recommendation]:
         return []
     freshest = max(_LATEST.values(), key=lambda r: r.generated_at)
     return freshest.recommendations
+
+
+@app.get("/api/market/snapshot", response_model=list[IndexQuote])
+async def market_snapshot() -> list[IndexQuote]:
+    """Row-1 dashboard tiles — SPY/QQQ/RSP/IWM/VIX/10Y/DXY/BTC."""
+    snap = await market_data.get_dashboard_snapshot()
+    return [
+        IndexQuote(label=q.label, symbol=q.symbol, price=q.price, changePct=q.change_pct)
+        for q in snap
+    ]
+
+
+@app.get("/api/activity", response_model=list[ActivityItem])
+async def activity_feed() -> list[ActivityItem]:
+    """Specialist activity feed — who filed what, newest first."""
+    items: list[ActivityItem] = []
+    for slot, report in _LATEST.items():
+        for sr in report.specialist_reports:
+            items.append(
+                ActivityItem(
+                    persona=sr.specialist,
+                    agentKey=sr.agent_key,
+                    slot=slot,
+                    keyTakeaway=sr.key_takeaway,
+                    timestamp=sr.timestamp,
+                )
+            )
+    items.sort(key=lambda a: a.timestamp, reverse=True)
+    return items
+
+
+@app.get("/api/tickers/{symbol}/news", response_model=list[NewsItem])
+async def ticker_news(symbol: str) -> list[NewsItem]:
+    """Recent Polygon news for one symbol."""
+    raw = await market_data.get_news(symbol.upper(), limit=12)
+    return [
+        NewsItem(
+            title=n.get("title", ""),
+            url=n.get("article_url", ""),
+            publisher=(n.get("publisher") or {}).get("name", ""),
+            publishedAt=n.get("published_utc"),
+            summary=n.get("description", "") or "",
+        )
+        for n in raw
+        if n.get("title")
+    ]
+
+
+@app.get("/api/tickers/{symbol}/history", response_model=list[PriceBar])
+async def ticker_history(symbol: str, days: int = 120) -> list[PriceBar]:
+    """Daily close + volume bars for the stock-detail price chart."""
+    bars = await market_data.get_history(symbol.upper(), days=days)
+    return [PriceBar(date=b["date"], close=b["close"], volume=b["volume"]) for b in bars]
 
 
 @app.get("/api/tickers/{symbol}", response_model=TickerDetail)
@@ -130,15 +195,19 @@ async def ticker_detail(symbol: str) -> TickerDetail:
                     )
 
     quote = await market_data.get_quote(symbol)
+    details = await market_data.get_ticker_details(symbol)
     return TickerDetail(
         symbol=symbol,
-        name=symbol,  # TODO(step 2 wiring): resolve company name from `securities`
-        description=(
-            "Company profile not yet wired. Connect the `securities` table or a "
-            "Polygon reference-data call to populate this field."
-        ),
+        name=details.get("name") or symbol,
+        description=details.get("description")
+        or "No company profile available from Polygon for this ticker.",
         price=quote.price,
         dailyPct=quote.daily_pct,
         ytdPct=quote.ytd_pct,
+        marketCap=details.get("market_cap"),
+        employees=details.get("total_employees"),
+        homepage=details.get("homepage_url"),
+        sector=details.get("sic_description"),
+        listDate=details.get("list_date"),
         notes=notes,
     )
