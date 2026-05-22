@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# next.js
+.next/
+out/
+build/
+dist/
+
+# env / secrets
+.env
+.env.local
+.env*.local
+*.pem
+
+# logs
+*.log
+npm-debug.log*
+logs/
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# misc
+.vercel
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# generated chart pngs
+apps/api/.charts_cache/
