@@ -33,6 +33,23 @@ class Settings(BaseSettings):
     # CORS
     allowed_origins: str = "http://localhost:3000"
 
+    # --- Production deploy concerns ---
+    environment: str = "development"      # 'development' | 'staging' | 'production'
+
+    # Sentry — error tracking
+    sentry_dsn: str = ""
+    sentry_traces_sample_rate: float = 0.1
+
+    # Supabase Auth — JWT verification
+    require_auth: bool = False            # gate every protected endpoint when true
+    supabase_jwt_secret: str = ""         # HS256 secret from Supabase project settings
+
+    # Resend webhooks — bounce/complaint signature verification (Svix)
+    resend_webhook_secret: str = ""
+
+    # Public REST rate limit (slowapi). e.g. "60/minute".
+    rate_limit_default: str = "60/minute"
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

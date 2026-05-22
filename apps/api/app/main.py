@@ -11,9 +11,12 @@ import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.agents.orchestrator import Beth
 from app.agents.registry import SPECIALISTS
@@ -36,14 +39,19 @@ from app.schemas import (
     TickerDetail,
     Top50Snapshot,
 )
+from app.middleware.auth import auth_middleware, verify_ws_token
+from app.middleware.rate_limit import limiter
+from app.routes import webhooks as webhook_routes
 from app.services import market_data
 from app.services.email_send import archive_root, list_archive, send_report
 from app.services.polygon_ws import PolygonStream
 from app.services.price_relay import PriceRelay
+from app.services.sentry import init_sentry
 
 logging.basicConfig(level=logging.INFO)
 
 settings = get_settings()
+init_sentry()
 
 
 class ConnectionManager:
@@ -128,6 +136,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rate limiter — applied to every route, default limit from settings.
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+# Auth middleware — no-op when REQUIRE_AUTH=false. Public paths in PUBLIC_PATH_PREFIXES.
+app.middleware("http")(auth_middleware)
+
+# Resend webhook (Svix-signed; auth via signature, bypasses bearer-token check).
+app.include_router(webhook_routes.router)
+
 beth = Beth()
 
 # In-memory report store, keyed by slot. Replaced by Supabase in a later step.
@@ -141,10 +160,14 @@ app.mount("/reports", StaticFiles(directory=str(archive_root())), name="reports"
 async def health() -> dict:
     return {
         "status": "ok",
+        "environment": settings.environment,
         "anthropic_configured": settings.has_anthropic,
         "polygon_configured": bool(settings.polygon_api_key),
         "resend_configured": bool(settings.resend_api_key),
+        "sentry_configured": bool(settings.sentry_dsn),
+        "auth_enforced": settings.require_auth,
         "reports_cached": [s.value for s in _LATEST],
+        "top50_size": len(engine.current().entries) if engine.current() else 0,
     }
 
 
@@ -237,7 +260,7 @@ async def refresh_top_50() -> Top50Snapshot:
 
 
 @app.websocket("/ws/prices")
-async def ws_prices(ws: WebSocket) -> None:
+async def ws_prices(ws: WebSocket, _claims: dict = Depends(verify_ws_token)) -> None:
     """Live Polygon trade ticks for the current Top 50 subscription set."""
     await price_relay.connect(ws)
     try:
@@ -250,7 +273,7 @@ async def ws_prices(ws: WebSocket) -> None:
 
 
 @app.websocket("/ws/top-50")
-async def ws_top_50(ws: WebSocket) -> None:
+async def ws_top_50(ws: WebSocket, _claims: dict = Depends(verify_ws_token)) -> None:
     """Pushes a full Top50Snapshot to the client whenever the ranking changes."""
     await manager.connect(ws)
     try:

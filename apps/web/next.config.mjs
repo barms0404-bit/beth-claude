@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -8,4 +10,10 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wraps the config; no SENTRY_AUTH_TOKEN => source-map upload is skipped
+// silently and the runtime SDK no-ops when NEXT_PUBLIC_SENTRY_DSN is unset.
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+});

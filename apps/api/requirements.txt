@@ -13,3 +13,6 @@ kaleido==0.2.1            # static PNG export for Plotly charts
 python-dotenv==1.0.1
 tenacity==9.0.0           # retry/backoff for external API calls
 websockets==13.1          # Polygon real-time stream client
+sentry-sdk[fastapi]==2.18.0   # error tracking
+slowapi==0.1.9            # rate limiting middleware
+pyjwt[crypto]==2.10.1     # Supabase Auth JWT verification
