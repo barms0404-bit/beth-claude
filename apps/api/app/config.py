@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     # Polygon.io
     polygon_api_key: str = ""
+    polygon_ws_url: str = "wss://socket.polygon.io/stocks"
 
     # Supabase (service-role key — backend only)
     supabase_url: str = ""

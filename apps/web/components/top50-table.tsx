@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useTop50 } from "@/lib/use-top50-socket";
+import { useLivePrices } from "@/lib/use-live-prices";
 import type { Top50Entry, Top50Snapshot } from "@/lib/api";
 import {
   Table,
@@ -63,6 +64,7 @@ function RankDelta({ entry }: { entry: Top50Entry }) {
 /** Row 2 — live, sortable Top 50 from the recommendation engine. */
 export function Top50Table({ initial }: { initial: Top50Snapshot }) {
   const snapshot = useTop50(initial);
+  const livePrices = useLivePrices();
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [asc, setAsc] = useState(true);
 
@@ -153,7 +155,15 @@ export function Top50Table({ initial }: { initial: Top50Snapshot }) {
               </Link>
             </TableCell>
             <TableCell className="max-w-[200px] truncate">{e.company_name}</TableCell>
-            <TableCell className="text-right tabular-nums">{formatUsd(e.price)}</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {livePrices[e.ticker] !== undefined && (
+                <span
+                  className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-success align-middle"
+                  title="Live tick"
+                />
+              )}
+              {formatUsd(livePrices[e.ticker] ?? e.price)}
+            </TableCell>
             <TableCell className={cn("text-right tabular-nums", changeTone(e.day_change_pct))}>
               {formatPct(e.day_change_pct)}
             </TableCell>

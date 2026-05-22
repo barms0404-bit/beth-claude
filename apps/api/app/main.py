@@ -37,6 +37,8 @@ from app.schemas import (
 )
 from app.services import market_data
 from app.services.email_send import archive_root, list_archive, send_report
+from app.services.polygon_ws import PolygonStream
+from app.services.price_relay import PriceRelay
 
 logging.basicConfig(level=logging.INFO)
 
@@ -69,15 +71,48 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+price_relay = PriceRelay()
+
+
+async def _on_polygon_trade(msg: dict) -> None:
+    """Forward one Polygon trade tick to every connected /ws/prices client."""
+    sym = msg.get("sym")
+    price = market_data.round2(msg.get("p"))
+    if sym and price is not None:
+        await price_relay.broadcast(str(sym).upper(), price, msg.get("t"))
+
+
+polygon_ws: PolygonStream | None = (
+    PolygonStream(
+        url=settings.polygon_ws_url,
+        api_key=settings.polygon_api_key,
+        on_trade=_on_polygon_trade,
+    )
+    if settings.polygon_api_key
+    else None
+)
+
+
+async def _handle_top50_update(snapshot: Top50Snapshot) -> None:
+    """Engine.on_update — fan out to /ws/top-50 clients AND retune Polygon subs."""
+    await manager.broadcast(snapshot)
+    if polygon_ws is not None:
+        try:
+            await polygon_ws.set_subscriptions(e.ticker for e in snapshot.entries)
+        except Exception as exc:
+            logging.getLogger("main").warning("polygon_ws resubscribe failed: %s", exc)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Push every engine re-rank to connected WebSocket clients.
-    engine.on_update = manager.broadcast
+    engine.on_update = _handle_top50_update
+    if polygon_ws is not None:
+        polygon_ws.start()
     start_scheduler()
     yield
     stop_scheduler()
+    if polygon_ws is not None:
+        await polygon_ws.stop()
 
 
 app = FastAPI(
@@ -198,6 +233,19 @@ async def refresh_top_50() -> Top50Snapshot:
     if not settings.has_anthropic:
         raise HTTPException(503, "ANTHROPIC_API_KEY not configured — see apps/api/.env.example")
     return await beth.refresh_top50()
+
+
+@app.websocket("/ws/prices")
+async def ws_prices(ws: WebSocket) -> None:
+    """Live Polygon trade ticks for the current Top 50 subscription set."""
+    await price_relay.connect(ws)
+    try:
+        while True:
+            await ws.receive_text()  # client keep-alive pings; payload ignored
+    except WebSocketDisconnect:
+        price_relay.disconnect(ws)
+    except Exception:
+        price_relay.disconnect(ws)
 
 
 @app.websocket("/ws/top-50")
