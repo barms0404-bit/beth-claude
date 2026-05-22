@@ -13,7 +13,7 @@ on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
 
--- --- 15 specialist analysts (key, name, persona) -------------------------
+-- --- 16 specialist analysts (key, name, persona) -------------------------
 insert into agents (key, name, persona, kind, role, sort_order) values
   ('morning_packet',     'Morning Packet Analyst',                'Eleanor Hayes',   'specialist',
    'Overnight wrap, pre-market movers, earnings recap.', 1),
@@ -43,8 +43,10 @@ insert into agents (key, name, persona, kind, role, sort_order) values
    'Rates, the Fed, factor rotation.', 13),
   ('quant',              'Quantitative Analyst',                  'Anika Sharma',    'specialist',
    'Factor exposure, screens, momentum.', 14),
+  ('dividend_aristocrat','Dividend Aristocrat & Income Specialist','Margaret Holloway','specialist',
+   'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 15),
   ('alt_data',           'Alt Data Specialist',                   'Kevin Park',      'specialist',
-   'Web traffic, app downloads, credit-card panels.', 15)
+   'Web traffic, app downloads, credit-card panels.', 16)
 on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;

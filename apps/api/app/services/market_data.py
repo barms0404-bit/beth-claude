@@ -243,6 +243,35 @@ async def get_history(symbol: str, days: int = 120) -> list[dict]:
 
 
 @async_ttl_cache(ttl_open=21600, ttl_closed=43200)
+async def get_dividends(symbol: str, limit: int = 24) -> list[dict]:
+    """Polygon dividend history for a ticker — used by the dividend specialist.
+
+    Returns up to `limit` records with: ex_dividend_date, cash_amount, frequency,
+    declaration_date, pay_date. Cached 6-12h (dividend schedules change rarely).
+    """
+    settings = get_settings()
+    if not settings.polygon_api_key:
+        return []
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            resp = await _http_get(
+                client,
+                f"{_BASE}/v3/reference/dividends",
+                params={
+                    "ticker": symbol.upper(),
+                    "limit": limit,
+                    "order": "desc",
+                    "sort": "ex_dividend_date",
+                    "apiKey": settings.polygon_api_key,
+                },
+            )
+            return resp.json().get("results", []) or []
+        except httpx.HTTPError as exc:
+            logger.warning("dividends %s failed: %s", symbol, exc)
+            return []
+
+
+@async_ttl_cache(ttl_open=21600, ttl_closed=43200)
 async def get_year_open_close(symbol: str) -> float | None:
     """The first trading-day close of the current calendar year. Drives YTD%."""
     settings = get_settings()
