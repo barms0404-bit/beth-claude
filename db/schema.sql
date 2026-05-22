@@ -20,8 +20,9 @@ exception when duplicate_object then null; end $$;
 -- agents — BETH, the 15 specialists, and the chart sub-agent
 -- ---------------------------------------------------------------------------
 create table if not exists agents (
-  key           text primary key,                 -- e.g. 'beth', 'morning_packet'
-  name          text not null,
+  key           text primary key,                 -- stable machine ID, e.g. 'morning_packet'
+  name          text not null,                    -- functional title
+  persona       text,                             -- human analyst name (the byline)
   kind          agent_kind not null,
   role          text not null,                    -- one-line mandate
   model         text not null default 'claude-sonnet-4-6',

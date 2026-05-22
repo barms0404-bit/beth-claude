@@ -56,7 +56,12 @@ async def health() -> dict:
 @app.get("/api/agents")
 async def list_agents() -> list[dict]:
     return [
-        {"key": s.key, "name": s.name, "leadSlot": s.lead_slot.value if s.lead_slot else None}
+        {
+            "key": s.key,
+            "persona": s.persona,
+            "title": s.name,
+            "leadSlot": s.lead_slot.value if s.lead_slot else None,
+        }
         for s in SPECIALISTS.values()
     ]
 
@@ -100,17 +105,29 @@ async def ticker_detail(symbol: str) -> TickerDetail:
     symbol = symbol.upper()
     notes: list[SpecialistNote] = []
     for report in _LATEST.values():
-        for rec in report.recommendations:
-            if rec.symbol == symbol:
-                notes.append(
-                    SpecialistNote(
-                        agentKey=rec.leadSpecialist,
-                        agentName=SPECIALISTS.get(rec.leadSpecialist).name
-                        if rec.leadSpecialist in SPECIALISTS
-                        else rec.leadSpecialist,
-                        commentary=rec.thesis,
+        for sr in report.specialist_reports:
+            for cn in sr.covered_names_commentary:
+                if cn.ticker.upper() == symbol:
+                    notes.append(
+                        SpecialistNote(
+                            agentKey=sr.agent_key,
+                            agentName=sr.specialist,
+                            commentary=f"[{cn.action}] {cn.narrative}",
+                        )
                     )
-                )
+            for idea in sr.new_ideas:
+                if idea.ticker.upper() == symbol:
+                    notes.append(
+                        SpecialistNote(
+                            agentKey=sr.agent_key,
+                            agentName=sr.specialist,
+                            commentary=(
+                                f"[New idea · conviction {idea.conviction_1_10}/10 · "
+                                f"{idea.time_horizon}] {idea.thesis} "
+                                f"Key risk: {idea.key_risk}"
+                            ),
+                        )
+                    )
 
     quote = await market_data.get_quote(symbol)
     return TickerDetail(

@@ -1,6 +1,8 @@
 """Pydantic models — API contracts and inter-agent payloads.
 
-The API-facing models mirror apps/web/lib/api.ts; keep the two in sync.
+Two model families live here:
+  - Inter-agent payloads — the canonical specialist contract (see docs/AGENTS.md).
+  - API-facing models — mirror apps/web/lib/api.ts; keep the two in sync.
 """
 
 from __future__ import annotations
@@ -15,57 +17,64 @@ from pydantic import BaseModel, Field
 # Enums
 # --------------------------------------------------------------------------
 class ReportSlot(str, Enum):
-    market_prep = "market_prep"   # 7:30 AM
-    mid_day = "mid_day"           # 11:00 AM
-    market_close = "market_close" # 1:30 PM
-
-
-class Stance(str, Enum):
-    bullish = "bullish"
-    neutral = "neutral"
-    bearish = "bearish"
+    market_prep = "market_prep"   # 7:30 AM AZ
+    mid_day = "mid_day"           # 11:00 AM AZ
+    market_close = "market_close" # 1:30 PM AZ
 
 
 # --------------------------------------------------------------------------
-# Inter-agent payloads — what a specialist returns to BETH
+# Inter-agent payloads — the canonical specialist contract
 # --------------------------------------------------------------------------
-class RecommendationDraft(BaseModel):
-    """A single name a specialist wants on the Top 50."""
+class CoveredName(BaseModel):
+    """Commentary on a name already in the specialist's coverage universe."""
 
-    symbol: str
+    ticker: str
+    move_pct: float | None = None
+    narrative: str
+    action: str = Field(description="hold | add | trim | buy | sell | watch")
+
+
+class NewIdea(BaseModel):
+    """A name the specialist is surfacing for the Top 50."""
+
+    ticker: str
     thesis: str
-    conviction: Stance = Stance.bullish
-    score: float = Field(ge=0, le=100, description="Specialist conviction, 0-100.")
+    conviction_1_10: int = Field(ge=1, le=10)
+    time_horizon: str = Field(description="e.g. '2-6 weeks', '6-12 months'")
+    key_risk: str
 
 
 class ChartRequest(BaseModel):
-    """A specialist asks the Chart Specialist for a visual."""
+    """A specialist asks the Chart Specialist sub-agent for one visual."""
 
-    symbol: str | None = None
-    title: str
-    intent: str = Field(description="What the chart should show and why it matters.")
+    chart_type: str
+    data_needed: str
+    why_this_chart: str
 
 
-class SpecialistOutput(BaseModel):
-    """Structured result of one specialist run."""
+class SpecialistReport(BaseModel):
+    """Structured result of one specialist run — the canonical contract Beth expects."""
 
-    agent_key: str
-    headline: str
-    commentary: str
-    recommendations: list[RecommendationDraft] = []
-    chart_requests: list[ChartRequest] = []
-    stance: Stance = Stance.neutral
+    specialist: str            # human persona name, e.g. "Marcus Webb"
+    agent_key: str             # stable registry key, e.g. "midday_tactical"
+    timestamp: datetime
+    key_takeaway: str
+    covered_names_commentary: list[CoveredName] = []
+    new_ideas: list[NewIdea] = []
+    chart_request: ChartRequest | None = None
+    risk_flags: list[str] = []
+    compliance_notes: list[str] = []
 
 
 class ChartSpec(BaseModel):
-    """Chart Specialist output — renderable spec + explainer + optional PNG."""
+    """Chart Specialist output — interactive + email-export specs plus explainer."""
 
     title: str
-    library: str = "plotly"            # 'plotly' | 'recharts'
-    spec_json: dict = {}
-    explanation: str
+    chart_explanation: str             # 2-3 paragraphs: why it matters / how to read it
+    recharts_spec: dict = {}           # interactive web version
+    plotly_spec: dict = {}             # HD PNG export for email reports
     png_url: str | None = None
-    symbol: str | None = None
+    requested_by: str                  # persona name of the requesting specialist
     agent_key: str
 
 
@@ -80,7 +89,7 @@ class Recommendation(BaseModel):
     dailyPct: float | None = None
     ytdPct: float | None = None
     thesis: str
-    leadSpecialist: str
+    leadSpecialist: str                # human persona name
 
 
 class SpecialistNote(BaseModel):
@@ -112,12 +121,13 @@ class GenerateReportRequest(BaseModel):
 
 
 class Report(BaseModel):
-    """BETH's aggregated output for one research window."""
+    """Beth's aggregated output for one research window."""
 
     slot: ReportSlot
     title: str
     summary: str
     recommendations: list[Recommendation] = []
     charts: list[ChartSpec] = []
+    specialist_reports: list[SpecialistReport] = []  # raw filings, retained for drill-down
     disclaimer: str
     generated_at: datetime
