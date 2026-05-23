@@ -65,6 +65,11 @@ class Settings(BaseSettings):
     # (requires tool-use in the specialist pipeline, not yet wired).
     citation_strict_mode: bool = False
 
+    # Temporal discipline — both the specialist's mental ruler (prompt) and the
+    # Validator's actual rejection threshold for market-hours data freshness.
+    stale_threshold_minutes: int = 5
+    coverage_gap_days: int = 7
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

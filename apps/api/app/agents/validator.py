@@ -48,8 +48,9 @@ THRESHOLDS: dict[DataKind, float] = {
     DataKind.economic_data: 0.0,      # exact
 }
 
-STALE_OPEN = 300        # 5 min during NYSE hours
-STALE_CLOSED = 3600     # 1 hr off-hours
+STALE_CLOSED = 3600     # 1 hr off-hours (the slow side; market-hours threshold
+                        # is settings.stale_threshold_minutes * 60 — kept in sync
+                        # with the specialist prompt's temporal-discipline ruler).
 SINGLE_SOURCE_CONFIDENCE = 0.3
 
 
@@ -140,7 +141,10 @@ class Validator:
         self, field: str, kind: DataKind, readings: list[SourceReading]
     ) -> VerifiedDataPoint:
         threshold = THRESHOLDS[kind]
-        stale_max = STALE_OPEN if market_open() else STALE_CLOSED
+        from app.config import get_settings
+
+        stale_open = get_settings().stale_threshold_minutes * 60
+        stale_max = stale_open if market_open() else STALE_CLOSED
         now = datetime.now(timezone.utc)
 
         # Drop stale readings (None age_seconds is treated as fresh).

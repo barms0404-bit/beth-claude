@@ -120,6 +120,31 @@ CITATION DISCIPLINE (transitional — tool-use not yet wired):
 """
 
 
+# ---------------------------------------------------------------------------
+# Temporal discipline — substituted at prompt-build time with the current
+# America/Phoenix date and the configured thresholds.
+# ---------------------------------------------------------------------------
+TEMPORAL_DISCIPLINE_TEMPLATE = """\
+TEMPORAL DISCIPLINE
+Today is {current_date} (America/Phoenix). Operate from this date forward.
+- For any tool-call result older than {threshold_minutes} minutes during NYSE
+  regular hours, refresh before citing. If you cannot refresh, mark the data
+  "[stale - last observed <timestamp>]" rather than treat it as live.
+- Earnings: cite the most recent reported quarter explicitly (e.g. "Q1 2026
+  print, reported <date>"), never "recent" without a date. When analyzing a
+  trend, name the quarters covered.
+- Guidance: every guidance reference must include the date the company issued
+  it. Format: "guidance issued <YYYY-MM-DD>".
+- Analyst estimates / price targets: include "as of <YYYY-MM-DD>" or the
+  publishing broker's most recent note date.
+- The words "recent" / "lately" / "newly" without a stated date range are
+  forbidden — state the window in days, weeks, or to-a-named-date.
+- If you cannot find data for a covered name within the past {coverage_gap_days}
+  days, surface it in risk_flags as
+  "[coverage gap - no observation on <TICKER> in past {coverage_gap_days}d]".
+"""
+
+
 @dataclass
 class Specialist:
     """A single domain analyst in the fleet."""
@@ -135,13 +160,22 @@ class Specialist:
 
     @property
     def system_prompt(self) -> str:
-        # Lazy import — avoids a circular dep at module load.
+        # Lazy imports — avoid a circular dep at module load.
+        from zoneinfo import ZoneInfo
+
         from app.config import get_settings
 
+        settings = get_settings()
         citation_block = (
             CITATION_REQUIREMENTS_STRICT
-            if get_settings().citation_strict_mode
+            if settings.citation_strict_mode
             else CITATION_REQUIREMENTS_PERMISSIVE
+        )
+        today_az = datetime.now(ZoneInfo("America/Phoenix")).date().isoformat()
+        temporal_block = TEMPORAL_DISCIPLINE_TEMPLATE.format(
+            current_date=today_az,
+            threshold_minutes=settings.stale_threshold_minutes,
+            coverage_gap_days=settings.coverage_gap_days,
         )
         return (
             f"{FIRM_PREAMBLE}\n"
@@ -152,6 +186,7 @@ class Specialist:
             f"--- YOUR MANDATE ---\n{self.mandate}\n\n"
             f"{DAILY_RESPONSIBILITIES}\n"
             f"{citation_block}\n"
+            f"{temporal_block}\n"
             f"{OUTPUT_CONTRACT}\n"
             f"{VOICE}"
         )
@@ -173,7 +208,12 @@ class Specialist:
 
 def build_context(*, slot: ReportSlot, market_brief: str, focus: str = "") -> str:
     """Assemble the user-message context block handed to a specialist."""
+    from zoneinfo import ZoneInfo
+
+    now_az = datetime.now(ZoneInfo("America/Phoenix"))
     payload = {
+        "today": now_az.date().isoformat(),
+        "now_az": now_az.strftime("%Y-%m-%d %H:%M:%S %Z"),
         "report_slot": slot.value,
         "market_brief": market_brief,
         "focus": focus or "Cover your universe broadly for this window.",
