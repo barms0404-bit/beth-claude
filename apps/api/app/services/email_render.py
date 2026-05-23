@@ -171,6 +171,90 @@ def _rates_setup_section(report: Report) -> str:
     return _section("Rates & Cross-Asset Setup", _specialist_report_html(sr))
 
 
+def _red_team_section(report: Report) -> str:
+    """Adversarial critique per high-conviction Top 50 pick."""
+    critiques = report.red_team_critiques
+    if not critiques:
+        return ""
+
+    blocks: list[str] = []
+    for c in critiques:
+        bear_strong = c.bear_stronger_than_bull
+        badge_class = "danger" if bear_strong else "gold-muted"
+        badge_label = "BEAR > BULL" if bear_strong else f"conviction {c.conviction:.1f}/10"
+        badge_color = DANGER if bear_strong else GOLD_MUTED
+
+        bias_chips = " ".join(
+            f"""<span style="display:inline-block;margin:1px 4px 1px 0;padding:2px 6px;background:{CARD_BORDER};color:{GOLD_MUTED};border-radius:3px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">{_esc(b)}</span>"""
+            for b in c.cognitive_biases[:6]
+        ) or f"""<span style="color:{GOLD_MUTED};font-size:11px;">none flagged</span>"""
+
+        err_chips = " ".join(
+            f"""<span style="display:inline-block;margin:1px 4px 1px 0;padding:2px 6px;background:{CARD_BORDER};color:{GOLD_MUTED};border-radius:3px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">{_esc(e)}</span>"""
+            for e in c.logical_errors[:6]
+        ) or f"""<span style="color:{GOLD_MUTED};font-size:11px;">none flagged</span>"""
+
+        assumption_rows = "".join(
+            f"""<tr>
+              <td style="padding:3px 8px 3px 0;color:{CREAM};vertical-align:top;">{_esc(a.assumption)}</td>
+              <td style="padding:3px 0;color:{DANGER if a.fragility >= 7 else (GOLD if a.fragility >= 4 else GOLD_MUTED)};vertical-align:top;white-space:nowrap;font-weight:600;">{a.fragility}/10</td>
+            </tr>"""
+            for a in c.assumptions[:6]
+        ) or f"""<tr><td style="padding:3px 0;color:{GOLD_MUTED};font-size:11px;">none surfaced</td></tr>"""
+
+        blocks.append(
+            f"""
+<div style="margin:16px 0;padding:14px;border:1px solid {DANGER if bear_strong else CARD_BORDER};border-radius:6px;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:Inter,Arial,sans-serif;">
+    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};">{_esc(c.ticker)}</span>
+    <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.18em;color:{badge_color};">{_esc(badge_label)}</span>
+  </div>
+  <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:{GOLD_MUTED};margin-bottom:10px;">Lead: {_esc(c.lead_specialist)}</div>
+
+  <div style="margin-bottom:10px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">Steelman bear</span><br/>
+    {_esc(c.steelman_bear)}
+  </div>
+
+  <div style="margin-bottom:10px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">Consensus is pricing</span><br/>
+    {_esc(c.consensus_pricing)}
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};margin-bottom:4px;">Cognitive biases</div>
+    {bias_chips}
+  </div>
+  <div style="margin-bottom:10px;">
+    <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};margin-bottom:4px;">Logical errors</div>
+    {err_chips}
+  </div>
+
+  <div style="margin-bottom:10px;">
+    <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};margin-bottom:4px;">Assumptions (fragility)</div>
+    <table style="width:100%;font-family:Inter,Arial,sans-serif;font-size:12px;border-collapse:collapse;">{assumption_rows}</table>
+  </div>
+
+  <div style="margin-bottom:10px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">Position sizing · drawdown · symmetry</span><br/>
+    {_esc(c.position_sizing_view)}{" · " if c.position_sizing_view and c.max_drawdown_estimate else ""}{_esc(c.max_drawdown_estimate)}
+    {f' · <span style="color:{GOLD if c.risk_reward_symmetry == "asymmetric" else DANGER};text-transform:uppercase;font-size:11px;">{_esc(c.risk_reward_symmetry)}</span>' if c.risk_reward_symmetry else ""}
+  </div>
+
+  <div style="margin-bottom:8px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{DANGER};">Kill shot</span><br/>
+    {_esc(c.kill_shot)}
+  </div>
+
+  <div style="margin-top:8px;padding-top:8px;border-top:1px solid {CARD_BORDER};font-family:Inter,Arial,sans-serif;font-size:13px;color:{GOLD};font-weight:600;">
+    {_esc(c.overall_verdict)}
+  </div>
+</div>"""
+        )
+
+    return _section("Red Team Review", "".join(blocks))
+
+
 def _bear_case_section(report: Report) -> str:
     """Contrarian-check rule: dedicated Value Investor bear case when triggered."""
     bca = report.bear_case_addendum
@@ -397,6 +481,10 @@ def render_report_email(
     bear_html = _bear_case_section(report)
     if bear_html:
         parts.append(bear_html)
+
+    red_team_html = _red_team_section(report)
+    if red_team_html:
+        parts.append(red_team_html)
 
     parts.append(_top50_changes(snapshot, dividend_lookup))
 

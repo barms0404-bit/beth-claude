@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
 from app.agents.citation_enforcer import enforcer as citation_enforcer
+from app.agents.red_team import red_team
 from app.agents.registry import SPECIALISTS, roster_for
 from app.agents.verifier import verify_high_conviction
 from app.engine.top50 import engine
@@ -28,6 +29,7 @@ from app.schemas import (
     CitationReport,
     Recommendation,
     RecommendationVerification,
+    RedTeamCritique,
     Report,
     ReportSlot,
     SpecialistReport,
@@ -155,7 +157,13 @@ class Beth:
         macro_event = macro_event_today()
         lead_key = "fixed_income" if macro_event else None
 
-        title, summary = await self._synthesize(slot, outputs)
+        # Red Team attacks the top conviction picks in parallel with the
+        # synthesis turn — independent inputs (synthesize reads `outputs`,
+        # Red Team reads the snapshot's ranked entries).
+        (title, summary), red_team_critiques = await asyncio.gather(
+            self._synthesize(slot, outputs),
+            red_team.attack(snapshot),
+        )
 
         return Report(
             slot=slot,
@@ -166,6 +174,7 @@ class Beth:
             specialist_reports=outputs,
             verifications=verifications,
             citation_reports=citation_reports,
+            red_team_critiques=red_team_critiques,
             lead_specialist_key=lead_key,
             bear_case_addendum=bear_case,
             macro_event=macro_event,

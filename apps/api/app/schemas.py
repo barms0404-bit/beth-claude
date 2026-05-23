@@ -330,6 +330,37 @@ class CitationReport(BaseModel):
     verified_at: datetime
 
 
+# --------------------------------------------------------------------------
+# Red Team Agent — adversarial critique of top recommendations
+# --------------------------------------------------------------------------
+class AssumptionCheck(BaseModel):
+    """One assumption underlying a recommendation, scored for fragility."""
+
+    assumption: str
+    fragility: int = Field(ge=1, le=10)   # 1 = rock solid, 10 = most likely to break
+    rationale: str = ""
+
+
+class RedTeamCritique(BaseModel):
+    """Adversarial critique of one Top 50 entry. Beth integrates into the report."""
+
+    ticker: str
+    lead_specialist: str
+    conviction: float                       # the entry's conviction_avg
+    steelman_bear: str                      # strongest argument against
+    consensus_pricing: str                  # what's already priced in
+    cognitive_biases: list[str] = []        # recency / confirmation / narrative / anchoring / survivorship
+    logical_errors: list[str] = []          # correlation/causation, selection, time-period gaming, apples/oranges
+    assumptions: list[AssumptionCheck] = []
+    position_sizing_view: str = ""          # is the implied size justified?
+    max_drawdown_estimate: str = ""         # downside if thesis breaks
+    risk_reward_symmetry: str = ""          # "asymmetric" | "symmetric"
+    kill_shot: str = ""                     # the one piece of evidence that would prove it wrong
+    bear_stronger_than_bull: bool = False   # the explicit override flag
+    overall_verdict: str = ""               # one-line takeaway
+    critiqued_at: datetime
+
+
 class RecommendationVerification(BaseModel):
     """One high-conviction `new_idea` after PSV. Keyed by (agent_key, ticker)."""
 
@@ -366,6 +397,7 @@ class Report(BaseModel):
     specialist_reports: list[SpecialistReport] = []  # raw filings, retained for drill-down
     verifications: list["RecommendationVerification"] = []  # PSV results, conviction>=8 only
     citation_reports: list[CitationReport] = []     # breadth-sweep citation enforcement
+    red_team_critiques: list[RedTeamCritique] = []  # adversarial review of top conviction picks
     lead_specialist_key: str | None = None          # e.g. 'fixed_income' on FOMC/CPI/NFP
     bear_case_addendum: SpecialistReport | None = None  # focused contrarian pass by value_investor
     macro_event: str | None = None                  # 'FOMC' | 'CPI' | 'NFP' | None
