@@ -53,6 +53,13 @@ class Settings(BaseSettings):
     # Public REST rate limit (slowapi). e.g. "60/minute".
     rate_limit_default: str = "60/minute"
 
+    # Macro event calendar — comma-separated YYYY-MM-DD lists, ET-local dates.
+    # Beth's orchestration rule: on FOMC / CPI / NFP days, Fixed Income leads
+    # the report. NFP is detected algorithmically (first Friday); these two
+    # need annual updates from Brian.
+    fomc_dates: str = ""
+    cpi_dates: str = ""
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

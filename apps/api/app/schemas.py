@@ -274,5 +274,8 @@ class Report(BaseModel):
     charts: list[ChartSpec] = []
     specialist_reports: list[SpecialistReport] = []  # raw filings, retained for drill-down
     verifications: list["RecommendationVerification"] = []  # PSV results, conviction>=8 only
+    lead_specialist_key: str | None = None          # e.g. 'fixed_income' on FOMC/CPI/NFP
+    bear_case_addendum: SpecialistReport | None = None  # focused contrarian pass by value_investor
+    macro_event: str | None = None                  # 'FOMC' | 'CPI' | 'NFP' | None
     disclaimer: str
     generated_at: datetime

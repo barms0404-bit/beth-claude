@@ -115,7 +115,78 @@ def _executive_summary(report: Report) -> str:
     )
 
 
-def _top50_changes(snapshot: Top50Snapshot | None) -> str:
+# --- Beth-orchestration-rule helpers --------------------------------------
+def _find_specialist(report: Report, agent_key: str) -> SpecialistReport | None:
+    for sr in report.specialist_reports:
+        if sr.agent_key == agent_key:
+            return sr
+    return None
+
+
+def _dividend_lookup(report: Report) -> dict[str, str]:
+    """Per-ticker dividend snippet from Margaret Holloway's filing.
+
+    Holloway's mandate puts yield + safety + payout INTO her narrative text;
+    we surface that narrative as-is on Top 50 changes (Beth's overlay rule).
+    """
+    sr = _find_specialist(report, "dividend_aristocrat")
+    if sr is None:
+        return {}
+    lookup: dict[str, str] = {}
+    for cn in sr.covered_names_commentary:
+        if cn.ticker:
+            lookup[cn.ticker.upper()] = cn.narrative
+    for idea in sr.new_ideas:
+        if idea.ticker and idea.ticker.upper() not in lookup:
+            lookup[idea.ticker.upper()] = (
+                f"Conviction {idea.conviction_1_10}/10 · {idea.thesis}"
+            )
+    return lookup
+
+
+def _lead_specialist_section(report: Report) -> str:
+    """Macro-day rule: Fixed Income (or whichever key is set) leads the report."""
+    if not report.lead_specialist_key:
+        return ""
+    sr = _find_specialist(report, report.lead_specialist_key)
+    if sr is None:
+        return ""
+    badge_label = f"Lead — {report.macro_event}" if report.macro_event else "Lead Specialist"
+    return _section(badge_label, _specialist_report_html(sr))
+
+
+def _rates_setup_section(report: Report) -> str:
+    """Morning rule: always surface Fixed Income's rates snapshot + equity read.
+
+    Skipped when Fixed Income is already the macro-day lead (no duplication).
+    Midday and close reports rely on the default Specialist Filings block.
+    """
+    if report.lead_specialist_key == "fixed_income":
+        return ""
+    if report.slot != ReportSlot.market_prep and not report.macro_event:
+        return ""
+    sr = _find_specialist(report, "fixed_income")
+    if sr is None:
+        return ""
+    return _section("Rates & Cross-Asset Setup", _specialist_report_html(sr))
+
+
+def _bear_case_section(report: Report) -> str:
+    """Contrarian-check rule: dedicated Value Investor bear case when triggered."""
+    bca = report.bear_case_addendum
+    if bca is None:
+        return ""
+    badge = (
+        f"""<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;"""
+        f"""color:{GOLD_MUTED};margin-bottom:8px;">Contrarian Check — Value Investor</div>"""
+    )
+    return _section("Bear Case Addendum", badge + _specialist_report_html(bca))
+
+
+def _top50_changes(
+    snapshot: Top50Snapshot | None,
+    dividend_lookup: dict[str, str] | None = None,
+) -> str:
     if snapshot is None or not snapshot.entries:
         body = f"""<div style="color:{GOLD_MUTED};font-family:Inter,Arial,sans-serif;font-size:13px;">No prior snapshot available yet.</div>"""
         return _section("Top 50 — Changes", body)
@@ -148,6 +219,28 @@ def _top50_changes(snapshot: Top50Snapshot | None) -> str:
         parts.append(
             f"""<table style="width:100%;font-family:Inter,Arial,sans-serif;font-size:13px;border-collapse:collapse;">{''.join(rows)}</table>"""
         )
+    # Dividend overlay — Holloway's coverage cross-referenced with the Top 50.
+    if dividend_lookup:
+        relevant: list[tuple[str, str]] = []
+        for entry in snapshot.entries:
+            key = entry.ticker.upper()
+            if key in dividend_lookup:
+                relevant.append((entry.ticker, dividend_lookup[key]))
+        if relevant:
+            rows = "".join(
+                f"""<tr>
+                  <td style="padding:4px 10px 4px 0;color:{GOLD};font-weight:600;width:64px;vertical-align:top;">{_esc(t)}</td>
+                  <td style="padding:4px 0;color:{CREAM};line-height:1.5;">{_esc(n)}</td>
+                </tr>"""
+                for t, n in relevant[:12]
+            )
+            parts.append(
+                f"""<div style="margin-top:14px;">
+                  <div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:{GOLD_MUTED};margin-bottom:6px;">Holloway — Income Coverage</div>
+                  <table style="width:100%;font-family:Inter,Arial,sans-serif;font-size:12px;border-collapse:collapse;">{rows}</table>
+                </div>"""
+            )
+
     if not parts:
         parts.append(
             f"""<div style="color:{GOLD_MUTED};font-family:Inter,Arial,sans-serif;font-size:13px;">No rank changes since the last snapshot.</div>"""
@@ -277,16 +370,56 @@ def render_report_email(
     snapshot: Top50Snapshot | None,
     png_data: dict[int, bytes],
 ) -> str:
-    """Build the complete HTML email body."""
-    parts = [
-        _header(report),
-        _executive_summary(report),
-        _top50_changes(snapshot),
+    """Build the complete HTML email body, honoring Beth's orchestration rules.
+
+    Section order:
+      header
+      lead specialist (macro days: Fixed Income above the exec summary)
+      executive summary
+      bear case addendum (when triggered by the contrarian rule)
+      top 50 changes (with Holloway income overlay)
+      rates & cross-asset setup (morning reports — Fixed Income dedicated)
+      slot lead specialist
+      other specialist filings (already-rendered specialists excluded)
+      charts
+      today's catalysts (morning only)
+      footer
+    """
+    dividend_lookup = _dividend_lookup(report)
+    parts: list[str] = [_header(report)]
+
+    lead_html = _lead_specialist_section(report)
+    if lead_html:
+        parts.append(lead_html)
+
+    parts.append(_executive_summary(report))
+
+    bear_html = _bear_case_section(report)
+    if bear_html:
+        parts.append(bear_html)
+
+    parts.append(_top50_changes(snapshot, dividend_lookup))
+
+    rates_html = _rates_setup_section(report)
+    if rates_html:
+        parts.append(rates_html)
+
+    # Don't render the same specialist twice — track what we already shipped.
+    rendered_keys: set[str] = set()
+    if report.lead_specialist_key:
+        rendered_keys.add(report.lead_specialist_key)
+    if rates_html:
+        rendered_keys.add("fixed_income")
+
+    slot_lead_keys = {"morning_packet", "midday_tactical", "market_close"}
+    leads = [
+        sr for sr in report.specialist_reports
+        if sr.agent_key in slot_lead_keys and sr.agent_key not in rendered_keys
     ]
-    # Slot-lead specialist gets a dedicated block; the rest stack underneath.
-    lead_keys = {"morning_packet", "midday_tactical", "market_close"}
-    leads = [sr for sr in report.specialist_reports if sr.agent_key in lead_keys]
-    others = [sr for sr in report.specialist_reports if sr.agent_key not in lead_keys]
+    others = [
+        sr for sr in report.specialist_reports
+        if sr.agent_key not in slot_lead_keys and sr.agent_key not in rendered_keys
+    ]
     if leads:
         parts.append(_section("Slot Lead", "".join(_specialist_report_html(sr) for sr in leads)))
     if others:

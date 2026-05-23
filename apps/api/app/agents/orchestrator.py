@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
-from app.agents.registry import roster_for
+from app.agents.registry import SPECIALISTS, roster_for
 from app.agents.verifier import verify_high_conviction
 from app.engine.top50 import engine
 from app.schemas import (
@@ -30,6 +30,24 @@ from app.schemas import (
     SpecialistReport,
     Top50Snapshot,
 )
+from app.services.macro_calendar import macro_event_today
+
+# Specialist keys whose picks count as "growth/thematic" for Beth's
+# orchestration rules (contrarian check, bull-skew detection).
+GROWTH_THEMATIC_KEYS: set[str] = {
+    "ai_datacenter",
+    "training_chip",
+    "inference_stack",
+    "robotics",
+    "quantum",
+    "tech_generalist",
+    "consumer_internet",
+}
+
+# Trigger threshold for the bull-skew rule.
+HIGH_CONVICTION = 8       # Rule 1: any single growth pick >= this fires contrarian.
+BULL_SKEW_FLOOR = 7       # Rule 4: count of growth picks >= this triggers when >= count.
+BULL_SKEW_COUNT = 4
 
 logger = logging.getLogger("beth")
 
@@ -100,17 +118,25 @@ class Beth:
     ) -> Report:
         outputs = await self.dispatch(slot, market_brief=market_brief)
 
-        # Charts and PSV run concurrently — both are LLM-heavy, neither blocks
-        # the other.
-        charts, verifications = await asyncio.gather(
+        # Three LLM-heavy passes run concurrently:
+        #   - render charts requested by specialists
+        #   - PSV verifier on conviction>=8 ideas
+        #   - Beth's "focused contrarian" pass (Value Investor again, if
+        #     growth/thematic team produced high-conviction picks or skewed bullish)
+        charts, verifications, bear_case = await asyncio.gather(
             self._render_charts(outputs),
             self._verify_high_conviction(outputs),
+            self._maybe_focused_contrarian(outputs, slot=slot),
         )
 
         # Feed the Top 50 engine and read the ranking back — single source.
         engine.ingest(outputs)
         snapshot = await engine.rebuild()
         recommendations = self._recommendations_from(snapshot)
+
+        # Macro event-day rule: on FOMC / CPI / NFP days, Fixed Income leads.
+        macro_event = macro_event_today()
+        lead_key = "fixed_income" if macro_event else None
 
         title, summary = await self._synthesize(slot, outputs)
 
@@ -122,6 +148,9 @@ class Beth:
             charts=charts,
             specialist_reports=outputs,
             verifications=verifications,
+            lead_specialist_key=lead_key,
+            bear_case_addendum=bear_case,
+            macro_event=macro_event,
             disclaimer=DISCLAIMER,
             generated_at=datetime.now(timezone.utc),
         )
@@ -153,6 +182,90 @@ class Beth:
             elif isinstance(result, Exception):
                 logger.warning("Verifier batch failed: %s", result)
         return flat
+
+    @staticmethod
+    async def _maybe_focused_contrarian(
+        outputs: list[SpecialistReport], *, slot: ReportSlot
+    ) -> SpecialistReport | None:
+        """Beth's contrarian-check rules:
+
+        - Rule 1: any growth/thematic pick with conviction >= HIGH_CONVICTION (8)
+          triggers a focused bear-case check on that name.
+        - Rule 4: when growth/thematic specialists collectively file >= BULL_SKEW_COUNT
+          picks at conviction >= BULL_SKEW_FLOOR, dispatch a dedicated bear case.
+
+        Both trigger the same downstream action — one extra Value Investor pass
+        with a focused contrarian context. Returns None when neither fires.
+        """
+        growth_picks: list[tuple[str, str, int, str]] = []
+        bull_skew_picks: list[tuple[str, str, int]] = []
+        for sr in outputs:
+            if sr.agent_key not in GROWTH_THEMATIC_KEYS:
+                continue
+            for idea in sr.new_ideas:
+                if idea.conviction_1_10 >= HIGH_CONVICTION:
+                    growth_picks.append(
+                        (sr.specialist, idea.ticker, idea.conviction_1_10, idea.thesis)
+                    )
+                if idea.conviction_1_10 >= BULL_SKEW_FLOOR:
+                    bull_skew_picks.append((sr.specialist, idea.ticker, idea.conviction_1_10))
+
+        bull_skew = len(bull_skew_picks) >= BULL_SKEW_COUNT
+        if not growth_picks and not bull_skew:
+            return None
+
+        spec = SPECIALISTS.get("value_investor")
+        if spec is None:
+            logger.warning("value_investor specialist missing — skipping contrarian pass.")
+            return None
+
+        triggers: list[str] = []
+        if growth_picks:
+            triggers.append(f"{len(growth_picks)} growth/thematic pick(s) at conviction>=8")
+        if bull_skew:
+            triggers.append(
+                f"team consensus skews bullish ({len(bull_skew_picks)} picks at "
+                f"conviction>={BULL_SKEW_FLOOR})"
+            )
+
+        picks_block = "\n".join(
+            f"- {persona}: {ticker} (conviction {conv}/10) — {thesis}"
+            for persona, ticker, conv, thesis in growth_picks[:12]
+        ) or "(no single name at conviction>=8 — the bull-skew rule fired)"
+
+        bull_block = "\n".join(
+            f"- {persona}: {ticker} ({conv}/10)"
+            for persona, ticker, conv in bull_skew_picks[:20]
+        )
+
+        focus = (
+            f"FOCUSED CONTRARIAN CHECK — triggered by: {'; '.join(triggers)}.\n\n"
+            "The growth/thematic side of the team has filed conviction picks that "
+            "require your bear-case rigor BEFORE this report reaches Brian. Do "
+            "NOT repeat your general-pass output. For each high-conviction name "
+            "below, produce the contrarian read: consensus thesis as you read "
+            "it, your counter-view, the valuation risk, the downside scenario, "
+            "and a verdict (defensible | overhyped | trap).\n\n"
+            f"HIGH-CONVICTION GROWTH PICKS (rule 1):\n{picks_block}\n\n"
+            f"FULL BULL-SKEW ROSTER (rule 4):\n{bull_block}\n\n"
+            "Output channels — use these fields in your standard SpecialistReport:\n"
+            "- key_takeaway: one sentence on the most stretched name and your "
+            "  overall verdict on the bullish skew.\n"
+            "- covered_names_commentary: one entry per checked ticker; narrative "
+            "  is your contrarian view + verdict; action is 'avoid' | 'watch' | 'hold'.\n"
+            "- new_ideas: leave empty unless you have a SHORT-side equivalent value "
+            "  setup that pairs with one of these names.\n"
+            "- risk_flags: any name you judge a trap."
+        )
+
+        context = build_context(
+            slot=slot, market_brief=Beth._default_brief(slot), focus=focus
+        )
+        try:
+            return await spec.run(context)
+        except Exception as exc:
+            logger.warning("Focused contrarian pass failed: %s", exc)
+            return None
 
     async def _render_charts(self, outputs: list[SpecialistReport]) -> list[ChartSpec]:
         jobs = [
