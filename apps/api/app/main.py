@@ -43,6 +43,7 @@ from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
 from app.routes import webhooks as webhook_routes
 from app.services import market_data
+from app.services.charts import charts_cache_dir
 from app.services.email_send import archive_root, list_archive, send_report
 from app.services.polygon_ws import PolygonStream
 from app.services.price_relay import PriceRelay
@@ -154,6 +155,8 @@ _LATEST: dict[ReportSlot, Report] = {}
 
 # Mount the archived-report HTMLs at /reports for the dashboard's archive links.
 app.mount("/reports", StaticFiles(directory=str(archive_root())), name="reports")
+# Mount rendered chart PNGs at /charts/{chart_id}.png.
+app.mount("/charts", StaticFiles(directory=str(charts_cache_dir())), name="charts")
 
 
 @app.get("/health")

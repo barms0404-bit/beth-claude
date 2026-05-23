@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { ChartSpec } from "@/lib/api";
+import { apiUrl, type ChartSpec } from "@/lib/api";
 import { AA } from "@/lib/design-tokens";
 
 interface Series {
@@ -35,6 +35,31 @@ function extractSeries(spec: Record<string, unknown>): Series | null {
   return { data: data as Record<string, unknown>[], xKey: xKey ?? keys[0], yKey };
 }
 
+function ExplanationBlock({
+  label,
+  body,
+  accent = false,
+}: {
+  label: string;
+  body: string;
+  accent?: boolean;
+}) {
+  if (!body) return null;
+  return (
+    <div>
+      <div
+        className={
+          "mb-1 text-[0.62rem] uppercase tracking-[0.18em] " +
+          (accent ? "text-gold" : "text-gold-muted")
+        }
+      >
+        {label}
+      </div>
+      <div>{body}</div>
+    </div>
+  );
+}
+
 /** Row 5 — the chart Beth promoted from the latest report. */
 export function ChartOfTheDay({ chart }: { chart: ChartSpec | null }) {
   if (!chart) {
@@ -49,9 +74,16 @@ export function ChartOfTheDay({ chart }: { chart: ChartSpec | null }) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="font-serif text-xl text-gold">{chart.title}</h3>
-        <p className="text-xs text-gold-muted">Promoted from {chart.requested_by}</p>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <h3 className="font-serif text-xl text-gold">{chart.title}</h3>
+          <p className="text-xs text-gold-muted">
+            Promoted from {chart.requested_by} · {chart.chart_type}
+          </p>
+        </div>
+        <span className="text-[0.62rem] uppercase tracking-wider text-gold-muted">
+          {chart.source}
+        </span>
       </div>
 
       {series ? (
@@ -84,14 +116,26 @@ export function ChartOfTheDay({ chart }: { chart: ChartSpec | null }) {
         </ResponsiveContainer>
       ) : (
         <div className="flex h-[200px] items-center justify-center rounded-md border border-dashed border-card-border px-4 text-center text-sm text-gold-muted">
-          This chart spec has no plottable series yet — live rendering arrives with
-          the chart pipeline.
+          No plottable series in this chart spec — the HD PNG render is at the link below.
         </div>
       )}
 
-      <p className="whitespace-pre-line text-sm leading-relaxed text-cream">
-        {chart.chart_explanation}
-      </p>
+      <div className="space-y-3 text-sm leading-relaxed text-cream">
+        <ExplanationBlock label="Why this chart" body={chart.explanation.why_this_chart} />
+        <ExplanationBlock label="How to read it" body={chart.explanation.how_to_read} />
+        <ExplanationBlock label="Key takeaway" body={chart.explanation.key_takeaway} accent />
+      </div>
+
+      {chart.png_url && (
+        <a
+          href={apiUrl(chart.png_url)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gold-muted hover:text-gold hover:underline"
+        >
+          Open HD PNG &rarr;
+        </a>
+      )}
     </div>
   );
 }

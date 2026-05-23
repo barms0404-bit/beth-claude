@@ -207,13 +207,29 @@ def _charts_html(charts, png_data: dict[int, bytes]) -> str:
             if png
             else f"""<div style="padding:16px;background:{CARD};border:1px dashed {CARD_BORDER};color:{GOLD_MUTED};font-family:Inter,Arial,sans-serif;font-size:12px;">Chart render unavailable.</div>"""
         )
+        exp = ch.explanation
+        explanation_html = f"""
+<div style="margin-top:12px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.6;">
+  <div style="margin-bottom:8px;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">Why this chart</span><br/>
+    {_esc(exp.why_this_chart)}
+  </div>
+  <div style="margin-bottom:8px;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">How to read it</span><br/>
+    {_esc(exp.how_to_read)}
+  </div>
+  <div>
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD};">Key takeaway</span><br/>
+    {_esc(exp.key_takeaway)}
+  </div>
+</div>"""
         blocks.append(
             f"""
 <div style="margin:18px 0;">
   <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};margin-bottom:6px;">{_esc(ch.title)}</div>
   <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:{GOLD_MUTED};margin-bottom:10px;">Promoted by {_esc(ch.requested_by)}</div>
   {image}
-  <div style="font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.6;margin-top:10px;">{_esc(ch.chart_explanation)}</div>
+  {explanation_html}
 </div>"""
         )
     return _section("Charts", "".join(blocks))

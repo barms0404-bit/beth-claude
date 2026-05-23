@@ -23,6 +23,7 @@ PUBLIC_PATH_PREFIXES: tuple[str, ...] = (
     "/health",
     "/webhooks",   # signature-verified inside the handler
     "/reports",    # static-mounted archive HTML, non-sensitive
+    "/charts",     # static-mounted chart PNGs, non-sensitive
     "/docs",
     "/openapi.json",
 )

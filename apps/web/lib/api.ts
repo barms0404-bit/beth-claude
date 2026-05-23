@@ -146,14 +146,25 @@ export interface ActivityItem {
   timestamp: string;
 }
 
+export interface ChartExplanation {
+  why_this_chart: string;
+  how_to_read: string;
+  key_takeaway: string;
+}
+
 export interface ChartSpec {
+  chart_id: string;
+  chart_type: string;
   title: string;
-  chart_explanation: string;
   recharts_spec: Record<string, unknown>;
   plotly_spec: Record<string, unknown>;
+  plotly_python_code: string;
+  explanation: ChartExplanation;
   png_url: string | null;
   requested_by: string;
   agent_key: string;
+  source: string;
+  rendered_at: string;
 }
 
 export interface ReportFull {

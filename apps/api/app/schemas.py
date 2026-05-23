@@ -7,6 +7,7 @@ Two model families live here:
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from enum import Enum
 
@@ -66,16 +67,29 @@ class SpecialistReport(BaseModel):
     compliance_notes: list[str] = []
 
 
-class ChartSpec(BaseModel):
-    """Chart Specialist output — interactive + email-export specs plus explainer."""
+class ChartExplanation(BaseModel):
+    """Three-part plain-English caption — required on every ChartSpec."""
 
+    why_this_chart: str        # 1-2 sentences — what investment question it answers
+    how_to_read: str           # 2-3 sentences — axes, key markers, good vs bad
+    key_takeaway: str          # 1 sentence — the actionable insight
+
+
+class ChartSpec(BaseModel):
+    """Chart Specialist output — two render specs + structured explainer + PNG."""
+
+    chart_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    chart_type: str                    # candlestick | line | bar | scatter | heatmap | treemap | sankey | area
     title: str
-    chart_explanation: str             # 2-3 paragraphs: why it matters / how to read it
     recharts_spec: dict = {}           # interactive web version
-    plotly_spec: dict = {}             # HD PNG export for email reports
+    plotly_spec: dict = {}             # what kaleido renders for the email PNG
+    plotly_python_code: str = ""       # documentation — equivalent Python, never exec'd
+    explanation: ChartExplanation
     png_url: str | None = None
-    requested_by: str                  # persona name of the requesting specialist
-    agent_key: str
+    requested_by: str                  # human persona of the requesting analyst (parent)
+    agent_key: str                     # registry key of the requesting analyst
+    source: str = "Polygon.io, AA Research"
+    rendered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 # --------------------------------------------------------------------------

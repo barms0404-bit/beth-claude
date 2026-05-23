@@ -49,9 +49,20 @@ async def send_report(report: Report) -> dict:
     settings = get_settings()
 
     # 1. PNGs for every chart the report carries.
+    #    Prefer the disk-cached render written by the Chart Specialist; fall back
+    #    to live re-render only if the cache file is missing or unreadable.
     png_data: dict[int, bytes] = {}
+    cache_dir = charts_svc.charts_cache_dir()
     for i, ch in enumerate(report.charts):
-        png = charts_svc.plotly_to_png(ch.plotly_spec)
+        png: bytes | None = None
+        cached = cache_dir / f"{ch.chart_id}.png"
+        if cached.exists():
+            try:
+                png = cached.read_bytes()
+            except OSError:
+                png = None
+        if png is None:
+            png = charts_svc.plotly_to_png(ch.plotly_spec)
         if png is not None:
             png_data[i] = png
 
