@@ -32,4 +32,8 @@ EXPOSE 8000
 
 # uvicorn binds to 0.0.0.0:$PORT. Workers=1 because the in-process APScheduler
 # and WebSocket subscription state must live in ONE worker.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 1"]
+#
+# Python-direct CMD: reads PORT from os.environ at runtime so this works even
+# if a parent orchestrator (Railway etc.) passes us a literal "$PORT" string
+# instead of doing shell expansion.
+CMD ["python", "-c", "import os, uvicorn; uvicorn.run('app.main:app', host='0.0.0.0', port=int(os.environ.get('PORT', '8000')), workers=1)"]
