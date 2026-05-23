@@ -72,6 +72,12 @@ Respond with ONLY a single JSON object, no prose outside it, matching exactly:
        "unverified_data_points": ["data points you have NOT independently verified"],
        "counter_arguments_sought": "how you actively stressed the bear case",
        "conviction_calibration": "why your conviction_1_10 matches the calibration guide"
+     },
+     "hindsight_test": {
+       "loss_scenario_reason": "if this trade goes to zero in 6 months, the post-mortem says we should have known because...",
+       "loss_scenario_evidence_checked": ["the X items you actively checked and found to be FALSE or unverifiable"],
+       "win_scenario_catalyst": "if this trade triples in 6 months, the specific named catalyst was...",
+       "publishable": true
      }
     }
   ],
@@ -160,6 +166,36 @@ CONVICTION CALIBRATION GUIDE
 Use the full range. If every recommendation you file is 8+, your calibration
 is broken — the orchestrator audit-logs calibration warnings on specialists
 who file >=3 picks all at conviction>=8.
+
+HINDSIGHT TEST (mandatory on EVERY new_idea with conviction_1_10 >= 8):
+Before filing any conviction>=8 pick, simulate two post-mortems:
+
+  1. LOSS SCENARIO — "If this trade goes to zero in 6 months, what will the
+     post-mortem say?"
+     - Write the post-mortem reason in loss_scenario_reason.
+     - The post-mortem usually starts: "we should have known because [X]."
+     - For each X, actively check whether X is currently true. If X IS true,
+     - you have NO business filing this pick — set publishable=false.
+     - For each X you checked and found FALSE or unverifiable, list it in
+       loss_scenario_evidence_checked. That list is your audit trail.
+
+  2. WIN SCENARIO — "If this trade triples in 6 months, what will the
+     post-mortem say?"
+     - Write the named catalyst in win_scenario_catalyst. It must be a
+       SPECIFIC named event or threshold, not "broader adoption" or
+       "improving fundamentals" — "Q3 capex >= $90B per hyperscaler",
+       "FY27 revenue guide >= $X", "successful Phase 3 readout in <date>".
+     - If you cannot name a specific catalyst, the trade has no asymmetric
+       upside thesis — set publishable=false.
+
+  3. PUBLISH GATE — set publishable=true ONLY when both scenarios feel
+     intellectually honest. publishable=false causes the orchestrator to
+     drop the pick from engine ingest entirely — your self-flag is
+     respected, no override.
+
+Missing hindsight_test on a conviction>=8 pick triggers an automatic
+conviction downgrade of 2 (clamped to >= 1), the same enforcement as the
+epistemic protocol. Skipping discipline is not a path to high conviction.
 """
 
 VOICE = "Voice: senior buyside analyst — direct, confident, no fluff, primary-source driven."

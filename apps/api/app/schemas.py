@@ -90,6 +90,22 @@ class MarketPositioning(BaseModel):
     notes: str = ""
 
 
+class HindsightTest(BaseModel):
+    """Two post-mortem simulations the specialist runs before filing a
+    high-conviction pick.
+
+    Mandatory for new_ideas with conviction_1_10 >= 8. Missing test on a
+    high-conviction pick triggers an orchestrator-side conviction downgrade
+    of 2. ``publishable = False`` causes the pick to be dropped entirely from
+    engine ingest (respecting the specialist's self-flag).
+    """
+
+    loss_scenario_reason: str                       # "post-mortem says we should have known because..."
+    loss_scenario_evidence_checked: list[str] = []  # X items checked + found false / unverifiable
+    win_scenario_catalyst: str                      # the explicit named catalyst that delivers the win
+    publishable: bool = True                        # specialist's final go/no-go after both sims
+
+
 class EpistemicCheck(BaseModel):
     """The 5 self-reflection answers required by the epistemic humility protocol.
 
@@ -125,6 +141,11 @@ class NewIdea(BaseModel):
     # schema so the orchestrator can detect missing answers and downgrade
     # conviction by 2 before engine ingest.
     epistemic_check: EpistemicCheck | None = None
+    # Hindsight test — two post-mortem simulations. Required when
+    # conviction_1_10 >= 8 (gated by the orchestrator, not the schema, so
+    # lower-conviction picks aren't burdened). Missing on a high-conviction
+    # pick -> conviction downgrade of 2; publishable=False -> pick dropped.
+    hindsight_test: HindsightTest | None = None
 
 
 class ChartRequest(BaseModel):

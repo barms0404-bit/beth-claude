@@ -158,6 +158,10 @@ class Beth:
         # downgraded value. Audit-log every downgrade.
         self._apply_epistemic_downgrade(outputs)
 
+        # Hindsight test on conviction>=8 picks (after epistemic downgrade).
+        # Missing test -> conviction -2; publishable=false -> drop pick.
+        self._apply_hindsight_test(outputs)
+
         # Calibration check — warn on specialists filing >=3 picks all at
         # conviction>=8. Audit-only; doesn't mutate conviction.
         self._check_calibration(outputs)
@@ -284,6 +288,73 @@ class Beth:
                     },
                 )
         return downgrades
+
+    @staticmethod
+    def _apply_hindsight_test(outputs: list[SpecialistReport]) -> tuple[int, int]:
+        """Two-tier enforcement on conviction>=8 picks:
+
+        1. ``hindsight_test`` is None or incomplete -> conviction -2 (audit logged).
+        2. ``publishable=False`` -> pick dropped entirely from new_ideas
+           (specialist's self-flag is respected).
+
+        Runs after _apply_epistemic_downgrade so the conviction>=8 gate
+        reflects honest conviction.
+        """
+        downgraded = 0
+        dropped = 0
+        for sr in outputs:
+            kept: list[NewIdea] = []
+            for idea in sr.new_ideas:
+                if idea.conviction_1_10 < 8:
+                    kept.append(idea)
+                    continue
+                ht = idea.hindsight_test
+                # Drop on explicit self-flag.
+                if ht is not None and ht.publishable is False:
+                    dropped += 1
+                    audit.log_event(
+                        "hindsight_test",
+                        {
+                            "agent_key": sr.agent_key,
+                            "specialist": sr.specialist,
+                            "ticker": idea.ticker,
+                            "action": "dropped",
+                            "reason": "publishable=false self-flag",
+                            "loss_scenario_reason": ht.loss_scenario_reason[:200],
+                            "thesis": idea.thesis[:240],
+                        },
+                    )
+                    continue
+                # Downgrade on missing or incomplete test.
+                complete = (
+                    ht is not None
+                    and ht.loss_scenario_reason.strip()
+                    and ht.win_scenario_catalyst.strip()
+                )
+                if not complete:
+                    original = idea.conviction_1_10
+                    idea.conviction_1_10 = max(1, original - 2)
+                    downgraded += 1
+                    audit.log_event(
+                        "hindsight_test",
+                        {
+                            "agent_key": sr.agent_key,
+                            "specialist": sr.specialist,
+                            "ticker": idea.ticker,
+                            "action": "downgraded",
+                            "original_conviction": original,
+                            "downgraded_conviction": idea.conviction_1_10,
+                            "reason": (
+                                "hindsight_test missing"
+                                if ht is None
+                                else "hindsight_test incomplete"
+                            ),
+                        },
+                    )
+                kept.append(idea)
+            if dropped:
+                sr.new_ideas = kept
+        return downgraded, dropped
 
     @staticmethod
     def _check_calibration(outputs: list[SpecialistReport]) -> int:
