@@ -12,7 +12,7 @@ conviction-ranked Top 50 from specialist `new_ideas`, runs its own synthesis tur
 (executive summary + conflict adjudication + escalated risk flags), and returns a
 `Report`.
 
-## The 22 Specialists
+## The 23 Specialists
 
 `apps/api/app/agents/registry.py`. Each is a `Specialist` with a `persona`, a
 functional title, a `coverage` universe, and a `mandate`. System prompt = shared
@@ -42,10 +42,11 @@ contract (the shared fragments are prompt-cached).
 | `fixed_income` | Edward Vance | Fixed Income Specialist | Rates, curve, credit, Fed — with growth-equity implication |
 | `value_investor` | Henry Whitlock | Value Investor Specialist | Intrinsic value, margin of safety, special situations, AI bubble bear case |
 | `dividend_aristocrat` | Margaret Holloway | Dividend Aristocrat & Income Specialist | Aristocrats/Kings, dividend safety + growth, REITs/BDCs |
+| `biotech_smid` | Dr. Rachel Sinclair | Biotech & Small Cap Biotech Specialist | PoS modeling, rNPV per asset, clinical trial design, conference dives — small-mid-cap |
 | `alt_data` | Kevin Park | Alt Data Specialist | Web traffic, app downloads, card panels |
 
 Dispatch rule (`roster_for`): the one window analyst whose `lead_slot` matches the
-report, plus all 19 non-window specialists.
+report, plus all 20 non-window specialists.
 
 ## Canonical specialist contract
 
