@@ -255,6 +255,60 @@ def _red_team_section(report: Report) -> str:
     return _section("Red Team Review", "".join(blocks))
 
 
+def _conflicts_section(report: Report) -> str:
+    """Per-ticker specialist disagreements — surface, never hide."""
+    conflicts = report.conflicts
+    if not conflicts:
+        return ""
+
+    blocks: list[str] = []
+    for c in conflicts:
+        verdict = c.verdict.value if hasattr(c.verdict, "value") else str(c.verdict)
+        crux_type = c.crux_type.value if hasattr(c.crux_type, "value") else str(c.crux_type)
+        verdict_color = DANGER if verdict in {"lean_bear", "no_position"} else GOLD
+
+        type_chips = " ".join(
+            f"""<span style="display:inline-block;margin:1px 4px 1px 0;padding:2px 6px;background:{CARD_BORDER};color:{GOLD_MUTED};border-radius:3px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">{_esc(t.value if hasattr(t, 'value') else str(t))}</span>"""
+            for t in c.conflict_types
+        )
+
+        views_rows = "".join(
+            f"""<tr>
+              <td style="padding:3px 8px 3px 0;color:{GOLD};font-weight:600;vertical-align:top;white-space:nowrap;">{_esc(v.specialist)}</td>
+              <td style="padding:3px 8px 3px 0;color:{GOLD if v.stance == 'bullish' else (DANGER if v.stance == 'bearish' else GOLD_MUTED)};text-transform:uppercase;font-size:11px;vertical-align:top;white-space:nowrap;">{_esc(v.stance)}{f' · {v.conviction}/10' if v.conviction else ''}{f' · ${v.base_case_price:.0f}' if v.base_case_price else ''}</td>
+              <td style="padding:3px 0;color:{CREAM};vertical-align:top;line-height:1.5;">{_esc((v.thesis or '')[:200])}</td>
+            </tr>"""
+            for v in c.views
+        )
+
+        blocks.append(
+            f"""
+<div style="margin:14px 0;padding:14px;border:1px solid {CARD_BORDER};border-radius:6px;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:Inter,Arial,sans-serif;margin-bottom:6px;">
+    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};">{_esc(c.ticker)}</span>
+    <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.18em;color:{verdict_color};">{_esc(verdict.replace('_', ' '))}</span>
+  </div>
+  <div style="margin-bottom:8px;">{type_chips}</div>
+
+  <div style="margin-bottom:10px;font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">
+    <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};">Crux ({_esc(crux_type.replace('_', ' '))})</span><br/>
+    {_esc(c.crux)}
+  </div>
+
+  <div style="margin-bottom:8px;">
+    <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:{GOLD_MUTED};margin-bottom:4px;">Specialist views</div>
+    <table style="width:100%;font-family:Inter,Arial,sans-serif;font-size:12px;border-collapse:collapse;">{views_rows}</table>
+  </div>
+
+  <div style="margin-top:8px;padding-top:8px;border-top:1px solid {CARD_BORDER};font-family:Inter,Arial,sans-serif;font-size:13px;color:{GOLD};font-weight:600;">
+    {_esc(c.recommended_action)}
+  </div>
+</div>"""
+        )
+
+    return _section("Disagreements", "".join(blocks))
+
+
 def _bear_case_section(report: Report) -> str:
     """Contrarian-check rule: dedicated Value Investor bear case when triggered."""
     bca = report.bear_case_addendum
@@ -481,6 +535,10 @@ def render_report_email(
     bear_html = _bear_case_section(report)
     if bear_html:
         parts.append(bear_html)
+
+    conflicts_html = _conflicts_section(report)
+    if conflicts_html:
+        parts.append(conflicts_html)
 
     red_team_html = _red_team_section(report)
     if red_team_html:

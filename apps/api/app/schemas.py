@@ -465,6 +465,54 @@ class SpecialistRecommendation(BaseModel):
 
 
 # --------------------------------------------------------------------------
+# Conflict Resolution Protocol — surface specialist disagreement
+# --------------------------------------------------------------------------
+class ConflictType(str, Enum):
+    opposite_actions = "opposite_actions"       # one specialist bull, another bear
+    conviction_spread = "conviction_spread"      # >= 3 spread across bullish picks
+    forecast_divergence = "forecast_divergence"  # base_case prices > 25% apart
+
+
+class CruxType(str, Enum):
+    data_resolvable = "data_resolvable"          # specific fact would settle it
+    interpretation = "interpretation"            # judgment call, no single data point
+
+
+class ConflictVerdict(str, Enum):
+    wait_for_data = "wait_for_data"              # surface, but hold position
+    present_both = "present_both"                # judgment call — both views go to PM
+    lean_bull = "lean_bull"                      # net bull after weighting
+    lean_bear = "lean_bear"                      # net bear after weighting
+    no_position = "no_position"                  # disagreement too noisy — pass
+
+
+class SpecialistView(BaseModel):
+    """One specialist's stance on the disputed ticker — collected by the resolver."""
+
+    agent_key: str
+    specialist: str
+    stance: str                                  # 'bullish' | 'bearish' | 'neutral'
+    action: str | None = None                    # action from covered_names_commentary
+    conviction: int | None = None                # 1-10 from new_ideas
+    thesis: str                                  # short summary
+    base_case_price: float | None = None
+    evidence_strength: int | None = None
+
+
+class ConflictReport(BaseModel):
+    """One per-ticker conflict — resolved into a verdict for the PM."""
+
+    ticker: str
+    conflict_types: list[ConflictType] = []
+    views: list[SpecialistView] = []
+    crux: str
+    crux_type: CruxType
+    verdict: ConflictVerdict
+    recommended_action: str = ""                 # one-line guidance for Brian
+    detected_at: datetime
+
+
+# --------------------------------------------------------------------------
 # audit_log — one row per LLM invocation across the fleet
 # --------------------------------------------------------------------------
 class AuditLogEntry(BaseModel):
@@ -635,6 +683,7 @@ class Report(BaseModel):
     verifications: list["RecommendationVerification"] = []  # PSV results, conviction>=8 only
     citation_reports: list[CitationReport] = []     # breadth-sweep citation enforcement
     red_team_critiques: list[RedTeamCritique] = []  # adversarial review of top conviction picks
+    conflicts: list[ConflictReport] = []            # specialist disagreements per ticker
     lead_specialist_key: str | None = None          # e.g. 'fixed_income' on FOMC/CPI/NFP
     bear_case_addendum: SpecialistReport | None = None  # focused contrarian pass by value_investor
     macro_event: str | None = None                  # 'FOMC' | 'CPI' | 'NFP' | None

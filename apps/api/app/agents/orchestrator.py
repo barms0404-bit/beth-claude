@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
 from app.agents.citation_enforcer import enforcer as citation_enforcer
+from app.agents.conflict_resolver import resolver as conflict_resolver
 from app.agents.red_team import red_team
 from app.agents.registry import SPECIALISTS, roster_for
 from app.agents.verifier import verify_high_conviction
@@ -27,6 +28,7 @@ from app.engine.top50 import engine
 from app.schemas import (
     ChartSpec,
     CitationReport,
+    ConflictReport,
     NewIdea,
     Recommendation,
     RecommendationAction,
@@ -160,17 +162,19 @@ class Beth:
         # conviction>=8. Audit-only; doesn't mutate conviction.
         self._check_calibration(outputs)
 
-        # Four work items run concurrently:
+        # Five work items run concurrently:
         #   - render charts requested by specialists
         #   - PSV verifier on conviction>=8 ideas
         #   - Beth's "focused contrarian" pass (Value Investor again, if
         #     growth/thematic team produced high-conviction picks or skewed bullish)
         #   - persist every new_idea as a SpecialistRecommendation row
-        charts, verifications, bear_case, _ = await asyncio.gather(
+        #   - resolve specialist disagreements per ticker
+        charts, verifications, bear_case, _, conflicts = await asyncio.gather(
             self._render_charts(outputs),
             self._verify_high_conviction(outputs),
             self._maybe_focused_contrarian(outputs, slot=slot),
             self._log_recommendations(outputs),
+            conflict_resolver.resolve(outputs),
         )
 
         # Feed the Top 50 engine and read the ranking back — single source.
@@ -201,6 +205,7 @@ class Beth:
             verifications=verifications,
             citation_reports=citation_reports,
             red_team_critiques=red_team_critiques,
+            conflicts=conflicts,
             lead_specialist_key=lead_key,
             bear_case_addendum=bear_case,
             macro_event=macro_event,
