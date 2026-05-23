@@ -26,10 +26,11 @@ from app.services.email_render import render_report_email, subject_for
 
 logger = logging.getLogger("email")
 
-# Archive root: <project_root>/reports — also static-mounted at /reports in main.py.
-#   __file__ = .../claude beth/apps/api/app/services/email_send.py
-#   parents[4] = .../claude beth/
-_ARCHIVE_DIR = Path(__file__).resolve().parents[4] / "reports"
+# Archive root: <app_root>/reports — also static-mounted at /reports in main.py.
+# In Docker (WORKDIR /app): __file__ = /app/app/services/email_send.py → parents[2] = /app
+# In local dev:              __file__ = .../apps/api/app/services/email_send.py → parents[2] = apps/api
+_APP_ROOT = Path(__file__).resolve().parents[2]
+_ARCHIVE_DIR = _APP_ROOT / "reports"
 
 
 def archive_root() -> Path:
