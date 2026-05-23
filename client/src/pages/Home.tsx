@@ -35,6 +35,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Bot,
+  Users,
 } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
@@ -215,6 +216,78 @@ export default function Home() {
           <NavButton icon={<Shield className="w-3 h-3" />} label="Tactical" onClick={() => scrollToSection(SECTIONS.tactical)} />
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
           <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
+
+          {/* Analysts Dropdown — All 39 Specialists */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm"
+                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Users className="w-3 h-3" />
+                <span className="ml-1">Analysts</span>
+                <ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[280px] max-h-96 overflow-y-auto">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Chief of Staff</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Beth — Master Orchestrator</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Daily Reporting Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Morning Packet Analyst</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Mid-Day Tactical Analyst</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Market Close Analyst</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style / Factor Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Dividend Aristocrat & Income Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Value Investor Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fixed Income Specialist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Chief Economist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Geopolitical Strategist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">China Economist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inflation Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fiscal)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fiscal Policy & Political Economy</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Global FX & Commodities Strategist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Labor Economist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Biotech & Small Cap Biotech Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Big Pharma & Specialty Pharma Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Healthcare Tools, CDMOs & Life Sciences</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Enterprise Software & SaaS Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Cybersecurity Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Internet Platforms & Digital Advertising</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fintech & Payments Specialist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Consumer Discretionary & Brands Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Travel, Leisure & Restaurants Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">E-Commerce & Marketplaces Specialist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">AI Data Center Buildout Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Energy Infrastructure Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Training Chip Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inference & AI Software Stack Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Robotics & Physical AI Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantum Computing Specialist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Functional Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantitative Analyst</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Alt Data Specialist</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Accuracy Infrastructure</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Data Validation Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Citation Enforcement Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Red Team Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Primary Source Verification Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Track Record & Performance Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Market Regime Detection Agent</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Consensus & Crowding Tracker</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Healthcare Dropdown */}
           <NavDropdown icon={<Heart className="w-3 h-3" />} label="Healthcare">
