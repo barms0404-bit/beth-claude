@@ -135,6 +135,8 @@ async def _classify_contextual(
         user_message=json.dumps(payload, indent=2),
         temperature=0.2,
         max_tokens=1024,
+        agent_name="regime_detector",
+        downstream_consumers=["engine.specialist_weights", "report.macro_event"],
     )
     try:
         return reply.as_json()

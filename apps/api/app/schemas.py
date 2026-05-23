@@ -445,6 +445,29 @@ class SpecialistRecommendation(BaseModel):
     consensus_target_vs_team_target_pct: float | None = None  # computed server-side
 
 
+# --------------------------------------------------------------------------
+# audit_log — one row per LLM invocation across the fleet
+# --------------------------------------------------------------------------
+class AuditLogEntry(BaseModel):
+    """One LLM call's full audit trail. Mirrors the audit_log table."""
+
+    log_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    agent_name: str                                   # 'specialist:training_chip', 'beth:synthesis', ...
+    input_context: dict = {}                          # {system_prompt, user_message}
+    output_response: str = ""
+    tool_calls_made: list[dict] = []                  # forward-compat for tool-use
+    tools_results: list[dict] = []                    # forward-compat for tool-use
+    model_version: str = ""
+    temperature: float | None = None
+    confidence_scores: dict = {}                      # agent-self-rated when emitted
+    citations: list[str] = []                         # source URLs / tool_call_ids
+    downstream_consumers: list[str] = []              # 'engine', 'email_render', ...
+    prompt_tokens: int = 0
+    output_tokens: int = 0
+    cache_read_tokens: int = 0
+
+
 class CloseRecommendationRequest(BaseModel):
     """POST body to mark a SpecialistRecommendation closed."""
 

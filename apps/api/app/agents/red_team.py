@@ -145,6 +145,8 @@ class RedTeam:
             user_message=user_message,
             temperature=0.3,
             max_tokens=2048,
+            agent_name=f"red_team:{entry.ticker}",
+            downstream_consumers=["report.red_team_critiques", "email_render"],
         )
         try:
             data = reply.as_json()

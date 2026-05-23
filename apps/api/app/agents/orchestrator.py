@@ -567,6 +567,8 @@ class Beth:
             system_prompt=_BETH_SYSTEM,
             user_message=f"Report window: {slot.value}\n\nSpecialist filings:\n{digest}",
             temperature=0.4,
+            agent_name="beth:synthesis",
+            downstream_consumers=["report.summary", "email_render"],
         )
         data = reply.as_json()
         return data.get("title", _SLOT_TITLES[slot]), data.get("summary", "")

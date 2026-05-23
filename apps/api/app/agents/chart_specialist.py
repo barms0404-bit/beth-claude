@@ -87,6 +87,8 @@ class ChartSpecialist:
             user_message=user_message,
             temperature=0.3,
             max_tokens=4096,
+            agent_name=f"chart_specialist:{agent_key}",
+            downstream_consumers=["email_render", "report.charts", "dashboard"],
         )
         try:
             data = reply.as_json()

@@ -191,6 +191,8 @@ async def _extract_claims(thesis: str, ticker: str) -> list[dict]:
         user_message=f"Ticker: {ticker}\nThesis: {thesis}",
         temperature=0.0,
         max_tokens=1024,
+        agent_name="verifier:extract",
+        downstream_consumers=["verifier:compare"],
     )
     try:
         data = reply.as_json()
@@ -279,6 +281,8 @@ async def _verify_via_edgar(
         ),
         temperature=0.0,
         max_tokens=2048,
+        agent_name="verifier:compare:edgar",
+        downstream_consumers=["report.verifications", "email_render"],
     )
     try:
         data = reply.as_json()
@@ -361,6 +365,8 @@ async def _compare_with_llm(
         ),
         temperature=0.0,
         max_tokens=2048,
+        agent_name="verifier:compare",
+        downstream_consumers=["report.verifications", "email_render"],
     )
     try:
         data = reply.as_json()

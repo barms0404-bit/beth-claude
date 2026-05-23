@@ -252,6 +252,13 @@ class Specialist:
             system_prompt=self.system_prompt,
             user_message=context,
             model=self.model,
+            agent_name=f"specialist:{self.key}",
+            downstream_consumers=[
+                "engine",
+                "citation_enforcer",
+                "verifier",
+                "email_render",
+            ],
         )
         self.last_reply = reply
         data = reply.as_json()

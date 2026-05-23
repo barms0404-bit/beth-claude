@@ -48,7 +48,7 @@ from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
 from app.routes import webhooks as webhook_routes
 from app.services import market_data, regime as regime_service
-from app.services import specialist_metrics, specialist_recommendations
+from app.services import audit_log, specialist_metrics, specialist_recommendations
 from app.services.charts import charts_cache_dir
 from app.services.email_send import archive_root, list_archive, send_report
 from app.services.polygon_ws import PolygonStream
@@ -234,6 +234,16 @@ async def close_recommendation(
     if rec is None:
         raise HTTPException(404, f"Recommendation {recommendation_id} not found")
     return rec
+
+
+@app.get("/api/audit/log")
+async def audit_log_query(
+    agent_name: str | None = None,
+    since: str | None = None,            # ISO timestamp
+    limit: int = 100,
+) -> list[dict]:
+    """Filtered audit-log query — newest first. Backend-only data; auth-gated."""
+    return audit_log.query_log(agent_name=agent_name, since_iso=since, limit=limit)
 
 
 @app.get("/api/citations/metrics")
