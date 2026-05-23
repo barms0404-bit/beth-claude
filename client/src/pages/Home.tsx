@@ -1,11 +1,11 @@
 /* 
  * Armstrong Arikat Research Terminal — Sovereign Command Center
- * Design: Military command center meets private banking interface
- * Color: Black background, Gold (#C9A961) for actionable elements, Cream for text
- * Typography: Cormorant Garamond for headings, Inter for body/data
+ * Full System: 39 Agents, All Sector Dashboards, Top 50 Engine
+ * Design: Black bg, Gold (#C9A961) accents, Cream (#F5E6C8) text
+ * Only red/green for market direction indicators
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import {
   ChevronDown,
@@ -27,6 +28,13 @@ import {
   Heart,
   ShoppingBag,
   Zap,
+  Clock,
+  Menu,
+  X,
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle,
+  Bot,
 } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
@@ -34,7 +42,7 @@ const SPY_CHART = "/manus-storage/spy_chart_699a562f.png";
 const NVDA_CHART = "/manus-storage/nvda_chart_7bda8308.png";
 const LLY_CHART = "/manus-storage/lly_chart_b1ec7ac4.png";
 
-// Section IDs for navigation
+// All section IDs
 const SECTIONS = {
   snapshot: "market-snapshot",
   macro: "macro-advisory",
@@ -46,210 +54,259 @@ const SECTIONS = {
   fixedIncome: "fixed-income",
   dividend: "dividend",
   geopolitical: "geopolitical",
+  aiInfra: "ai-infrastructure",
+  saas: "enterprise-saas",
+  cyber: "cybersecurity",
+  internet: "internet-platforms",
+  fintech: "fintech-payments",
+  biotech: "biotech",
+  pharma: "big-pharma",
+  healthTools: "health-tools",
+  travel: "travel-leisure",
+  ecommerce: "ecommerce",
+  chinaEcon: "china-economist",
+  inflation: "inflation",
+  fiscal: "fiscal-policy",
+  fxCommod: "fx-commodities",
+  labor: "labor-economist",
+  quantum: "quantum-computing",
+  robotics: "robotics-ai",
+  energy: "energy-infrastructure",
+  value: "value-investor",
+  agentStatus: "agent-status",
+  reports: "reports-archive",
 };
 
 function scrollToSection(id: string) {
   const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // Market data
 const indexData = [
-  { name: "S&P 500", value: "7,473.47", change: "+0.37%", up: true },
-  { name: "Nasdaq", value: "26,343.97", change: "+0.19%", up: true },
-  { name: "Dow Jones", value: "50,579.70", change: "+0.58%", up: true },
-  { name: "10Y Treasury", value: "4.87%", change: "+0.03", up: false },
+  { name: "S&P 500", ticker: "SPY", value: "7,473.47", change: "+0.37%", up: true },
+  { name: "Nasdaq", ticker: "QQQ", value: "26,343.97", change: "+0.19%", up: true },
+  { name: "Dow Jones", ticker: "DIA", value: "50,579.70", change: "+0.58%", up: true },
+  { name: "Russell 2000", ticker: "IWM", value: "2,387.12", change: "+0.42%", up: true },
+  { name: "VIX", ticker: "VIX", value: "13.82", change: "-0.45", up: true },
+  { name: "10Y Treasury", ticker: "TNX", value: "4.87%", change: "+0.03", up: false },
+  { name: "DXY", ticker: "DXY", value: "104.23", change: "+0.12%", up: false },
+  { name: "BTC", ticker: "BTC", value: "$71,245", change: "+2.1%", up: true },
 ];
 
 const top50Data = [
-  { ticker: "NVDA", company: "NVIDIA Corp", sector: "Technology", conviction: "High", price: "$208.27", change: "+4.2%", catalyst: "AI chip demand, $5.5T valuation" },
-  { ticker: "AVGO", company: "Broadcom Inc", sector: "Technology", conviction: "High", price: "$289.45", change: "+2.8%", catalyst: "AI data center networking" },
-  { ticker: "MSFT", company: "Microsoft", sector: "Technology", conviction: "High", price: "$418.57", change: "-0.12%", catalyst: "Enterprise AI integration" },
-  { ticker: "LLY", company: "Eli Lilly", sector: "Healthcare", conviction: "High", price: "$892.30", change: "+1.4%", catalyst: "GLP-1 prescription growth" },
-  { ticker: "COST", company: "Costco", sector: "Consumer", conviction: "Medium", price: "$1,045.20", change: "+0.8%", catalyst: "Defensive inflation play" },
-  { ticker: "AMD", company: "AMD", sector: "Technology", conviction: "High", price: "$467.51", change: "+3.9%", catalyst: "AI GPU competition" },
-  { ticker: "ARM", company: "ARM Holdings", sector: "Technology", conviction: "High", price: "$245.80", change: "+2.1%", catalyst: "Mobile AI chip architecture" },
-  { ticker: "DELL", company: "Dell Technologies", sector: "Technology", conviction: "High", price: "$178.90", change: "+12.4%", catalyst: "$43B AI backlog" },
-  { ticker: "QCOM", company: "Qualcomm", sector: "Technology", conviction: "Medium-High", price: "$241.15", change: "+13.0%", catalyst: "Partnership news, edge AI" },
-  { ticker: "JPM", company: "JPMorgan Chase", sector: "Financials", conviction: "Medium", price: "$287.40", change: "+0.6%", catalyst: "Strong capital markets" },
+  { rank: 1, ticker: "NVDA", company: "NVIDIA Corp", sector: "AI/Chips", conviction: "High", price: "$208.27", change: "+4.2%", ytd: "+48.2%", specialist: "Training Chip", updated: "2 min ago" },
+  { rank: 2, ticker: "AVGO", company: "Broadcom Inc", sector: "AI/Networking", conviction: "High", price: "$289.45", change: "+2.8%", ytd: "+52.1%", specialist: "AI Data Center", updated: "5 min ago" },
+  { rank: 3, ticker: "MSFT", company: "Microsoft", sector: "Enterprise SW", conviction: "High", price: "$418.57", change: "-0.12%", ytd: "+18.4%", specialist: "SaaS", updated: "3 min ago" },
+  { rank: 4, ticker: "LLY", company: "Eli Lilly", sector: "Pharma", conviction: "High", price: "$892.30", change: "+1.4%", ytd: "+22.7%", specialist: "Big Pharma", updated: "8 min ago" },
+  { rank: 5, ticker: "AMD", company: "AMD", sector: "AI/Chips", conviction: "High", price: "$467.51", change: "+3.9%", ytd: "+38.9%", specialist: "Training Chip", updated: "2 min ago" },
+  { rank: 6, ticker: "ARM", company: "ARM Holdings", sector: "AI/Chips", conviction: "High", price: "$245.80", change: "+2.1%", ytd: "+61.3%", specialist: "Inference", updated: "4 min ago" },
+  { rank: 7, ticker: "DELL", company: "Dell Technologies", sector: "AI Infra", conviction: "High", price: "$178.90", change: "+12.4%", ytd: "+44.8%", specialist: "AI Data Center", updated: "1 min ago" },
+  { rank: 8, ticker: "QCOM", company: "Qualcomm", sector: "AI/Mobile", conviction: "Med-High", price: "$241.15", change: "+13.0%", ytd: "+35.2%", specialist: "Inference", updated: "6 min ago" },
+  { rank: 9, ticker: "COST", company: "Costco", sector: "Consumer", conviction: "Medium", price: "$1,045.20", change: "+0.8%", ytd: "+12.1%", specialist: "Consumer", updated: "10 min ago" },
+  { rank: 10, ticker: "JPM", company: "JPMorgan Chase", sector: "Financials", conviction: "Medium", price: "$287.40", change: "+0.6%", ytd: "+15.8%", specialist: "Fintech", updated: "7 min ago" },
+  { rank: 11, ticker: "MRVL", company: "Marvell Tech", sector: "AI/Chips", conviction: "High", price: "$128.45", change: "+3.2%", ytd: "+42.6%", specialist: "AI Data Center", updated: "3 min ago" },
+  { rank: 12, ticker: "PANW", company: "Palo Alto Networks", sector: "Cyber", conviction: "High", price: "$412.80", change: "+1.8%", ytd: "+28.4%", specialist: "Cybersecurity", updated: "5 min ago" },
+  { rank: 13, ticker: "NVO", company: "Novo Nordisk", sector: "Pharma", conviction: "High", price: "$142.60", change: "+0.9%", ytd: "+19.3%", specialist: "Big Pharma", updated: "9 min ago" },
+  { rank: 14, ticker: "V", company: "Visa Inc", sector: "Fintech", conviction: "Med-High", price: "$318.90", change: "+0.4%", ytd: "+14.7%", specialist: "Fintech", updated: "6 min ago" },
+  { rank: 15, ticker: "SMCI", company: "Super Micro", sector: "AI Infra", conviction: "High", price: "$52.30", change: "+5.6%", ytd: "+67.2%", specialist: "AI Data Center", updated: "2 min ago" },
+];
+
+const specialistAgents = [
+  { name: "Beth", role: "Chief of Staff Orchestrator", status: "active", lastDispatch: "2 min ago", model: "claude-opus-4-7" },
+  { name: "AI Data Center", role: "Growth/Thematic", status: "active", lastDispatch: "5 min ago", model: "claude-opus-4-7" },
+  { name: "Energy Infrastructure", role: "Growth/Thematic", status: "active", lastDispatch: "12 min ago", model: "claude-opus-4-7" },
+  { name: "Training Chip", role: "Growth/Thematic", status: "active", lastDispatch: "3 min ago", model: "claude-opus-4-7" },
+  { name: "Inference & AI Software", role: "Growth/Thematic", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
+  { name: "Robotics & Physical AI", role: "Growth/Thematic", status: "active", lastDispatch: "15 min ago", model: "claude-opus-4-7" },
+  { name: "Quantum Computing", role: "Growth/Thematic", status: "active", lastDispatch: "20 min ago", model: "claude-opus-4-7" },
+  { name: "Enterprise SaaS", role: "Technology", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
+  { name: "Cybersecurity", role: "Technology", status: "active", lastDispatch: "9 min ago", model: "claude-opus-4-7" },
+  { name: "Internet Platforms", role: "Technology", status: "active", lastDispatch: "7 min ago", model: "claude-opus-4-7" },
+  { name: "Fintech & Payments", role: "Technology", status: "active", lastDispatch: "11 min ago", model: "claude-opus-4-7" },
+  { name: "Biotech", role: "Healthcare", status: "active", lastDispatch: "14 min ago", model: "claude-opus-4-7" },
+  { name: "Big Pharma", role: "Healthcare", status: "active", lastDispatch: "10 min ago", model: "claude-opus-4-7" },
+  { name: "Healthcare Tools", role: "Healthcare", status: "active", lastDispatch: "18 min ago", model: "claude-opus-4-7" },
+  { name: "Consumer Discretionary", role: "Consumer", status: "active", lastDispatch: "13 min ago", model: "claude-opus-4-7" },
+  { name: "Travel & Leisure", role: "Consumer", status: "active", lastDispatch: "16 min ago", model: "claude-opus-4-7" },
+  { name: "E-Commerce", role: "Consumer", status: "active", lastDispatch: "19 min ago", model: "claude-opus-4-7" },
+  { name: "Chief Economist", role: "Economic Advisory", status: "active", lastDispatch: "4 min ago", model: "claude-opus-4-7" },
+  { name: "Geopolitical Strategist", role: "Economic Advisory", status: "active", lastDispatch: "22 min ago", model: "claude-opus-4-7" },
+  { name: "China Economist", role: "Economic Advisory", status: "active", lastDispatch: "25 min ago", model: "claude-opus-4-7" },
+  { name: "Inflation Specialist", role: "Economic Advisory", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
+  { name: "Dividend & Income", role: "Style/Factor", status: "active", lastDispatch: "30 min ago", model: "claude-opus-4-7" },
+  { name: "Value Investor", role: "Style/Factor", status: "active", lastDispatch: "28 min ago", model: "claude-opus-4-7" },
+  { name: "Fixed Income", role: "Style/Factor", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
+];
+
+const accuracyAgents = [
+  { name: "Data Validation", status: "active", checks: 1247, lastRun: "< 1 min", temp: "0.0" },
+  { name: "Citation Enforcement", status: "active", checks: 892, lastRun: "< 1 min", temp: "0.0" },
+  { name: "Red Team", status: "active", checks: 34, lastRun: "5 min ago", temp: "0.5" },
+  { name: "Primary Source Verification", status: "active", checks: 12, lastRun: "8 min ago", temp: "0.0" },
+  { name: "Track Record", status: "active", checks: 1, lastRun: "Yesterday close", temp: "0.2" },
+  { name: "Market Regime Detection", status: "active", checks: 1, lastRun: "6:00 AM AZ", temp: "0.2" },
+  { name: "Consensus & Crowding", status: "active", checks: 1, lastRun: "6:30 AM AZ", temp: "0.2" },
 ];
 
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 
+  // Calculate next report time
+  const getNextReport = () => {
+    const now = new Date();
+    const azHour = (now.getUTCHours() - 7 + 24) % 24;
+    if (azHour < 7 || (azHour === 7 && now.getUTCMinutes() < 30)) return "7:30 AM AZ — Morning Prep";
+    if (azHour < 11) return "11:00 AM AZ — Mid-Day Tactical";
+    if (azHour < 13 || (azHour === 13 && now.getUTCMinutes() < 30)) return "1:30 PM AZ — Market Close";
+    return "7:30 AM AZ — Morning Prep (Tomorrow)";
+  };
+
   return (
     <div className="min-h-screen bg-[#000000] relative">
-      {/* Logo Watermark Background */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center"
-        style={{ opacity: 0.04 }}
-      >
+      {/* Logo Watermark */}
+      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center" style={{ opacity: 0.04 }}>
         <img src={LOGO_URL} alt="" className="w-[60vw] max-w-[800px]" />
       </div>
 
       {/* Top Command Bar */}
-      <header className="sticky top-0 z-50 border-b-4 border-[#C9A961] bg-[#000000]/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b-4 border-[#C9A961] bg-[#000000]/97 backdrop-blur-sm">
         {/* Logo Row */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#1F1A0F]">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-[#1F1A0F]">
           <div className="flex items-center gap-3">
-            <img src={LOGO_URL} alt="Armstrong Arikat" className="h-10 w-auto" />
+            <img src={LOGO_URL} alt="Armstrong Arikat" className="h-9 w-auto" />
             <div>
               <h1 className="text-[#C9A961] text-sm font-semibold tracking-[4px] uppercase" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
                 Research Terminal
               </h1>
-              <p className="text-[#8A7548] text-[10px] tracking-[2px] uppercase">
-                Private Wealth Group
+              <p className="text-[#8A7548] text-[10px] tracking-[2px] uppercase">Private Wealth Group</p>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+              <div className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse"></div>
+              <span className="text-[#4ADE80] text-[10px] uppercase tracking-[1px]">NYSE Open</span>
+            </div>
+            <div className="text-right">
+              <p className="text-[#C9A961] text-xs font-medium">
+                {currentTime.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+              </p>
+              <p className="text-[#8A7548] text-[10px]">
+                Next Report: {getNextReport()}
               </p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-[#C9A961] text-xs font-medium">
-              {currentTime.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-            </p>
-            <p className="text-[#8A7548] text-[10px]">
-              {currentTime.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZoneName: "short" })}
-            </p>
-          </div>
+          {/* Mobile menu toggle */}
+          <button className="md:hidden text-[#C9A961]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
 
-        {/* Navigation Buttons Row */}
-        <nav className="flex items-center gap-1 px-4 py-2 overflow-x-auto">
-          {/* Direct Push Buttons */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection(SECTIONS.snapshot)}
-            className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-          >
-            <Activity className="w-3 h-3 mr-1.5" />
-            Market Snapshot
-          </Button>
+        {/* Navigation Row - Desktop */}
+        <nav className="hidden md:flex items-center gap-1 px-4 py-1.5 overflow-x-auto">
+          <NavButton icon={<Activity className="w-3 h-3" />} label="Dashboard" onClick={() => scrollToSection(SECTIONS.snapshot)} />
+          <NavButton icon={<BarChart3 className="w-3 h-3" />} label="Top 50" onClick={() => scrollToSection(SECTIONS.top50)} />
+          <NavButton icon={<Shield className="w-3 h-3" />} label="Tactical" onClick={() => scrollToSection(SECTIONS.tactical)} />
+          <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
+          <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection(SECTIONS.macro)}
-            className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-          >
-            <Globe className="w-3 h-3 mr-1.5" />
-            Macro Advisory
-          </Button>
+          {/* Healthcare Dropdown */}
+          <NavDropdown icon={<Heart className="w-3 h-3" />} label="Healthcare">
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Biotech & Small Cap</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Big Pharma & Specialty</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Healthcare Tools & Life Sciences</DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthcare)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">GLP-1 Tracker</DropdownMenuItem>
+          </NavDropdown>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection(SECTIONS.top50)}
-            className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-          >
-            <BarChart3 className="w-3 h-3 mr-1.5" />
-            Top 50
-          </Button>
+          {/* Technology Dropdown */}
+          <NavDropdown icon={<Cpu className="w-3 h-3" />} label="Technology">
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Enterprise SaaS</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Cybersecurity</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Internet & Digital Ad</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fintech & Payments</DropdownMenuItem>
+          </NavDropdown>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToSection(SECTIONS.tactical)}
-            className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-          >
-            <Shield className="w-3 h-3 mr-1.5" />
-            Tactical Playbook
-          </Button>
+          {/* AI Infrastructure Dropdown */}
+          <NavDropdown icon={<Zap className="w-3 h-3" />} label="AI Infra">
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">AI Data Center Buildout</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Energy Infrastructure</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Training Chips</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inference & AI Software</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Robotics & Physical AI</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantum Computing</DropdownMenuItem>
+          </NavDropdown>
 
-          {/* Sector Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-              >
-                <Briefcase className="w-3 h-3 mr-1.5" />
-                Sectors
-                <ChevronDown className="w-3 h-3 ml-1.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30">
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <Cpu className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Technology & AI
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthcare)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <Heart className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Healthcare & Biotech
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <ShoppingBag className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Consumer Discretionary
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <Briefcase className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Fixed Income
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <TrendingUp className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Dividend & Income
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Consumer Dropdown */}
+          <NavDropdown icon={<ShoppingBag className="w-3 h-3" />} label="Consumer">
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Discretionary & Brands</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Travel, Leisure & Restaurants</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">E-Commerce & Marketplaces</DropdownMenuItem>
+          </NavDropdown>
 
-          {/* Research Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[11px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97]"
-              >
-                <Zap className="w-3 h-3 mr-1.5" />
-                Research
-                <ChevronDown className="w-3 h-3 ml-1.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30">
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <Globe className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Geopolitical Strategy
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <Activity className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Economic Advisory
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] hover:bg-[#C9A961]/10 focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
-                <BarChart3 className="w-3 h-3 mr-2 text-[#C9A961]" />
-                Fixed Income Analysis
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* More Dropdown */}
+          <NavDropdown icon={<Briefcase className="w-3 h-3" />} label="More">
+            <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style & Factor</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Dividends & Income</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Value Investor</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fixed Income</DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+            <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Geopolitical Strategy</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">China Economist</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inflation Specialist</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Labor Economist</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">FX & Commodities</DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Reports Archive</DropdownMenuItem>
+          </NavDropdown>
         </nav>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <nav className="md:hidden px-4 py-3 border-t border-[#1F1A0F] space-y-2 max-h-[70vh] overflow-y-auto">
+            {Object.entries({
+              "Dashboard": SECTIONS.snapshot,
+              "Top 50": SECTIONS.top50,
+              "Tactical Playbook": SECTIONS.tactical,
+              "Macro Advisory": SECTIONS.macro,
+              "Technology & AI": SECTIONS.tech,
+              "AI Infrastructure": SECTIONS.aiInfra,
+              "Healthcare": SECTIONS.healthcare,
+              "Consumer": SECTIONS.consumer,
+              "Fixed Income": SECTIONS.fixedIncome,
+              "Dividends": SECTIONS.dividend,
+              "Geopolitical": SECTIONS.geopolitical,
+              "Agent Status": SECTIONS.agentStatus,
+              "Reports": SECTIONS.reports,
+            }).map(([label, id]) => (
+              <button key={id} onClick={() => { scrollToSection(id); setMobileMenuOpen(false); }} className="block w-full text-left text-[#F5E6C8] text-sm py-2 px-3 rounded hover:bg-[#C9A961]/10 transition-colors">
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 px-4 py-6 max-w-[1440px] mx-auto space-y-8">
+      <main className="relative z-10 px-4 py-6 max-w-[1440px] mx-auto space-y-10">
 
-        {/* SECTION: Market Snapshot */}
+        {/* MARKET SNAPSHOT */}
         <section id={SECTIONS.snapshot}>
-          <SectionHeader title="Market Snapshot" subtitle="Live Index Performance" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <SectionHeader title="Market Snapshot" subtitle="Live Index Performance — Real-Time Data" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
             {indexData.map((idx) => (
-              <div
-                key={idx.name}
-                className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 hover:border-[#3A2F1F] transition-colors duration-150"
-              >
-                <p className="text-[#8A7548] text-xs uppercase tracking-[1px] mb-1">{idx.name}</p>
-                <p className="text-[#F5E6C8] text-2xl font-semibold" style={{ fontFamily: "'Inter', sans-serif", fontVariantNumeric: "tabular-nums" }}>
-                  {idx.value}
-                </p>
-                <p className={`text-sm font-medium mt-1 ${idx.up ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>
-                  {idx.up ? <TrendingUp className="w-3 h-3 inline mr-1" /> : <TrendingDown className="w-3 h-3 inline mr-1" />}
-                  {idx.change}
+              <div key={idx.name} className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-3 hover:border-[#3A2F1F] transition-colors duration-100">
+                <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px] mb-0.5">{idx.name}</p>
+                <p className="text-[#F5E6C8] text-lg font-semibold" style={{ fontVariantNumeric: "tabular-nums" }}>{idx.value}</p>
+                <p className={`text-xs font-medium ${idx.up ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>
+                  {idx.up ? "▲" : "▼"} {idx.change}
                 </p>
               </div>
             ))}
@@ -260,203 +317,56 @@ export default function Home() {
           </div>
           <div className="mt-4 bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
             <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              The S&P 500 continues its record-breaking run, finishing its <strong className="text-[#C9A961]">eighth consecutive week</strong> in the green, closing at 7,473.47. 
-              The Dow Jones Industrial Average surged past 50,500, setting fresh record highs. The rally is broad-based with technology, financials, and industrials all contributing. 
-              U.S. markets will be closed Monday for Memorial Day. Traders continue to watch for developments in U.S.-Iran peace negotiations and any steps toward reopening the Strait of Hormuz.
+              The S&P 500 continues its record-breaking run, finishing its <strong className="text-[#C9A961]">eighth consecutive week</strong> in the green at 7,473.47. 
+              The Dow Jones surged past 50,500 setting fresh record highs. The rally is broad-based with technology, financials, and industrials all contributing. 
+              U.S. markets closed Monday for Memorial Day. Key watchpoints: U.S.-Iran peace negotiations and potential Strait of Hormuz reopening.
             </p>
           </div>
         </section>
 
-        {/* SECTION: Macroeconomic Advisory */}
-        <section id={SECTIONS.macro}>
-          <SectionHeader title="Macroeconomic Advisory" subtitle="Chief Economist & Fixed Income Strategy" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 border-l-4 border-l-[#C9A961]">
-              <h4 className="text-[#C9A961] text-lg mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Chief Economist View</h4>
-              <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">
-                The broader macroeconomic picture presents a <strong className="text-[#C9A961]">divergence between stock market performance and consumer sentiment</strong>. 
-                While equities soar, the University of Michigan's May Survey of Consumers hit new lows due to persistent inflation and gas prices.
-              </p>
-              <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">
-                The Fed funds rate is expected to remain steady in the <strong className="text-[#C9A961]">3.50%-3.75% range</strong>, with a growing 37% probability of rate hikes 
-                in late 2026 or 2027 if inflation remains sticky. Goldman Sachs has warned of a growing risk that rising yields and inflation could trigger a stock market correction.
-              </p>
-              <div className="mt-4 p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                <p className="text-[#8A7548] text-xs uppercase tracking-[1px] mb-1">Key Risk</p>
-                <p className="text-[#EF4444] text-sm">Consumer sentiment at new lows while equities at all-time highs — historical divergence often precedes correction.</p>
-              </div>
+        {/* TOP 50 RECOMMENDATION ENGINE */}
+        <section id={SECTIONS.top50}>
+          <SectionHeader title="Top 50 Recommendation Engine" subtitle="Composite Scoring — Refreshes Every 15 Min During Market Hours" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-[#1F1A0F] flex items-center justify-between">
+              <p className="text-[#8A7548] text-xs">Scoring: conviction × specialist_track_record × thematic_relevance | Cross-specialist bonus: +1.5x</p>
+              <span className="text-[#4ADE80] text-[10px] uppercase tracking-[1px] flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse"></div> Live
+              </span>
             </div>
-            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 border-l-4 border-l-[#C9A961]">
-              <h4 className="text-[#C9A961] text-lg mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Fixed Income Strategy</h4>
-              <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">
-                Treasury yields remain elevated near 2007 levels, putting pressure on rate-sensitive sectors. The 10-year yield has risen to approximately 4.87%, 
-                while the 2-year remains inverted relative to historical norms.
-              </p>
-              <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">
-                <strong className="text-[#C9A961]">Recommendation:</strong> Barbell strategy — holding short-duration T-bills for yield while accumulating high-quality corporate credit. 
-                Avoid long-duration bonds until the Fed signals a clear pivot.
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                  <p className="text-[#8A7548] text-xs uppercase tracking-[1px]">Fed Funds Rate</p>
-                  <p className="text-[#C9A961] text-lg font-semibold">3.50-3.75%</p>
-                </div>
-                <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                  <p className="text-[#8A7548] text-xs uppercase tracking-[1px]">Hike Probability</p>
-                  <p className="text-[#EF4444] text-lg font-semibold">37%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION: Technology & AI */}
-        <section id={SECTIONS.tech}>
-          <SectionHeader title="Technology & AI" subtitle="Thematic Focus — The AI 11" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 mb-4">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              The <strong className="text-[#C9A961]">"AI 11"</strong> has officially replaced the Magnificent 7 as the core driver of tech performance. 
-              The semiconductor and AI infrastructure buildout continues at an unprecedented pace, with Dell reporting a record $43 billion AI backlog and 
-              NVIDIA surpassing $5.5 trillion in market capitalization.
-            </p>
-            <img src={NVDA_CHART} alt="NVIDIA Chart" className="w-full rounded mb-4" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { ticker: "NVDA", name: "NVIDIA", price: "$208.27", change: "+4.2%", note: "$5.5T market cap. Most valuable company globally. AI chip demand unprecedented." },
-              { ticker: "AVGO", name: "Broadcom", price: "$289.45", change: "+2.8%", note: "Up 106% YoY. Network infrastructure for AI data centers. Custom ASIC leader." },
-              { ticker: "MSFT", name: "Microsoft", price: "$418.57", change: "-0.12%", note: "Enterprise AI dominance through Copilot. $3.1T market cap." },
-              { ticker: "DELL", name: "Dell Technologies", price: "$178.90", change: "+12.4%", note: "Record $43B AI backlog. AI revenues expected to double to $50B in FY2027." },
-            ].map((stock) => (
-              <div key={stock.ticker} className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-4 hover:border-[#3A2F1F] transition-colors">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="text-[#C9A961] font-semibold text-sm">{stock.ticker}</span>
-                    <span className="text-[#8A7548] text-xs ml-2">{stock.name}</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[#F5E6C8] text-sm font-medium" style={{ fontVariantNumeric: "tabular-nums" }}>{stock.price}</p>
-                    <p className={`text-xs ${stock.change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>{stock.change}</p>
-                  </div>
-                </div>
-                <p className="text-[#F5E6C8]/80 text-xs leading-relaxed">{stock.note}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* SECTION: Healthcare & Biotech */}
-        <section id={SECTIONS.healthcare}>
-          <SectionHeader title="Healthcare & Biotech" subtitle="GLP-1 Megacycle & Biotech M&A" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 mb-4">
-            <img src={LLY_CHART} alt="Eli Lilly Chart" className="w-full rounded mb-4" />
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              The <strong className="text-[#C9A961]">GLP-1 megacycle</strong> continues unabated with Eli Lilly and Novo Nordisk dominating the weight-loss drug market. 
-              Manufacturing capacity remains the primary constraint, with both companies investing billions in production expansion. 
-              Small-cap biotech is seeing a resurgence as M&A activity picks up, particularly in the oncology space.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[#C9A961] font-semibold">LLY</span>
-                <span className="text-[#4ADE80] text-sm">+1.4%</span>
-              </div>
-              <p className="text-[#F5E6C8]/80 text-xs">Eli Lilly — GLP-1 prescription growth accelerating. Manufacturing expansion on track. Target: $950+</p>
-            </div>
-            <div className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[#C9A961] font-semibold">NVO</span>
-                <span className="text-[#4ADE80] text-sm">+0.9%</span>
-              </div>
-              <p className="text-[#F5E6C8]/80 text-xs">Novo Nordisk — Wegovy supply improving. Oral GLP-1 pipeline advancing. Duopoly strengthening.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION: Consumer Discretionary */}
-        <section id={SECTIONS.consumer}>
-          <SectionHeader title="Consumer Discretionary" subtitle="Inflation Impact & Trade-Down Effect" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Mixed signals in consumer spending. High-end retail remains resilient, but discount retailers like <strong className="text-[#C9A961]">Walmart (WMT)</strong> and 
-              <strong className="text-[#C9A961]"> Costco (COST)</strong> are seeing increased foot traffic as consumers trade down due to inflation. 
-              Consumer sentiment at new lows creates a cautious outlook for discretionary spending.
-            </p>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
-                <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">Consumer Sentiment</p>
-                <p className="text-[#EF4444] text-lg font-semibold">New Low</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
-                <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">WMT Traffic</p>
-                <p className="text-[#4ADE80] text-lg font-semibold">+4.2%</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
-                <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">COST Comps</p>
-                <p className="text-[#4ADE80] text-lg font-semibold">+6.8%</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION: Fixed Income */}
-        <section id={SECTIONS.fixedIncome}>
-          <SectionHeader title="Fixed Income Analysis" subtitle="Yield Curve & Credit Markets" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              {[
-                { label: "2Y Yield", value: "4.52%", status: "neutral" },
-                { label: "10Y Yield", value: "4.87%", status: "danger" },
-                { label: "30Y Yield", value: "5.12%", status: "danger" },
-                { label: "2s10s Spread", value: "+35bps", status: "success" },
-              ].map((item) => (
-                <div key={item.label} className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
-                  <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">{item.label}</p>
-                  <p className={`text-lg font-semibold ${item.status === "danger" ? "text-[#EF4444]" : item.status === "success" ? "text-[#4ADE80]" : "text-[#C9A961]"}`}>
-                    {item.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              The yield curve has normalized with the 2s10s spread turning positive at +35bps, ending the longest inversion in history. 
-              However, elevated long-end yields near 2007 levels signal persistent inflation expectations. 
-              Investment-grade credit spreads remain tight at ~90bps OAS, while high-yield spreads have widened slightly to ~350bps.
-            </p>
-          </div>
-        </section>
-
-        {/* SECTION: Dividend & Income */}
-        <section id={SECTIONS.dividend}>
-          <SectionHeader title="Dividend & Income" subtitle="Aristocrat Strategy & Yield Plays" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              In the current environment of elevated yields and market uncertainty, <strong className="text-[#C9A961]">dividend aristocrats</strong> provide 
-              a defensive anchor. We recommend allocating 10-15% of the portfolio to high-quality dividend growers with 25+ year track records.
-            </p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#1F1A0F]">
-                    <th className="text-left py-2 text-[#C9A961] text-xs uppercase tracking-[1px]">Ticker</th>
-                    <th className="text-left py-2 text-[#C9A961] text-xs uppercase tracking-[1px]">Company</th>
-                    <th className="text-right py-2 text-[#C9A961] text-xs uppercase tracking-[1px]">Yield</th>
-                    <th className="text-right py-2 text-[#C9A961] text-xs uppercase tracking-[1px]">Streak</th>
+                  <tr className="border-b border-[#C9A961]/20 bg-[#0A0A0A]">
+                    <th className="text-left py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">#</th>
+                    <th className="text-left py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Ticker</th>
+                    <th className="text-left py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Company</th>
+                    <th className="text-left py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Sector</th>
+                    <th className="text-center py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Conviction</th>
+                    <th className="text-right py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Price</th>
+                    <th className="text-right py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Day %</th>
+                    <th className="text-right py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">YTD %</th>
+                    <th className="text-left py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Lead Specialist</th>
+                    <th className="text-right py-2.5 px-3 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Updated</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { ticker: "JNJ", name: "Johnson & Johnson", yield: "3.2%", streak: "62 yrs" },
-                    { ticker: "PG", name: "Procter & Gamble", yield: "2.4%", streak: "68 yrs" },
-                    { ticker: "KO", name: "Coca-Cola", yield: "2.9%", streak: "62 yrs" },
-                    { ticker: "PEP", name: "PepsiCo", yield: "2.7%", streak: "52 yrs" },
-                  ].map((d) => (
-                    <tr key={d.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5">
-                      <td className="py-2 text-[#C9A961] font-medium">{d.ticker}</td>
-                      <td className="py-2 text-[#F5E6C8]">{d.name}</td>
-                      <td className="py-2 text-right text-[#4ADE80]">{d.yield}</td>
-                      <td className="py-2 text-right text-[#F5E6C8]">{d.streak}</td>
+                  {top50Data.map((s) => (
+                    <tr key={s.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5 transition-colors cursor-pointer">
+                      <td className="py-2.5 px-3 text-[#8A7548] text-xs">{s.rank}</td>
+                      <td className="py-2.5 px-3 text-[#C9A961] font-semibold text-xs">{s.ticker}</td>
+                      <td className="py-2.5 px-3 text-[#F5E6C8] text-xs">{s.company}</td>
+                      <td className="py-2.5 px-3 text-[#8A7548] text-xs">{s.sector}</td>
+                      <td className="py-2.5 px-3 text-center">
+                        <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-[0.5px] font-semibold ${s.conviction === "High" ? "bg-[#C9A961]/20 text-[#C9A961]" : "bg-[#8A7548]/20 text-[#8A7548]"}`}>
+                          {s.conviction}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right text-[#F5E6C8] text-xs" style={{ fontVariantNumeric: "tabular-nums" }}>{s.price}</td>
+                      <td className={`py-2.5 px-3 text-right text-xs ${s.change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`} style={{ fontVariantNumeric: "tabular-nums" }}>{s.change}</td>
+                      <td className={`py-2.5 px-3 text-right text-xs ${s.ytd.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`} style={{ fontVariantNumeric: "tabular-nums" }}>{s.ytd}</td>
+                      <td className="py-2.5 px-3 text-[#8A7548] text-xs">{s.specialist}</td>
+                      <td className="py-2.5 px-3 text-right text-[#8A7548] text-[10px]">{s.updated}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -465,115 +375,330 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION: Top 50 Recommendations */}
-        <section id={SECTIONS.top50}>
-          <SectionHeader title="Top 50 Recommendation Engine" subtitle="Composite Scoring & Specialist Polling" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#C9A961]/30">
-                  <th className="text-left py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">#</th>
-                  <th className="text-left py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Ticker</th>
-                  <th className="text-left py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Company</th>
-                  <th className="text-left py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Sector</th>
-                  <th className="text-center py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Conviction</th>
-                  <th className="text-right py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Price</th>
-                  <th className="text-right py-3 text-[#C9A961] text-xs uppercase tracking-[1px]">Change</th>
-                  <th className="text-left py-3 text-[#C9A961] text-xs uppercase tracking-[1px] pl-4">Catalyst</th>
-                </tr>
-              </thead>
-              <tbody>
-                {top50Data.map((stock, i) => (
-                  <tr key={stock.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5 transition-colors">
-                    <td className="py-3 text-[#8A7548]">{i + 1}</td>
-                    <td className="py-3 text-[#C9A961] font-semibold">{stock.ticker}</td>
-                    <td className="py-3 text-[#F5E6C8]">{stock.company}</td>
-                    <td className="py-3 text-[#8A7548] text-xs">{stock.sector}</td>
-                    <td className="py-3 text-center">
-                      <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-[0.5px] font-semibold ${
-                        stock.conviction === "High" ? "bg-[#C9A961]/20 text-[#C9A961]" : "bg-[#8A7548]/20 text-[#8A7548]"
-                      }`}>
-                        {stock.conviction}
-                      </span>
-                    </td>
-                    <td className="py-3 text-right text-[#F5E6C8]" style={{ fontVariantNumeric: "tabular-nums" }}>{stock.price}</td>
-                    <td className={`py-3 text-right ${stock.change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`} style={{ fontVariantNumeric: "tabular-nums" }}>
-                      {stock.change}
-                    </td>
-                    <td className="py-3 text-[#F5E6C8]/70 text-xs pl-4">{stock.catalyst}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* MACROECONOMIC ADVISORY */}
+        <section id={SECTIONS.macro}>
+          <SectionHeader title="Macroeconomic Advisory" subtitle="Chief Economist & Economic Advisory Pod" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <AgentCard title="Chief Economist" agent="Chief Economist" content="Divergence between stock market performance and consumer sentiment. University of Michigan May Survey hit new lows. Fed funds rate steady at 3.50-3.75% with 37% probability of hikes in late 2026." highlight="Growth equity implication: Cautious on rate-sensitive sectors. Favor quality growth with pricing power." />
+            <AgentCard title="Fixed Income Strategy" agent="Fixed Income Specialist" content="Treasury yields elevated near 2007 levels. 10Y at 4.87%, 2s10s spread normalized at +35bps. IG spreads tight at ~90bps OAS. HY widened to ~350bps." highlight="Recommendation: Barbell strategy — short-duration T-bills + high-quality corporate credit." />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <MetricCard label="Fed Funds Rate" value="3.50-3.75%" status="neutral" />
+            <MetricCard label="Hike Probability" value="37%" status="danger" />
+            <MetricCard label="Consumer Sentiment" value="New Low" status="danger" />
+            <MetricCard label="2s10s Spread" value="+35bps" status="success" />
           </div>
         </section>
 
-        {/* SECTION: Tactical Playbook */}
+        {/* TACTICAL PLAYBOOK */}
         <section id={SECTIONS.tactical}>
-          <SectionHeader title="Tactical Playbook" subtitle="Actionable Recommendations for Today" />
-          <div className="space-y-4">
-            {[
-              {
-                priority: "1",
-                title: "Maintain AI Exposure",
-                description: "Do not trim winners in the AI infrastructure space (NVDA, AVGO, ARM). The backlog of orders (e.g., Dell's $43B) indicates the cycle is still in early innings. The AI buildout is a multi-year secular trend.",
-                action: "HOLD / ADD ON DIPS",
-                color: "#4ADE80",
-              },
-              {
-                priority: "2",
-                title: "Hedge with Defensive Staples",
-                description: "Given the divergence between consumer sentiment and market highs, allocate 10-15% to dividend aristocrats and consumer staples (JNJ, PG, KO, COST). These provide downside protection if the correction materializes.",
-                action: "ACCUMULATE",
-                color: "#C9A961",
-              },
-              {
-                priority: "3",
-                title: "Monitor Treasury Yields",
-                description: "Watch the 10-year Treasury closely. If it breaks above 5.0%, growth stocks may see a short-term pullback of 5-8%, presenting a buying opportunity. Set alerts at 4.95% and 5.05%.",
-                action: "WATCH / SET ALERTS",
-                color: "#F59E0B",
-              },
-            ].map((item) => (
-              <div key={item.priority} className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 border-l-4" style={{ borderLeftColor: item.color }}>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#C9A961] text-2xl font-bold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                      {item.priority}
-                    </span>
-                    <h4 className="text-[#F5E6C8] text-base font-medium">{item.title}</h4>
-                  </div>
-                  <span className="px-3 py-1 rounded text-[10px] uppercase tracking-[1px] font-bold" style={{ backgroundColor: `${item.color}20`, color: item.color }}>
-                    {item.action}
-                  </span>
-                </div>
-                <p className="text-[#F5E6C8]/80 text-sm leading-relaxed ml-9">{item.description}</p>
-              </div>
-            ))}
+          <SectionHeader title="Tactical Playbook" subtitle="Actionable Recommendations — Today's Priorities" />
+          <div className="space-y-3">
+            <TacticalItem priority="1" title="Maintain AI Exposure" action="HOLD / ADD ON DIPS" color="#4ADE80" description="Do not trim winners in AI infrastructure (NVDA, AVGO, ARM). Dell's $43B backlog indicates cycle still in early innings. Multi-year secular trend." />
+            <TacticalItem priority="2" title="Hedge with Defensive Staples" action="ACCUMULATE" color="#C9A961" description="Given consumer sentiment/market divergence, allocate 10-15% to dividend aristocrats (JNJ, PG, KO, COST). Provides downside protection." />
+            <TacticalItem priority="3" title="Monitor Treasury Yields" action="WATCH / SET ALERTS" color="#F59E0B" description="If 10Y breaks 5.0%, growth stocks may pullback 5-8%. Set alerts at 4.95% and 5.05%. This would be a buying opportunity." />
+            <TacticalItem priority="4" title="Geopolitical Watch" action="MONITOR" color="#8A7548" description="U.S.-Iran negotiations could ease oil supply. China semiconductor restrictions tightening. Both impact sector allocation." />
           </div>
         </section>
 
-        {/* SECTION: Geopolitical */}
-        <section id={SECTIONS.geopolitical}>
-          <SectionHeader title="Geopolitical Strategy" subtitle="Global Risk Assessment" />
+        {/* TECHNOLOGY & AI */}
+        <section id={SECTIONS.tech}>
+          <SectionHeader title="Technology & AI" subtitle="Training Chips • Inference • AI Data Center • Software" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 mb-4">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              The <strong className="text-[#C9A961]">"AI 11"</strong> has replaced the Magnificent 7 as the core performance driver. Semiconductor and AI infrastructure buildout continues at unprecedented pace.
+            </p>
+            <img src={NVDA_CHART} alt="NVIDIA Chart" className="w-full rounded" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <StockCard ticker="NVDA" name="NVIDIA" price="$208.27" change="+4.2%" note="$5.5T market cap. Most valuable company globally. AI chip demand unprecedented." />
+            <StockCard ticker="AVGO" name="Broadcom" price="$289.45" change="+2.8%" note="Up 106% YoY. Network infrastructure for AI data centers. Custom ASIC leader." />
+            <StockCard ticker="AMD" name="AMD" price="$467.51" change="+3.9%" note="AI GPU competition intensifying. MI300X gaining enterprise traction." />
+            <StockCard ticker="ARM" name="ARM Holdings" price="$245.80" change="+2.1%" note="Mobile AI chip architecture. Royalty model benefits from AI everywhere." />
+            <StockCard ticker="DELL" name="Dell Technologies" price="$178.90" change="+12.4%" note="Record $43B AI backlog. AI revenues to double to $50B in FY2027." />
+            <StockCard ticker="SMCI" name="Super Micro" price="$52.30" change="+5.6%" note="AI server leader. Liquid cooling advantage. High growth, volatile." />
+          </div>
+        </section>
+
+        {/* AI INFRASTRUCTURE */}
+        <section id={SECTIONS.aiInfra}>
+          <SectionHeader title="AI Infrastructure Buildout" subtitle="Data Centers • Energy • Networking • Cooling" />
           <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
             <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Key geopolitical developments impacting markets this week:
+              The AI data center buildout represents a <strong className="text-[#C9A961]">$1 trillion+ infrastructure cycle</strong> over the next 5 years. 
+              Key bottlenecks: power availability, cooling technology, and chip supply. Companies solving these constraints are seeing unprecedented demand.
             </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+                <p className="text-[#C9A961] text-xs font-semibold mb-1">Power Demand</p>
+                <p className="text-[#F5E6C8] text-xs">US data center power demand projected to triple by 2030. Utilities and independent power producers benefiting.</p>
+              </div>
+              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+                <p className="text-[#C9A961] text-xs font-semibold mb-1">Cooling Tech</p>
+                <p className="text-[#F5E6C8] text-xs">Liquid cooling becoming mandatory for next-gen GPU clusters. Vertiv, nVent leading the transition.</p>
+              </div>
+              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+                <p className="text-[#C9A961] text-xs font-semibold mb-1">Networking</p>
+                <p className="text-[#F5E6C8] text-xs">800G/1.6T optical transceivers in high demand. Broadcom, Marvell, Arista dominant.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ENERGY INFRASTRUCTURE */}
+        <section id={SECTIONS.energy}>
+          <SectionHeader title="Energy Infrastructure" subtitle="Power Generation for AI • Grid Modernization" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Data center power demand is creating a <strong className="text-[#C9A961]">renaissance in power generation</strong>. Nuclear, natural gas, and renewables all benefiting. 
+              Key names: GE Vernova (GEV), Vistra (VST), Constellation Energy (CEG), NRG Energy (NRG). Grid infrastructure: Quanta Services (PWR), EATON (ETN).
+            </p>
+          </div>
+        </section>
+
+        {/* ENTERPRISE SAAS */}
+        <section id={SECTIONS.saas}>
+          <SectionHeader title="Enterprise SaaS" subtitle="Net Revenue Retention • Rule of 40 • AI Exposure" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              Enterprise software seeing bifurcation: <strong className="text-[#C9A961]">AI-enabled platforms</strong> (ServiceNow, Workday, Salesforce) accelerating, 
+              while legacy SaaS facing compression. Key metric: AI revenue contribution as % of ARR.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StockMini ticker="NOW" price="$1,045" change="+8.8%" />
+              <StockMini ticker="WDAY" price="$312" change="+4.2%" />
+              <StockMini ticker="CRM" price="$348" change="+1.1%" />
+              <StockMini ticker="MSFT" price="$419" change="-0.1%" />
+            </div>
+          </div>
+        </section>
+
+        {/* CYBERSECURITY */}
+        <section id={SECTIONS.cyber}>
+          <SectionHeader title="Cybersecurity" subtitle="Platformization • Zero Trust • AI-Powered Defense" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              Cybersecurity spending remains resilient as AI-powered threats escalate. <strong className="text-[#C9A961]">Platformization trend</strong> favoring 
+              Palo Alto Networks and CrowdStrike as enterprises consolidate vendors.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StockMini ticker="PANW" price="$413" change="+1.8%" />
+              <StockMini ticker="CRWD" price="$398" change="+2.1%" />
+              <StockMini ticker="ZS" price="$181" change="+5.9%" />
+              <StockMini ticker="FTNT" price="$134" change="+3.5%" />
+            </div>
+          </div>
+        </section>
+
+        {/* INTERNET PLATFORMS */}
+        <section id={SECTIONS.internet}>
+          <SectionHeader title="Internet Platforms & Digital Advertising" subtitle="Ad Revenue • AI Integration • Engagement" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              Digital advertising recovery continues with AI-driven ad targeting improving ROAS. <strong className="text-[#C9A961]">Meta and Alphabet</strong> leading 
+              with AI-powered creative tools and automated campaign optimization.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StockMini ticker="META" price="$642" change="+0.8%" />
+              <StockMini ticker="GOOGL" price="$192" change="+0.5%" />
+              <StockMini ticker="SNAP" price="$18.40" change="+3.2%" />
+              <StockMini ticker="TTD" price="$128" change="+1.9%" />
+            </div>
+          </div>
+        </section>
+
+        {/* FINTECH */}
+        <section id={SECTIONS.fintech}>
+          <SectionHeader title="Fintech & Payments" subtitle="Payment Volume • Credit Quality • Digital Banking" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              Payment volumes remain healthy despite consumer sentiment weakness. <strong className="text-[#C9A961]">Visa and Mastercard</strong> cross-border volumes 
+              strong. Watch consumer credit delinquencies for early warning signs.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StockMini ticker="V" price="$319" change="+0.4%" />
+              <StockMini ticker="MA" price="$542" change="+0.6%" />
+              <StockMini ticker="SQ" price="$89" change="+2.3%" />
+              <StockMini ticker="PYPL" price="$78" change="+1.1%" />
+            </div>
+          </div>
+        </section>
+
+        {/* HEALTHCARE */}
+        <section id={SECTIONS.healthcare}>
+          <SectionHeader title="Healthcare — GLP-1 Tracker" subtitle="Eli Lilly vs Novo Nordisk • Prescriptions • Manufacturing" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 mb-4">
+            <img src={LLY_CHART} alt="Eli Lilly Chart" className="w-full rounded mb-4" />
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              The <strong className="text-[#C9A961]">GLP-1 megacycle</strong> continues. Weekly US prescriptions growing 15%+ QoQ. Manufacturing capacity remains primary constraint.
+              Oral GLP-1 pipeline advancing — could expand TAM 3-5x.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <MetricCard label="LLY Market Share" value="58%" status="success" />
+            <MetricCard label="NVO Market Share" value="39%" status="neutral" />
+            <MetricCard label="Weekly Rx Growth" value="+15% QoQ" status="success" />
+            <MetricCard label="Supply Constraint" value="Moderate" status="warning" />
+          </div>
+        </section>
+
+        {/* BIOTECH */}
+        <section id={SECTIONS.biotech}>
+          <SectionHeader title="Biotech & Small Cap Biotech" subtitle="Clinical Catalysts • M&A • Pipeline" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Small-cap biotech seeing resurgence as <strong className="text-[#C9A961]">M&A activity picks up</strong> in oncology. Big pharma patent cliffs driving 
+              acquisition appetite. Key catalysts: PDUFA dates, Phase 3 readouts, and FDA advisory committees.
+            </p>
+          </div>
+        </section>
+
+        {/* BIG PHARMA */}
+        <section id={SECTIONS.pharma}>
+          <SectionHeader title="Big Pharma & Specialty Pharma" subtitle="Patent Cliffs • Pipeline Value • M&A" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <StockMini ticker="LLY" price="$892" change="+1.4%" />
+              <StockMini ticker="NVO" price="$143" change="+0.9%" />
+              <StockMini ticker="MRK" price="$128" change="+0.3%" />
+              <StockMini ticker="ABBV" price="$198" change="+0.7%" />
+              <StockMini ticker="PFE" price="$28" change="-0.4%" />
+              <StockMini ticker="JNJ" price="$162" change="+0.2%" />
+            </div>
+          </div>
+        </section>
+
+        {/* HEALTH TOOLS */}
+        <section id={SECTIONS.healthTools}>
+          <SectionHeader title="Healthcare Tools & Life Sciences" subtitle="CDMOs • Diagnostics • Lab Equipment" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Life sciences tools seeing recovery after destocking cycle. <strong className="text-[#C9A961]">AI drug discovery</strong> driving demand for 
+              high-throughput screening and genomics platforms. CDMOs benefiting from GLP-1 manufacturing demand.
+            </p>
+          </div>
+        </section>
+
+        {/* CONSUMER */}
+        <section id={SECTIONS.consumer}>
+          <SectionHeader title="Consumer Discretionary & Brands" subtitle="Brand Heat • Athletic Share • Trade-Down Effect" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+              Mixed signals. High-end retail resilient, but <strong className="text-[#C9A961]">trade-down effect</strong> accelerating. 
+              Walmart and Costco gaining share. Consumer sentiment at new lows creates cautious outlook.
+            </p>
+            <div className="grid grid-cols-3 gap-3">
+              <MetricCard label="Consumer Sentiment" value="New Low" status="danger" />
+              <MetricCard label="WMT Traffic" value="+4.2%" status="success" />
+              <MetricCard label="COST Comps" value="+6.8%" status="success" />
+            </div>
+          </div>
+        </section>
+
+        {/* TRAVEL & LEISURE */}
+        <section id={SECTIONS.travel}>
+          <SectionHeader title="Travel, Leisure & Restaurants" subtitle="TSA Throughput • RevPAR • Cruise Yields" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Travel demand remains above 2019 levels. <strong className="text-[#C9A961]">Cruise net yields</strong> at all-time highs. 
+              Restaurant industry seeing GLP-1 headwinds on portion sizes. Hotels benefiting from business travel recovery.
+            </p>
+          </div>
+        </section>
+
+        {/* E-COMMERCE */}
+        <section id={SECTIONS.ecommerce}>
+          <SectionHeader title="E-Commerce & Marketplaces" subtitle="GMV Growth • Take Rates • Geographic Expansion" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StockMini ticker="AMZN" price="$266" change="-0.8%" />
+              <StockMini ticker="SHOP" price="$112" change="+1.4%" />
+              <StockMini ticker="MELI" price="$2,180" change="+2.1%" />
+              <StockMini ticker="SE" price="$142" change="+3.8%" />
+            </div>
+          </div>
+        </section>
+
+        {/* FIXED INCOME */}
+        <section id={SECTIONS.fixedIncome}>
+          <SectionHeader title="Fixed Income Analysis" subtitle="Yield Curve • Credit Spreads • Fed Path" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <MetricCard label="2Y Yield" value="4.52%" status="neutral" />
+              <MetricCard label="10Y Yield" value="4.87%" status="danger" />
+              <MetricCard label="30Y Yield" value="5.12%" status="danger" />
+              <MetricCard label="IG OAS" value="~90bps" status="success" />
+            </div>
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Yield curve normalized with 2s10s at +35bps. Long-end yields near 2007 levels signal persistent inflation expectations. 
+              Credit markets remain healthy with tight IG spreads, though HY has widened to ~350bps.
+            </p>
+          </div>
+        </section>
+
+        {/* DIVIDEND & INCOME */}
+        <section id={SECTIONS.dividend}>
+          <SectionHeader title="Dividend Aristocrat & Income" subtitle="25+ Year Streak • Defensive Allocation" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#1F1A0F]">
+                    <th className="text-left py-2 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Ticker</th>
+                    <th className="text-left py-2 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Company</th>
+                    <th className="text-right py-2 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Yield</th>
+                    <th className="text-right py-2 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Streak</th>
+                    <th className="text-right py-2 text-[#C9A961] text-[10px] uppercase tracking-[1px]">Safety</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { ticker: "JNJ", name: "Johnson & Johnson", yield: "3.2%", streak: "62 yrs", safety: "A+" },
+                    { ticker: "PG", name: "Procter & Gamble", yield: "2.4%", streak: "68 yrs", safety: "A+" },
+                    { ticker: "KO", name: "Coca-Cola", yield: "2.9%", streak: "62 yrs", safety: "A" },
+                    { ticker: "PEP", name: "PepsiCo", yield: "2.7%", streak: "52 yrs", safety: "A" },
+                    { ticker: "MMM", name: "3M Company", yield: "5.8%", streak: "66 yrs", safety: "B+" },
+                  ].map((d) => (
+                    <tr key={d.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5">
+                      <td className="py-2 text-[#C9A961] font-medium text-xs">{d.ticker}</td>
+                      <td className="py-2 text-[#F5E6C8] text-xs">{d.name}</td>
+                      <td className="py-2 text-right text-[#4ADE80] text-xs">{d.yield}</td>
+                      <td className="py-2 text-right text-[#F5E6C8] text-xs">{d.streak}</td>
+                      <td className="py-2 text-right text-[#C9A961] text-xs">{d.safety}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* VALUE INVESTOR */}
+        <section id={SECTIONS.value}>
+          <SectionHeader title="Value Investor" subtitle="Deep Value • Margin of Safety • Mean Reversion" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Value factor underperforming in current growth-led regime. However, <strong className="text-[#C9A961]">select deep value opportunities</strong> emerging 
+              in energy, financials, and healthcare where earnings growth is mispriced. Regime Detection suggests maintaining reduced value allocation until factor rotation signals appear.
+            </p>
+          </div>
+        </section>
+
+        {/* GEOPOLITICAL */}
+        <section id={SECTIONS.geopolitical}>
+          <SectionHeader title="Geopolitical Strategy" subtitle="Global Risk Assessment • Event-Driven Analysis" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
             <div className="space-y-3">
               {[
-                { event: "U.S.-Iran Peace Negotiations", impact: "Potential reopening of Strait of Hormuz could ease oil supply concerns", risk: "Medium" },
-                { event: "China Trade Tensions", impact: "Semiconductor export restrictions tightening; benefiting domestic AI chip makers", risk: "High" },
-                { event: "European Energy Policy", impact: "EU accelerating renewable transition; positive for clean energy equities", risk: "Low" },
+                { event: "U.S.-Iran Peace Negotiations", impact: "Potential Strait of Hormuz reopening could ease oil supply", risk: "Medium" },
+                { event: "China Semiconductor Restrictions", impact: "Export controls tightening; domestic AI chip makers benefiting", risk: "High" },
+                { event: "EU Energy Transition", impact: "Accelerating renewable policy; positive for clean energy equities", risk: "Low" },
+                { event: "Russia-Ukraine Conflict", impact: "Frozen conflict scenario; European defense spending elevated", risk: "Medium" },
               ].map((geo) => (
                 <div key={geo.event} className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
                   <div className="flex justify-between items-start">
                     <p className="text-[#C9A961] text-sm font-medium">{geo.event}</p>
-                    <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-[0.5px] font-semibold ${
-                      geo.risk === "High" ? "bg-[#EF4444]/20 text-[#EF4444]" : geo.risk === "Medium" ? "bg-[#F59E0B]/20 text-[#F59E0B]" : "bg-[#4ADE80]/20 text-[#4ADE80]"
-                    }`}>
-                      {geo.risk} Risk
-                    </span>
+                    <RiskBadge risk={geo.risk} />
                   </div>
                   <p className="text-[#F5E6C8]/70 text-xs mt-1">{geo.impact}</p>
                 </div>
@@ -582,7 +707,175 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer / Disclaimer */}
+        {/* CHINA ECONOMIST */}
+        <section id={SECTIONS.chinaEcon}>
+          <SectionHeader title="China Economist" subtitle="Asian Session • Policy • Trade Impact" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              China's economic recovery remains uneven. <strong className="text-[#C9A961]">Property sector stabilization</strong> efforts ongoing but consumer confidence weak. 
+              Tech sector regulation easing. Semiconductor self-sufficiency push accelerating with massive state investment.
+            </p>
+          </div>
+        </section>
+
+        {/* INFLATION */}
+        <section id={SECTIONS.inflation}>
+          <SectionHeader title="Inflation Specialist" subtitle="CPI • PCE • Leading Indicators • 12-Month Forecast" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <MetricCard label="CPI YoY" value="3.4%" status="warning" />
+              <MetricCard label="Core PCE" value="2.8%" status="warning" />
+              <MetricCard label="Supercore" value="4.1%" status="danger" />
+              <MetricCard label="12M Forecast" value="3.0-3.5%" status="warning" />
+            </div>
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Inflation proving stickier than expected. <strong className="text-[#C9A961]">Supercore (services ex-housing)</strong> remains elevated at 4.1%, 
+              driven by wage growth and insurance costs. Energy prices adding upward pressure. Path to 2% target extended into 2027.
+            </p>
+          </div>
+        </section>
+
+        {/* FISCAL POLICY */}
+        <section id={SECTIONS.fiscal}>
+          <SectionHeader title="Fiscal Policy & Political Economy" subtitle="Government Spending • Tax Policy • Regulation" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Fiscal deficit remains elevated. <strong className="text-[#C9A961]">Bond supply concerns</strong> contributing to elevated long-end yields. 
+              Midterm elections approaching — watch for policy uncertainty premium in markets.
+            </p>
+          </div>
+        </section>
+
+        {/* FX & COMMODITIES */}
+        <section id={SECTIONS.fxCommod}>
+          <SectionHeader title="Global FX & Commodities" subtitle="Dollar • Oil • Gold • Cross-Asset Flows" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <MetricCard label="DXY" value="104.23" status="neutral" />
+              <MetricCard label="WTI Crude" value="$72.40" status="neutral" />
+              <MetricCard label="Gold" value="$2,415" status="success" />
+              <MetricCard label="Copper" value="$4.82" status="success" />
+            </div>
+          </div>
+        </section>
+
+        {/* LABOR ECONOMIST */}
+        <section id={SECTIONS.labor}>
+          <SectionHeader title="Labor Economist" subtitle="NFP • Claims • JOLTS • Wage Tracker" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <MetricCard label="Unemployment" value="4.1%" status="neutral" />
+              <MetricCard label="Initial Claims" value="218K" status="success" />
+              <MetricCard label="Wage Growth" value="+4.2% YoY" status="warning" />
+              <MetricCard label="JOLTS Ratio" value="1.2x" status="neutral" />
+            </div>
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Labor market remains resilient but gradually cooling. Wage growth still above Fed comfort zone at 4.2% YoY. 
+              JOLTS openings-to-unemployed ratio normalized to 1.2x from pandemic peak of 2.0x.
+            </p>
+          </div>
+        </section>
+
+        {/* QUANTUM COMPUTING */}
+        <section id={SECTIONS.quantum}>
+          <SectionHeader title="Quantum Computing" subtitle="Speculative • Early Stage • High Volatility" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">
+              Quantum computing names extending multi-day gains on speculative interest. <strong className="text-[#C9A961]">Rigetti (RGTI)</strong> and 
+              <strong className="text-[#C9A961]"> D-Wave (QBTS)</strong> leading. Still pre-revenue for most — position sizing should reflect speculative nature.
+            </p>
+            <div className="p-3 bg-[#0A0A0A] rounded border border-[#EF4444]/30">
+              <p className="text-[#EF4444] text-xs font-semibold">⚠ HIGH SPECULATION WARNING</p>
+              <p className="text-[#F5E6C8]/70 text-xs mt-1">Quantum names are highly speculative. Maximum 1-2% portfolio allocation recommended.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ROBOTICS */}
+        <section id={SECTIONS.robotics}>
+          <SectionHeader title="Robotics & Physical AI" subtitle="Humanoids • Industrial Automation • Autonomous" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
+              Physical AI emerging as next major theme. <strong className="text-[#C9A961]">Tesla's Optimus</strong>, Figure AI, and industrial robotics 
+              seeing accelerating investment. NVIDIA's Isaac platform enabling simulation-to-reality transfer. Watch: ISRG, ROK, ABB.
+            </p>
+          </div>
+        </section>
+
+        {/* AGENT STATUS */}
+        <section id={SECTIONS.agentStatus}>
+          <SectionHeader title="Agent System Status" subtitle="39 Agents Deployed — Real-Time Health Monitor" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Specialist Agents */}
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">32 Specialist Agents</h4>
+              <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+                {specialistAgents.map((agent) => (
+                  <div key={agent.name} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-[#C9A961]/5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                      <span className="text-[#F5E6C8] text-xs">{agent.name}</span>
+                      <span className="text-[#8A7548] text-[10px]">({agent.role})</span>
+                    </div>
+                    <span className="text-[#8A7548] text-[10px]">{agent.lastDispatch}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Accuracy Agents */}
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">7 Accuracy Infrastructure Agents</h4>
+              <div className="space-y-2">
+                {accuracyAgents.map((agent) => (
+                  <div key={agent.name} className="p-2.5 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                        <span className="text-[#F5E6C8] text-xs font-medium">{agent.name}</span>
+                      </div>
+                      <span className="text-[#4ADE80] text-[10px] uppercase">Active</span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-[#8A7548] text-[10px]">Checks today: {agent.checks}</span>
+                      <span className="text-[#8A7548] text-[10px]">Last: {agent.lastRun}</span>
+                      <span className="text-[#8A7548] text-[10px]">Temp: {agent.temp}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* REPORTS ARCHIVE */}
+        <section id={SECTIONS.reports}>
+          <SectionHeader title="Reports Archive" subtitle="Daily Reports — Morning • Mid-Day • Close" />
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
+            <div className="space-y-2">
+              {[
+                { type: "Morning Prep", date: "May 23, 2026", time: "7:30 AM AZ", status: "Delivered" },
+                { type: "Mid-Day Tactical", date: "May 22, 2026", time: "11:00 AM AZ", status: "Delivered" },
+                { type: "Market Close", date: "May 22, 2026", time: "1:30 PM AZ", status: "Delivered" },
+                { type: "Morning Prep", date: "May 22, 2026", time: "7:30 AM AZ", status: "Delivered" },
+                { type: "Mid-Day Tactical", date: "May 21, 2026", time: "11:00 AM AZ", status: "Delivered" },
+              ].map((report, i) => (
+                <div key={i} className="flex items-center justify-between py-2.5 px-3 rounded hover:bg-[#C9A961]/5 border-b border-[#1F1A0F]/50">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-3.5 h-3.5 text-[#4ADE80]" />
+                    <div>
+                      <p className="text-[#F5E6C8] text-xs font-medium">{report.type}</p>
+                      <p className="text-[#8A7548] text-[10px]">{report.date} • {report.time}</p>
+                    </div>
+                  </div>
+                  <span className="text-[#4ADE80] text-[10px] uppercase tracking-[1px]">{report.status}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
         <footer className="border-t border-[#1F1A0F] pt-6 pb-8">
           <div className="text-center">
             <img src={LOGO_URL} alt="Armstrong Arikat" className="h-12 mx-auto mb-3 opacity-60" />
@@ -592,7 +885,7 @@ export default function Home() {
               Past performance does not indicate future results. Holdings and views subject to change without notice.
             </p>
             <p className="text-[#8A7548] text-[10px] mt-3">
-              Generated: {new Date().toISOString()}
+              Generated: {new Date().toISOString()} | 39 Agents Operational | Pipeline: &lt;180s
             </p>
           </div>
         </footer>
@@ -601,14 +894,124 @@ export default function Home() {
   );
 }
 
-// Reusable Section Header Component
+// ─── Reusable Components ────────────────────────────────────────────────────
+
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="mb-4 pb-3 border-b border-[#1F1A0F]">
-      <h2 className="text-[#C9A961] text-2xl tracking-[2px]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-        {title}
-      </h2>
+      <h2 className="text-[#C9A961] text-2xl tracking-[2px]" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{title}</h2>
       <p className="text-[#8A7548] text-xs uppercase tracking-[2px] mt-1">{subtitle}</p>
     </div>
+  );
+}
+
+function NavButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+  return (
+    <Button variant="outline" size="sm" onClick={onClick}
+      className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+      {icon}
+      <span className="ml-1">{label}</span>
+    </Button>
+  );
+}
+
+function NavDropdown({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm"
+          className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+          {icon}
+          <span className="ml-1">{label}</span>
+          <ChevronDown className="w-2.5 h-2.5 ml-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[200px]">
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function AgentCard({ title, agent, content, highlight }: { title: string; agent: string; content: string; highlight: string }) {
+  return (
+    <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 border-l-4 border-l-[#C9A961]">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-[#C9A961] text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{title}</h4>
+        <span className="text-[#8A7548] text-[10px] uppercase tracking-[1px] flex items-center gap-1">
+          <Bot className="w-3 h-3" /> {agent}
+        </span>
+      </div>
+      <p className="text-[#F5E6C8] text-sm leading-relaxed mb-3">{content}</p>
+      <div className="p-3 bg-[#0A0A0A] rounded border border-[#C9A961]/20">
+        <p className="text-[#C9A961] text-xs">{highlight}</p>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({ label, value, status }: { label: string; value: string; status: "success" | "danger" | "warning" | "neutral" }) {
+  const colors = { success: "text-[#4ADE80]", danger: "text-[#EF4444]", warning: "text-[#F59E0B]", neutral: "text-[#C9A961]" };
+  return (
+    <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
+      <p className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">{label}</p>
+      <p className={`text-lg font-semibold ${colors[status]}`}>{value}</p>
+    </div>
+  );
+}
+
+function TacticalItem({ priority, title, action, color, description }: { priority: string; title: string; action: string; color: string; description: string }) {
+  return (
+    <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 border-l-4" style={{ borderLeftColor: color }}>
+      <div className="flex items-start justify-between mb-1.5">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[#C9A961] text-xl font-bold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{priority}</span>
+          <h4 className="text-[#F5E6C8] text-sm font-medium">{title}</h4>
+        </div>
+        <span className="px-2.5 py-0.5 rounded text-[9px] uppercase tracking-[1px] font-bold" style={{ backgroundColor: `${color}20`, color }}>{action}</span>
+      </div>
+      <p className="text-[#F5E6C8]/80 text-xs leading-relaxed ml-8">{description}</p>
+    </div>
+  );
+}
+
+function StockCard({ ticker, name, price, change, note }: { ticker: string; name: string; price: string; change: string; note: string }) {
+  return (
+    <div className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-3.5 hover:border-[#3A2F1F] transition-colors">
+      <div className="flex justify-between items-start mb-1.5">
+        <div>
+          <span className="text-[#C9A961] font-semibold text-sm">{ticker}</span>
+          <span className="text-[#8A7548] text-[10px] ml-1.5">{name}</span>
+        </div>
+        <div className="text-right">
+          <p className="text-[#F5E6C8] text-xs font-medium" style={{ fontVariantNumeric: "tabular-nums" }}>{price}</p>
+          <p className={`text-[10px] ${change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>{change}</p>
+        </div>
+      </div>
+      <p className="text-[#F5E6C8]/70 text-[11px] leading-relaxed">{note}</p>
+    </div>
+  );
+}
+
+function StockMini({ ticker, price, change }: { ticker: string; price: string; change: string }) {
+  return (
+    <div className="p-2.5 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
+      <p className="text-[#C9A961] text-xs font-semibold">{ticker}</p>
+      <p className="text-[#F5E6C8] text-xs" style={{ fontVariantNumeric: "tabular-nums" }}>{price}</p>
+      <p className={`text-[10px] ${change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>{change}</p>
+    </div>
+  );
+}
+
+function RiskBadge({ risk }: { risk: string }) {
+  const styles: Record<string, string> = {
+    High: "bg-[#EF4444]/20 text-[#EF4444]",
+    Medium: "bg-[#F59E0B]/20 text-[#F59E0B]",
+    Low: "bg-[#4ADE80]/20 text-[#4ADE80]",
+  };
+  return (
+    <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-[0.5px] font-semibold ${styles[risk] || styles.Medium}`}>
+      {risk} Risk
+    </span>
   );
 }
