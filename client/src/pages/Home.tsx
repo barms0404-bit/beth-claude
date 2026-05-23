@@ -40,6 +40,8 @@ import {
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 const SPY_CHART = "/manus-storage/spy_chart_699a562f.png";
+const DOW_CHART = "/manus-storage/dow_chart_889b99c5.png";
+const NASDAQ_CHART = "/manus-storage/nasdaq_chart_b9493ce4.png";
 const NVDA_CHART = "/manus-storage/nvda_chart_7bda8308.png";
 const LLY_CHART = "/manus-storage/lly_chart_b1ec7ac4.png";
 
@@ -226,6 +228,31 @@ export default function Home() {
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
           <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
 
+          {/* Economists Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm"
+                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Globe className="w-3 h-3" />
+                <span className="ml-1">Economists</span>
+                <ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[300px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Robert Kessler</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief Economist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Victoria Sterling</span><span className="text-[#8A7548] ml-2 text-[10px]">— Geopolitical Strategist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Wei Lin</span><span className="text-[#8A7548] ml-2 text-[10px]">— China Economist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Thomas Brennan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inflation Specialist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fiscal)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Patricia Duval</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fiscal Policy & Political Economy</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Alexander Petrov</span><span className="text-[#8A7548] ml-2 text-[10px]">— Global FX & Commodities</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Maria Santos</span><span className="text-[#8A7548] ml-2 text-[10px]">— Labor Economist</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Fixed Income</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Claire Donovan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fixed Income Specialist</span></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Analysts Dropdown — All Specialists with Real Names */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -409,6 +436,16 @@ export default function Home() {
           <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
             <p className="text-[#C9A961] text-sm font-medium mb-3 uppercase tracking-[1px]">S&P 500 — 1 Month Trend</p>
             <img src={SPY_CHART} alt="S&P 500 Chart" className="w-full rounded" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <p className="text-[#C9A961] text-sm font-medium mb-3 uppercase tracking-[1px]">Dow Jones — 1 Month Trend</p>
+              <img src={DOW_CHART} alt="Dow Jones Chart" className="w-full rounded" />
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <p className="text-[#C9A961] text-sm font-medium mb-3 uppercase tracking-[1px]">Nasdaq Composite — 1 Month Trend</p>
+              <img src={NASDAQ_CHART} alt="Nasdaq Chart" className="w-full rounded" />
+            </div>
           </div>
           <div className="mt-4 bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
             <p className="text-[#F5E6C8] text-sm leading-relaxed">
