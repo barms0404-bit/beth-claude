@@ -71,6 +71,55 @@ Rules:
 VOICE = "Voice: senior buyside analyst — direct, confident, no fluff, primary-source driven."
 
 
+# ---------------------------------------------------------------------------
+# Citation requirements (mandatory once tool-use is wired)
+#
+# Activated when CITATION_STRICT_MODE=true. Brian's verbatim directive — every
+# specific number must cite the tool call that produced it; uncited claims are
+# refused or marked [unverified - requires tool call].
+# ---------------------------------------------------------------------------
+CITATION_REQUIREMENTS_STRICT = """\
+CITATION REQUIREMENTS (mandatory):
+- Every factual claim must include {source: "tool_call_id" or "document_id"}.
+- Statements about earnings, guidance, prices, yields, ratings, or any number
+  must cite the exact tool call that produced the data.
+- If you cannot cite a source, you must state "I do not have verified data on
+  this" rather than estimate or recall from training.
+- Never reference specific dollar amounts, percentages, or dates unless they
+  came from a tool call in this session.
+- Quotes from management or analysts require source document attribution.
+- If a tool call failed or returned no data, say so explicitly — do not fill
+  the gap.
+
+HALLUCINATION PROTOCOL:
+If you find yourself about to write a specific number, name, or fact that
+didn't come from this session's tool calls, STOP and either:
+  (a) call a tool to verify it, or
+  (b) write "[unverified - requires tool call]" instead of the claim.
+"""
+
+# ---------------------------------------------------------------------------
+# Transitional version — applied when CITATION_STRICT_MODE=false (today).
+# Specialists don't have tool-use yet; the hard version would lobotomize them.
+# This softer version preserves the spirit (don't fabricate specifics) without
+# demanding tool_call_ids that don't exist yet.
+# ---------------------------------------------------------------------------
+CITATION_REQUIREMENTS_PERMISSIVE = """\
+CITATION DISCIPLINE (transitional — tool-use not yet wired):
+- Be conservative with specific numbers, dollar amounts, and dates. If you are
+  not confident the value is current, qualify the claim ("approximately", "as
+  of the last available data") or omit it.
+- Do NOT invent earnings figures, analyst ratings, price targets, or quotes
+  from management. If you don't know, say so plainly.
+- When you reference a specific number you are uncertain about, mark it
+  [unverified] inline so Beth and the Citation Enforcement Agent can flag it.
+- Prefer qualitative framing over fabricated quantitative precision.
+- The full citation-tag requirement activates when CITATION_STRICT_MODE=true
+  (paired with the tool-use pipeline). Treat the permissive version as a
+  hallucination-prevention floor, not a license to estimate freely.
+"""
+
+
 @dataclass
 class Specialist:
     """A single domain analyst in the fleet."""
@@ -86,6 +135,14 @@ class Specialist:
 
     @property
     def system_prompt(self) -> str:
+        # Lazy import — avoids a circular dep at module load.
+        from app.config import get_settings
+
+        citation_block = (
+            CITATION_REQUIREMENTS_STRICT
+            if get_settings().citation_strict_mode
+            else CITATION_REQUIREMENTS_PERMISSIVE
+        )
         return (
             f"{FIRM_PREAMBLE}\n"
             f"--- WHO YOU ARE ---\n"
@@ -94,6 +151,7 @@ class Specialist:
             f"--- YOUR COVERAGE UNIVERSE ---\n{self.coverage}\n\n"
             f"--- YOUR MANDATE ---\n{self.mandate}\n\n"
             f"{DAILY_RESPONSIBILITIES}\n"
+            f"{citation_block}\n"
             f"{OUTPUT_CONTRACT}\n"
             f"{VOICE}"
         )
