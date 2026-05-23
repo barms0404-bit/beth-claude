@@ -13,7 +13,7 @@ on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
 
--- --- 18 specialist analysts (key, name, persona) -------------------------
+-- --- 19 specialist analysts (key, name, persona) -------------------------
 insert into agents (key, name, persona, kind, role, sort_order) values
   ('morning_packet',     'Morning Packet Analyst',                'Eleanor Hayes',   'specialist',
    'Overnight wrap, pre-market movers, earnings recap.', 1),
@@ -43,14 +43,16 @@ insert into agents (key, name, persona, kind, role, sort_order) values
    'Rates, the Fed, factor rotation.', 13),
   ('quant',              'Quantitative Analyst',                  'Anika Sharma',    'specialist',
    'Factor exposure, screens, momentum.', 14),
+  ('chief_economist',    'Chief Economist',                       'Nathaniel Beech', 'specialist',
+   'Global economic narrative — growth/inflation 2x2, Fed reaction function, liquidity + business cycle. Feeds Beth''s regime classification.', 15),
   ('fixed_income',       'Fixed Income Specialist',               'Edward Vance',    'specialist',
-   'Rates, curve, credit spreads, Fed mechanics — translated into growth-equity implications.', 15),
+   'Rates, curve, credit spreads, Fed mechanics — translated into growth-equity implications.', 16),
   ('value_investor',     'Value Investor Specialist',             'Henry Whitlock',  'specialist',
-   'Intrinsic-value hunter, margin of safety, special situations, AI bubble bear case.', 16),
+   'Intrinsic-value hunter, margin of safety, special situations, AI bubble bear case.', 17),
   ('dividend_aristocrat','Dividend Aristocrat & Income Specialist','Margaret Holloway','specialist',
-   'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 17),
+   'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 18),
   ('alt_data',           'Alt Data Specialist',                   'Kevin Park',      'specialist',
-   'Web traffic, app downloads, credit-card panels.', 18)
+   'Web traffic, app downloads, credit-card panels.', 19)
 on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
