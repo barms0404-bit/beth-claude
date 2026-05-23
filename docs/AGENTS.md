@@ -12,7 +12,7 @@ conviction-ranked Top 50 from specialist `new_ideas`, runs its own synthesis tur
 (executive summary + conflict adjudication + escalated risk flags), and returns a
 `Report`.
 
-## The 20 Specialists
+## The 21 Specialists
 
 `apps/api/app/agents/registry.py`. Each is a `Specialist` with a `persona`, a
 functional title, a `coverage` universe, and a `mandate`. System prompt = shared
@@ -36,6 +36,7 @@ contract (the shared fragments are prompt-cached).
 | `macro_strategy` | Robert Sterling | Macro Strategy Analyst | Rates, Fed, factor rotation |
 | `quant` | Anika Sharma | Quantitative Analyst | Factor exposure, screens, momentum |
 | `chief_economist` | Nathaniel Beech | Chief Economist | Growth-inflation 2x2, Fed reaction function, liquidity + business cycle, global growth |
+| `china_economist` | Vivian Liao | China Economist | China macro + policy + property + tech ecosystem; end-market impact matrix on U.S. names |
 | `geopolitical_strategist` | Andrew Pemberton | Geopolitical Strategist | Taiwan/China/semis supply chain, Russia/Ukraine, Middle East, elections, sanctions |
 | `fixed_income` | Edward Vance | Fixed Income Specialist | Rates, curve, credit, Fed — with growth-equity implication |
 | `value_investor` | Henry Whitlock | Value Investor Specialist | Intrinsic value, margin of safety, special situations, AI bubble bear case |
@@ -43,7 +44,7 @@ contract (the shared fragments are prompt-cached).
 | `alt_data` | Kevin Park | Alt Data Specialist | Web traffic, app downloads, card panels |
 
 Dispatch rule (`roster_for`): the one window analyst whose `lead_slot` matches the
-report, plus all 17 non-window specialists.
+report, plus all 18 non-window specialists.
 
 ## Canonical specialist contract
 
