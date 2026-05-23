@@ -18,6 +18,7 @@ Trust nothing. Verify everything.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timezone
 
@@ -29,7 +30,7 @@ from app.schemas import (
     RecommendationVerification,
     VerificationStatus,
 )
-from app.services import sec_edgar
+from app.services import market_data, openfda, sec_edgar, uspto
 from app.services.anthropic_client import call_agent
 
 logger = logging.getLogger("verifier")
@@ -216,11 +217,13 @@ async def _verify_claim(
 
     if claim_type in _EDGAR_TYPES:
         return await _verify_via_edgar(claim_text, claim_type, ticker, now)
+    if claim_type == ClaimType.patent:
+        return await _verify_via_uspto(claim_text, ticker, now)
+    if claim_type == ClaimType.regulatory:
+        return await _verify_via_openfda(claim_text, ticker, now)
 
     # Paywalled / unstructured sources — honest about it.
     notes_for: dict[ClaimType, str] = {
-        ClaimType.patent: "USPTO adapter not wired yet.",
-        ClaimType.regulatory: "FDA/FCC/FTC adapters not wired yet.",
         ClaimType.analyst_rating: (
             "Broker research notes are paywalled (institutional only) and "
             "cannot be verified from public sources."
@@ -317,4 +320,145 @@ async def _verify_via_edgar(
         verification_timestamp=now,
         discrepancies_found=(data.get("discrepancies_found") or None),
         notes=notes,
+    )
+
+
+# --- USPTO + openFDA verification paths ----------------------------------
+async def _company_name(ticker: str) -> str | None:
+    """Resolve ticker -> company name via Polygon for assignee/firm lookups."""
+    details = await market_data.get_ticker_details(ticker)
+    name = (details.get("name") or "").strip()
+    return name or None
+
+
+async def _compare_with_llm(
+    *,
+    claim_text: str,
+    claim_type: ClaimType,
+    source_label: str,
+    source_url: str | None,
+    source_text: str,
+    now: datetime,
+) -> ClaimVerification:
+    """Shared LLM-compare + quote post-validation used by USPTO and openFDA paths."""
+    if not source_text:
+        return ClaimVerification(
+            claim_text=claim_text,
+            claim_type=claim_type,
+            status=VerificationStatus.unverified,
+            primary_source_url=source_url,
+            verification_timestamp=now,
+            notes=f"{source_label}: no records returned for the claim.",
+        )
+
+    reply = await call_agent(
+        system_prompt=_VERIFY_SYSTEM,
+        user_message=(
+            f"Claim: {claim_text}\n\n"
+            f"Source: {source_label}\n"
+            f"Source URL: {source_url or '(varies per record)'}\n\n"
+            f"Source text (truncated):\n{source_text}"
+        ),
+        temperature=0.0,
+        max_tokens=2048,
+    )
+    try:
+        data = reply.as_json()
+    except Exception as exc:
+        return ClaimVerification(
+            claim_text=claim_text,
+            claim_type=claim_type,
+            status=VerificationStatus.unverified,
+            primary_source_url=source_url,
+            verification_timestamp=now,
+            notes=f"LLM verification reply was not JSON: {exc}",
+        )
+
+    status_raw = data.get("status", "unverified")
+    quote = (data.get("exact_quote") or "").strip() or None
+    notes = data.get("notes") or ""
+
+    if status_raw == "verified":
+        if not quote:
+            status_raw = "unverified"
+            notes = (notes + " | No exact_quote returned despite verified status.").strip(" |")
+        elif quote not in source_text:
+            status_raw = "discrepancy"
+            notes = (
+                notes + " | LLM claimed a verbatim quote not found in the source text."
+            ).strip(" |")
+    if status_raw not in _VALID_STATUSES:
+        status_raw = "unverified"
+
+    return ClaimVerification(
+        claim_text=claim_text,
+        claim_type=claim_type,
+        status=VerificationStatus(status_raw),
+        primary_source_url=source_url,
+        exact_quote=quote,
+        verification_timestamp=now,
+        discrepancies_found=(data.get("discrepancies_found") or None),
+        notes=notes,
+    )
+
+
+async def _verify_via_uspto(
+    claim_text: str, ticker: str, now: datetime
+) -> ClaimVerification:
+    """Resolve ticker -> assignee -> recent patents -> LLM compare."""
+    assignee = await _company_name(ticker)
+    if not assignee:
+        return ClaimVerification(
+            claim_text=claim_text,
+            claim_type=ClaimType.patent,
+            status=VerificationStatus.unverified,
+            verification_timestamp=now,
+            notes=f"Could not resolve company name for {ticker} via Polygon.",
+        )
+    patents = await uspto.search_patents_by_assignee(assignee, limit=25)
+    source_text = uspto.patents_as_text(patents)
+    return await _compare_with_llm(
+        claim_text=claim_text,
+        claim_type=ClaimType.patent,
+        source_label=f"USPTO PatentsView · assignee={assignee}",
+        source_url="https://search.patentsview.org/",
+        source_text=source_text,
+        now=now,
+    )
+
+
+async def _verify_via_openfda(
+    claim_text: str, ticker: str, now: datetime
+) -> ClaimVerification:
+    """Resolve ticker -> company -> labels + recalls -> LLM compare."""
+    company = await _company_name(ticker)
+    if not company:
+        return ClaimVerification(
+            claim_text=claim_text,
+            claim_type=ClaimType.regulatory,
+            status=VerificationStatus.unverified,
+            verification_timestamp=now,
+            notes=f"Could not resolve company name for {ticker} via Polygon.",
+        )
+    labels, drug_recalls, device_recalls = await asyncio.gather(
+        openfda.search_drug_labels_by_company(company, limit=10),
+        openfda.search_drug_recalls(company, limit=10),
+        openfda.search_device_recalls(company, limit=10),
+        return_exceptions=True,
+    )
+    text_blocks: list[str] = []
+    if isinstance(labels, list):
+        text_blocks.append(openfda.records_as_text(labels, "drug_label"))
+    if isinstance(drug_recalls, list):
+        text_blocks.append(openfda.records_as_text(drug_recalls, "drug_recall"))
+    if isinstance(device_recalls, list):
+        text_blocks.append(openfda.records_as_text(device_recalls, "device_recall"))
+    source_text = "\n".join(b for b in text_blocks if b)
+    return await _compare_with_llm(
+        claim_text=claim_text,
+        claim_type=ClaimType.regulatory,
+        source_label=f"openFDA · firm={company}",
+        source_url="https://open.fda.gov/",
+        source_text=source_text,
+        now=now,
     )
