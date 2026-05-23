@@ -71,12 +71,17 @@ class SpecialistPick:
     published_at: datetime
 
     def weight(self, now: datetime) -> float:
+        # Imported lazily — services.regime is mutated at runtime by the
+        # morning Regime Detector cron; lazy import avoids any startup cycle.
+        from app.services.regime import regime_weight
+
         hours = max((now - self.published_at).total_seconds() / 3600.0, 0.0)
         decay = HOURLY_DECAY**hours
         return (
             self.conviction
             * track_record(self.agent_key)
             * thematic_relevance(self.ticker)
+            * regime_weight(self.agent_key)
             * decay
         )
 

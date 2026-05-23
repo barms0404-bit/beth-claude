@@ -386,6 +386,76 @@ class CloseRecommendationRequest(BaseModel):
 
 
 # --------------------------------------------------------------------------
+# Market Regime Detection Agent
+# --------------------------------------------------------------------------
+class VolatilityRegime(str, Enum):
+    low = "low"             # VIX < 15
+    normal = "normal"       # 15-20
+    elevated = "elevated"   # 20-30
+    crisis = "crisis"       # > 30
+
+
+class RateRegime(str, Enum):
+    easing = "easing"
+    holding = "holding"
+    hiking = "hiking"
+    inverted = "inverted"   # curve inversion, independent of Fed direction
+
+
+class CreditRegime(str, Enum):
+    tight = "tight"
+    normal = "normal"
+    stressed = "stressed"
+    crisis = "crisis"
+
+
+class FactorRegime(str, Enum):
+    growth_led = "growth_led"
+    value_led = "value_led"
+    quality_led = "quality_led"
+    mixed = "mixed"
+
+
+class BreadthRegime(str, Enum):
+    broad_rally = "broad_rally"
+    narrow_leadership = "narrow_leadership"
+    broad_selloff = "broad_selloff"
+    rotation = "rotation"
+
+
+class LiquidityRegime(str, Enum):
+    abundant = "abundant"
+    normal = "normal"
+    tightening = "tightening"
+    stressed = "stressed"
+
+
+class RegimeClassification(BaseModel):
+    """One dimension's call — label, confidence, short rationale."""
+
+    label: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    rationale: str = ""
+
+
+class RegimeSnapshot(BaseModel):
+    """The morning regime read across all six dimensions."""
+
+    classified_at: datetime
+    volatility: RegimeClassification
+    rate: RegimeClassification
+    credit: RegimeClassification
+    factor: RegimeClassification
+    breadth: RegimeClassification
+    liquidity: RegimeClassification
+    historical_analogs: list[str] = []                # e.g. ["Q4 2018", "Q1 2016"]
+    transition_probability_30d: float = Field(ge=0.0, le=1.0)
+    specialist_weights: dict[str, float] = {}         # agent_key -> multiplier
+    inputs: dict[str, float | None] = {}              # raw measurements snapshot
+    notes: str = ""
+
+
+# --------------------------------------------------------------------------
 # Red Team Agent — adversarial critique of top recommendations
 # --------------------------------------------------------------------------
 class AssumptionCheck(BaseModel):

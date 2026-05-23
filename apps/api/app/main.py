@@ -34,6 +34,7 @@ from app.schemas import (
     PriceBar,
     Recommendation,
     RecommendationVerification,
+    RegimeSnapshot,
     Report,
     ReportSlot,
     ReportSummary,
@@ -46,7 +47,7 @@ from app.schemas import (
 from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
 from app.routes import webhooks as webhook_routes
-from app.services import market_data
+from app.services import market_data, regime as regime_service
 from app.services import specialist_metrics, specialist_recommendations
 from app.services.charts import charts_cache_dir
 from app.services.email_send import archive_root, list_archive, send_report
@@ -177,6 +178,22 @@ async def health() -> dict:
         "reports_cached": [s.value for s in _LATEST],
         "top50_size": len(engine.current().entries) if engine.current() else 0,
     }
+
+
+@app.get("/api/regime", response_model=RegimeSnapshot | None)
+async def current_regime() -> RegimeSnapshot | None:
+    """The latest market regime classification (rehydrated on restart)."""
+    return regime_service.current_snapshot()
+
+
+@app.post("/api/regime/refresh", response_model=RegimeSnapshot)
+async def refresh_regime() -> RegimeSnapshot:
+    """Manually trigger regime classification — the morning cron does this auto."""
+    if not settings.has_anthropic:
+        raise HTTPException(503, "ANTHROPIC_API_KEY not configured — see apps/api/.env.example")
+    from app.agents.regime_detector import detector
+
+    return await detector.detect()
 
 
 @app.get(

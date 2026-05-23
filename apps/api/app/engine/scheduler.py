@@ -46,6 +46,20 @@ async def _top50_poll_job() -> None:
         logger.warning("Top 50 poll failed: %s", exc)
 
 
+async def _regime_job() -> None:
+    """Morning regime classification — runs 7:00 AM AZ before the prep report."""
+    from app.agents.regime_detector import detector
+
+    try:
+        snap = await detector.detect()
+        logger.info(
+            "Regime classified — vol=%s rate=%s factor=%s",
+            snap.volatility.label, snap.rate.label, snap.factor.label,
+        )
+    except Exception as exc:
+        logger.warning("Regime classification failed: %s", exc)
+
+
 async def _report_job(slot_value: str) -> None:
     """One scheduled report: generate -> render -> archive -> send."""
     from app.agents.orchestrator import Beth
@@ -91,10 +105,21 @@ def start_scheduler() -> None:
             coalesce=True,
         )
 
+    # 7:00 AM AZ — regime classification fires 30 min before the prep report
+    # so its specialist_weights are live when Beth dispatches the roster.
+    _scheduler.add_job(
+        _regime_job,
+        CronTrigger(hour=7, minute=0, timezone=settings.schedule_timezone),
+        id="regime_detect",
+        max_instances=1,
+        coalesce=True,
+    )
+
     _scheduler.start()
     logger.info(
-        "Scheduler started — Top 50 every 15m (market hours), reports at 7:30/11:00/13:30 %s.",
-        settings.schedule_timezone,
+        "Scheduler started — Top 50 every 15m (market hours), reports at "
+        "7:30/11:00/13:30 %s, regime detect at 7:00 %s.",
+        settings.schedule_timezone, settings.schedule_timezone,
     )
 
 
