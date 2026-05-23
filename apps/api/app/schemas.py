@@ -244,6 +244,55 @@ class OverallVerification(str, Enum):
     skipped = "skipped"
 
 
+# --------------------------------------------------------------------------
+# Data Validation Agent — cross-source verified data packets
+# --------------------------------------------------------------------------
+class DataKind(str, Enum):
+    equity_price = "equity_price"
+    treasury_yield = "treasury_yield"
+    fundamentals = "fundamentals"
+    economic_data = "economic_data"
+
+
+class ConfidenceStatus(str, Enum):
+    verified = "verified"               # variance under threshold across >=2 sources
+    flagged = "flagged"                 # variance over threshold but reconcilable
+    excluded = "excluded"               # sources fundamentally disagree -> drop
+    stale = "stale"                     # data exceeded the freshness window
+    insufficient_sources = "insufficient_sources"  # <2 sources returned a value
+
+
+class SourceReading(BaseModel):
+    source: str                         # 'polygon' | 'yahoo' | 'fred' | 'treasury_gov' | 'bls'
+    value: float | None = None
+    fetched_at: datetime
+    age_seconds: float | None = None
+    error: str | None = None
+
+
+class VerifiedDataPoint(BaseModel):
+    """One field after cross-source validation. Specialists see only these."""
+
+    field: str                          # e.g. 'AAPL.price', 'DGS10', 'CPIAUCSL'
+    kind: DataKind
+    value: float | None                 # reconciled value (mean / single source)
+    confidence: float = Field(ge=0.0, le=1.0)
+    status: ConfidenceStatus
+    variance: float | None = None       # absolute (yields) or relative (others)
+    threshold: float
+    sources: list[SourceReading] = []
+    verified_at: datetime
+    notes: str = ""
+
+
+class VerifiedDataPacket(BaseModel):
+    """Bundle of validated points handed to a specialist or surfaced via API."""
+
+    points: list[VerifiedDataPoint] = []
+    verified_at: datetime
+    overall_confidence: float = Field(ge=0.0, le=1.0)
+
+
 class RecommendationVerification(BaseModel):
     """One high-conviction `new_idea` after PSV. Keyed by (agent_key, ticker)."""
 

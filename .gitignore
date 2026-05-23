@@ -40,5 +40,6 @@ coverage/
 *.tsbuildinfo
 next-env.d.ts
 
-# generated chart pngs
+# generated chart pngs + validator audit log
 apps/api/.charts_cache/
+apps/api/.audit/

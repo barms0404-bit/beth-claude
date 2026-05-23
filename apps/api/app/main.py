@@ -20,6 +20,7 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from app.agents.orchestrator import Beth
 from app.agents.registry import SPECIALISTS
+from app.agents.validator import validator
 from app.config import get_settings
 from app.engine.scheduler import start_scheduler, stop_scheduler
 from app.engine.top50 import engine
@@ -38,6 +39,7 @@ from app.schemas import (
     SpecialistNote,
     TickerDetail,
     Top50Snapshot,
+    VerifiedDataPoint,
 )
 from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
@@ -172,6 +174,18 @@ async def health() -> dict:
         "reports_cached": [s.value for s in _LATEST],
         "top50_size": len(engine.current().entries) if engine.current() else 0,
     }
+
+
+@app.get("/api/validation/equity/{ticker}", response_model=VerifiedDataPoint)
+async def validate_equity(ticker: str) -> VerifiedDataPoint:
+    """Cross-source equity-price validation (Polygon vs Yahoo, 0.1% threshold)."""
+    return await validator.validate_equity_price(ticker)
+
+
+@app.get("/api/validation/treasury/{series_id}", response_model=VerifiedDataPoint)
+async def validate_treasury(series_id: str) -> VerifiedDataPoint:
+    """Cross-source treasury-yield validation (FRED vs treasury.gov, 1bps threshold)."""
+    return await validator.validate_treasury_yield(series_id)
 
 
 @app.get("/api/agents")
