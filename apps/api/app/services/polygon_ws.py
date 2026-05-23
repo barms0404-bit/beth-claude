@@ -80,29 +80,54 @@ class PolygonStream:
         self._subscribed = set(self._desired)
 
     # -- main loop ----------------------------------------------------------
+    # Reconnect policy: backoff starts at 5s, doubles to 60s max. We only reset
+    # backoff after a STABLE connection (>=30s of uptime) — otherwise a clean
+    # close immediately after auth (e.g., Polygon idle-disconnect when the
+    # subscription set is empty at boot) would tight-loop with backoff stuck.
+    _STABLE_THRESHOLD_SECONDS = 30.0
+
     async def _run(self) -> None:
-        backoff = 1.0
+        import time
+
+        backoff = 5.0
         while not self._stopping and not self._auth_dead:
+            connect_started_at = time.monotonic()
+            close_reason = "unknown"
             try:
                 async with websockets.connect(self.url, ping_interval=20) as ws:
                     self._ws = ws
                     if not await self._authenticate(ws):
                         # Hard exit — tier / key issue, no point retrying.
                         return
-                    logger.info("Polygon WS connected + authenticated.")
+                    logger.info(
+                        "Polygon WS connected + authenticated (subs=%d).",
+                        len(self._desired),
+                    )
                     self._subscribed = set()
-                    backoff = 1.0
                     await self._reconcile()
                     await self._consume(ws)
+                    close_reason = "consume returned"
             except asyncio.CancelledError:
                 return
+            except ConnectionClosed as exc:
+                close_reason = f"ConnectionClosed code={exc.code} reason={exc.reason!r}"
             except Exception as exc:
-                logger.warning("Polygon WS dropped: %s — reconnecting in %.1fs", exc, backoff)
+                close_reason = f"{type(exc).__name__}: {exc}"
             finally:
                 self._ws = None
 
             if self._stopping or self._auth_dead:
                 return
+
+            uptime = time.monotonic() - connect_started_at
+            if uptime >= self._STABLE_THRESHOLD_SECONDS:
+                # Long-lived connection — safe to reset backoff.
+                backoff = 5.0
+            logger.warning(
+                "Polygon WS dropped after %.1fs: %s — reconnecting in %.1fs",
+                uptime, close_reason, backoff,
+            )
+
             try:
                 await asyncio.sleep(backoff)
             except asyncio.CancelledError:
