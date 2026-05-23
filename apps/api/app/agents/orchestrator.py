@@ -28,14 +28,16 @@ from app.schemas import (
     ChartSpec,
     CitationReport,
     Recommendation,
+    RecommendationAction,
     RecommendationVerification,
     RedTeamCritique,
     Report,
     ReportSlot,
+    SpecialistRecommendation,
     SpecialistReport,
     Top50Snapshot,
 )
-from app.services import market_data
+from app.services import market_data, specialist_recommendations
 from app.services.duration import duration_for
 from app.services.macro_calendar import macro_event_today
 
@@ -136,15 +138,17 @@ class Beth:
         # mode, outputs are unchanged and only the citation_reports populate.
         citation_reports = await self._enforce_citations(outputs)
 
-        # Three LLM-heavy passes run concurrently:
+        # Four work items run concurrently:
         #   - render charts requested by specialists
         #   - PSV verifier on conviction>=8 ideas
         #   - Beth's "focused contrarian" pass (Value Investor again, if
         #     growth/thematic team produced high-conviction picks or skewed bullish)
-        charts, verifications, bear_case = await asyncio.gather(
+        #   - persist every new_idea as a SpecialistRecommendation row
+        charts, verifications, bear_case, _ = await asyncio.gather(
             self._render_charts(outputs),
             self._verify_high_conviction(outputs),
             self._maybe_focused_contrarian(outputs, slot=slot),
+            self._log_recommendations(outputs),
         )
 
         # Feed the Top 50 engine and read the ranking back — single source.
@@ -211,6 +215,47 @@ class Beth:
             elif isinstance(result, Exception):
                 logger.warning("Verifier batch failed: %s", result)
         return flat
+
+    @staticmethod
+    async def _log_recommendations(outputs: list[SpecialistReport]) -> int:
+        """Append every specialist's new_ideas to the SpecialistRecommendation store.
+
+        Each new_idea becomes one row with entry_price = current snapshot price
+        (batch-fetched) and entry_timestamp = filing time. Lifecycle outcome
+        columns stay None until the trade is closed via /api/specialist-
+        recommendations/{id}/close.
+        """
+        if not outputs:
+            return 0
+        tickers: set[str] = set()
+        for sr in outputs:
+            for idea in sr.new_ideas:
+                if idea.ticker:
+                    tickers.add(idea.ticker.upper())
+        quotes = await market_data.get_quotes(sorted(tickers)) if tickers else {}
+
+        written = 0
+        for sr in outputs:
+            for idea in sr.new_ideas:
+                ticker = idea.ticker.upper() if idea.ticker else ""
+                if not ticker:
+                    continue
+                quote = quotes.get(ticker)
+                rec = SpecialistRecommendation(
+                    agent_key=sr.agent_key,
+                    specialist=sr.specialist,
+                    ticker=ticker,
+                    action=RecommendationAction.long,  # new_ideas are bullish pitches
+                    conviction_1_10=idea.conviction_1_10,
+                    time_horizon=idea.time_horizon,
+                    thesis_summary=idea.thesis,
+                    entry_price=(quote.price if quote else None),
+                    entry_timestamp=sr.timestamp or datetime.now(timezone.utc),
+                    thesis_assumptions=[idea.key_risk] if idea.key_risk else [],
+                )
+                specialist_recommendations.append(rec)
+                written += 1
+        return written
 
     @staticmethod
     async def _enforce_citations(

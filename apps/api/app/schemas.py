@@ -8,7 +8,7 @@ Two model families live here:
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -328,6 +328,61 @@ class CitationReport(BaseModel):
     hallucination_rate: float = 0.0   # (uncited + distorted + fabricated) / claims_total
     strict_mode: bool = False         # whether sanitization was applied to the SpecialistReport
     verified_at: datetime
+
+
+# --------------------------------------------------------------------------
+# specialist_recommendations — closed-loop trade tracking
+# --------------------------------------------------------------------------
+class RecommendationAction(str, Enum):
+    long = "long"
+    short = "short"
+    avoid = "avoid"
+    watch = "watch"
+
+
+class SpecialistRecommendation(BaseModel):
+    """One specialist's recommendation — lifecycle from filing to close.
+
+    Written when a specialist files a `new_idea`; updated by the close
+    endpoint when the trade exits. Drives per-specialist track records
+    feeding the Top 50 engine's TRACK_RECORD map.
+    """
+
+    recommendation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    agent_key: str
+    specialist: str                                       # persona name
+    ticker: str
+    action: RecommendationAction = RecommendationAction.long
+    conviction_1_10: int = Field(ge=1, le=10)
+    time_horizon: str
+    thesis_summary: str
+
+    entry_price: float | None = None
+    entry_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    target_price: float | None = None
+    stop_loss: float | None = None
+    thesis_assumptions: list[str] = []
+    catalyst_expected: str | None = None
+    catalyst_date_estimate: str | None = None             # ISO date, free-form OK
+
+    closed: bool = False
+    exit_price: float | None = None
+    exit_timestamp: datetime | None = None
+    realized_return: float | None = None                  # percent
+    vs_benchmark_return: float | None = None              # percent vs SPY (computed at close)
+    hit_target: bool | None = None
+    thesis_validated: bool | None = None
+    post_mortem_notes: str | None = None
+
+
+class CloseRecommendationRequest(BaseModel):
+    """POST body to mark a SpecialistRecommendation closed."""
+
+    exit_price: float
+    exit_timestamp: datetime | None = None
+    hit_target: bool | None = None
+    thesis_validated: bool | None = None
+    post_mortem_notes: str | None = None
 
 
 # --------------------------------------------------------------------------

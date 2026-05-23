@@ -27,6 +27,7 @@ from app.engine.top50 import engine
 from app.schemas import (
     ActivityItem,
     ArchivedReport,
+    CloseRecommendationRequest,
     GenerateReportRequest,
     IndexQuote,
     NewsItem,
@@ -37,6 +38,7 @@ from app.schemas import (
     ReportSlot,
     ReportSummary,
     SpecialistNote,
+    SpecialistRecommendation,
     TickerDetail,
     Top50Snapshot,
     VerifiedDataPoint,
@@ -45,7 +47,7 @@ from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
 from app.routes import webhooks as webhook_routes
 from app.services import market_data
-from app.services import specialist_metrics
+from app.services import specialist_metrics, specialist_recommendations
 from app.services.charts import charts_cache_dir
 from app.services.email_send import archive_root, list_archive, send_report
 from app.services.polygon_ws import PolygonStream
@@ -175,6 +177,46 @@ async def health() -> dict:
         "reports_cached": [s.value for s in _LATEST],
         "top50_size": len(engine.current().entries) if engine.current() else 0,
     }
+
+
+@app.get(
+    "/api/specialist-recommendations",
+    response_model=list[SpecialistRecommendation],
+)
+async def list_recommendations(
+    specialist: str | None = None,         # agent_key
+    ticker: str | None = None,
+    closed: bool | None = None,
+    limit: int = 200,
+) -> list[SpecialistRecommendation]:
+    """Filtered query over the closed-loop recommendation log."""
+    return specialist_recommendations.filter_records(
+        agent_key=specialist,
+        ticker=ticker,
+        closed=closed,
+        limit=limit,
+    )
+
+
+@app.post(
+    "/api/specialist-recommendations/{recommendation_id}/close",
+    response_model=SpecialistRecommendation,
+)
+async def close_recommendation(
+    recommendation_id: str, req: CloseRecommendationRequest
+) -> SpecialistRecommendation:
+    """Mark a recommendation closed, compute realized return, persist post-mortem."""
+    rec = specialist_recommendations.close(
+        recommendation_id,
+        exit_price=req.exit_price,
+        exit_timestamp=req.exit_timestamp,
+        hit_target=req.hit_target,
+        thesis_validated=req.thesis_validated,
+        post_mortem_notes=req.post_mortem_notes,
+    )
+    if rec is None:
+        raise HTTPException(404, f"Recommendation {recommendation_id} not found")
+    return rec
 
 
 @app.get("/api/citations/metrics")
