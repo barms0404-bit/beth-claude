@@ -13,7 +13,7 @@ on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
 
--- --- 21 specialist analysts (key, name, persona) -------------------------
+-- --- 22 specialist analysts (key, name, persona) -------------------------
 insert into agents (key, name, persona, kind, role, sort_order) values
   ('morning_packet',     'Morning Packet Analyst',                'Eleanor Hayes',   'specialist',
    'Overnight wrap, pre-market movers, earnings recap.', 1),
@@ -47,16 +47,18 @@ insert into agents (key, name, persona, kind, role, sort_order) values
    'Global economic narrative — growth/inflation 2x2, Fed reaction function, liquidity + business cycle. Feeds Beth''s regime classification.', 15),
   ('china_economist',       'China Economist',                       'Vivian Liao',       'specialist',
    'China macro + policy + property + tech ecosystem with skeptical lens. End-market impact matrix on U.S. names with China exposure.', 16),
+  ('inflation_specialist',  'Inflation Specialist',                  'Catherine Voss',    'specialist',
+   'Inflation decomp + shelter lag model + supercore framework + regime classifier. Precise to the basis point.', 17),
   ('geopolitical_strategist','Geopolitical Strategist',              'Andrew Pemberton',  'specialist',
-   'Geopolitical risk for the growth equity book — Taiwan/China/semis supply chain, Russia/Ukraine, Middle East, elections, sanctions.', 17),
+   'Geopolitical risk for the growth equity book — Taiwan/China/semis supply chain, Russia/Ukraine, Middle East, elections, sanctions.', 18),
   ('fixed_income',          'Fixed Income Specialist',               'Edward Vance',      'specialist',
-   'Rates, curve, credit spreads, Fed mechanics — translated into growth-equity implications.', 18),
+   'Rates, curve, credit spreads, Fed mechanics — translated into growth-equity implications.', 19),
   ('value_investor',        'Value Investor Specialist',             'Henry Whitlock',    'specialist',
-   'Intrinsic-value hunter, margin of safety, special situations, AI bubble bear case.', 19),
+   'Intrinsic-value hunter, margin of safety, special situations, AI bubble bear case.', 20),
   ('dividend_aristocrat',   'Dividend Aristocrat & Income Specialist','Margaret Holloway','specialist',
-   'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 20),
+   'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 21),
   ('alt_data',              'Alt Data Specialist',                   'Kevin Park',        'specialist',
-   'Web traffic, app downloads, credit-card panels.', 21)
+   'Web traffic, app downloads, credit-card panels.', 22)
 on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
