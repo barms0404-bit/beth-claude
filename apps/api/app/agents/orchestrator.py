@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 from datetime import datetime, timezone
 
 from app.agents.base import build_context
@@ -30,7 +31,15 @@ from app.schemas import (
     SpecialistReport,
     Top50Snapshot,
 )
+from app.services import market_data
+from app.services.duration import duration_for
 from app.services.macro_calendar import macro_event_today
+
+# Parseable tags emitted by Holloway and Whitlock at the start of every
+# covered_names_commentary narrative. See their mandates in registry.py.
+_RE_YIELD = re.compile(r"yield\s+(\d+(?:\.\d+)?)\s*%", re.I)
+_RE_SAFETY = re.compile(r"safety\s+(\d+)\s*/\s*10", re.I)
+_RE_MOS = re.compile(r"\bMoS\s+(-?\d+(?:\.\d+)?)\s*%", re.I)
 
 # Specialist keys whose picks count as "growth/thematic" for Beth's
 # orchestration rules (contrarian check, bull-skew detection).
@@ -132,6 +141,7 @@ class Beth:
         # Feed the Top 50 engine and read the ranking back — single source.
         engine.ingest(outputs)
         snapshot = await engine.rebuild()
+        await self._enrich_top50(snapshot, outputs)
         recommendations = self._recommendations_from(snapshot)
 
         # Macro event-day rule: on FOMC / CPI / NFP days, Fixed Income leads.
@@ -160,7 +170,9 @@ class Beth:
         """Poll specialists and re-rank the Top 50. Driven by the scheduler."""
         outputs = await self.dispatch(ReportSlot.mid_day)
         engine.ingest(outputs)
-        return await engine.rebuild()
+        snapshot = await engine.rebuild()
+        await self._enrich_top50(snapshot, outputs)
+        return snapshot
 
     # -- pipeline stages ----------------------------------------------------
     @staticmethod
@@ -279,6 +291,70 @@ class Beth:
             return []
         done = await asyncio.gather(*jobs, return_exceptions=True)
         return [c for c in done if isinstance(c, ChartSpec)]
+
+    @staticmethod
+    async def _enrich_top50(snapshot: Top50Snapshot, outputs: list[SpecialistReport]) -> None:
+        """Overlay per-ticker specialist signal onto each Top 50 entry — in place.
+
+        - dividend_yield / dividend_safety from Holloway's tag prefix.
+        - value_score (margin of safety %) from Whitlock's tag prefix.
+        - duration_sensitivity from Polygon sic_description -> duration_for().
+
+        The two tag prefixes are spelled out in each specialist's mandate; if
+        the LLM departs from the format we degrade to None silently.
+        """
+        holloway = Beth._coverage_lookup(outputs, "dividend_aristocrat")
+        whitlock = Beth._coverage_lookup(outputs, "value_investor")
+
+        # Pull sector details once per ticker — get_ticker_details is cached.
+        sectors = await asyncio.gather(
+            *(market_data.get_ticker_details(e.ticker) for e in snapshot.entries),
+            return_exceptions=True,
+        )
+
+        for entry, details in zip(snapshot.entries, sectors):
+            # Holloway overlays
+            text = holloway.get(entry.ticker.upper())
+            if text:
+                m = _RE_YIELD.search(text)
+                if m:
+                    try:
+                        entry.dividend_yield = float(m.group(1))
+                    except ValueError:
+                        pass
+                m = _RE_SAFETY.search(text)
+                if m:
+                    try:
+                        entry.dividend_safety = int(m.group(1))
+                    except ValueError:
+                        pass
+            # Whitlock overlay
+            text = whitlock.get(entry.ticker.upper())
+            if text:
+                m = _RE_MOS.search(text)
+                if m:
+                    try:
+                        entry.value_score = float(m.group(1))
+                    except ValueError:
+                        pass
+            # Duration sensitivity from sector
+            if isinstance(details, dict):
+                entry.duration_sensitivity = duration_for(details.get("sic_description"))
+
+    @staticmethod
+    def _coverage_lookup(
+        outputs: list[SpecialistReport], agent_key: str
+    ) -> dict[str, str]:
+        """ticker.upper() -> narrative text for one specialist's coverage."""
+        for sr in outputs:
+            if sr.agent_key != agent_key:
+                continue
+            lookup: dict[str, str] = {}
+            for cn in sr.covered_names_commentary:
+                if cn.ticker:
+                    lookup[cn.ticker.upper()] = cn.narrative
+            return lookup
+        return {}
 
     @staticmethod
     def _recommendations_from(snapshot: Top50Snapshot) -> list[Recommendation]:

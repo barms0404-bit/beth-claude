@@ -24,6 +24,10 @@ type SortKey =
   | "day_change_pct"
   | "ytd_change_pct"
   | "conviction_avg"
+  | "dividend_yield"
+  | "dividend_safety"
+  | "value_score"
+  | "duration_sensitivity"
   | "lead_specialist";
 
 const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
@@ -34,8 +38,18 @@ const COLUMNS: { key: SortKey; label: string; align?: "right" }[] = [
   { key: "day_change_pct", label: "Day %", align: "right" },
   { key: "ytd_change_pct", label: "YTD %", align: "right" },
   { key: "conviction_avg", label: "Conviction", align: "right" },
+  { key: "dividend_yield", label: "Yield", align: "right" },
+  { key: "dividend_safety", label: "Safety", align: "right" },
+  { key: "value_score", label: "MoS", align: "right" },
+  { key: "duration_sensitivity", label: "Duration" },
   { key: "lead_specialist", label: "Lead Specialist" },
 ];
+
+const DURATION_TONE: Record<string, string> = {
+  high: "bg-danger/15 text-danger",
+  medium: "bg-gold/15 text-gold",
+  low: "bg-success/15 text-success",
+};
 
 /** Up arrow (gold) / down arrow (muted) / NEW badge based on previous_rank. */
 function RankDelta({ entry }: { entry: Top50Entry }) {
@@ -172,6 +186,33 @@ export function Top50Table({ initial }: { initial: Top50Snapshot }) {
             </TableCell>
             <TableCell className="text-right tabular-nums">
               {e.conviction_avg.toFixed(1)}/10
+            </TableCell>
+            <TableCell className="text-right tabular-nums text-gold-muted">
+              {e.dividend_yield != null ? `${e.dividend_yield.toFixed(2)}%` : "—"}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">
+              {e.dividend_safety != null ? (
+                <span className="text-cream">{e.dividend_safety}/10</span>
+              ) : (
+                <span className="text-gold-muted">—</span>
+              )}
+            </TableCell>
+            <TableCell className={cn("text-right tabular-nums", changeTone(e.value_score))}>
+              {e.value_score != null ? formatPct(e.value_score) : "—"}
+            </TableCell>
+            <TableCell>
+              {e.duration_sensitivity ? (
+                <span
+                  className={cn(
+                    "inline-block rounded px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-wider",
+                    DURATION_TONE[e.duration_sensitivity] ?? "text-gold-muted",
+                  )}
+                >
+                  {e.duration_sensitivity === "medium" ? "med" : e.duration_sensitivity}
+                </span>
+              ) : (
+                <span className="text-gold-muted">—</span>
+              )}
             </TableCell>
             <TableCell
               className="whitespace-nowrap text-gold-muted"

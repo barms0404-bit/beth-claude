@@ -178,6 +178,11 @@ class Top50Entry(BaseModel):
     thesis_summary: str
     conviction_avg: float
     time_horizon: str
+    # --- Specialist overlays (populated by the orchestrator post-rebuild) ---
+    dividend_yield: float | None = None        # Holloway, current yield %
+    dividend_safety: int | None = None         # Holloway, 1-10
+    value_score: float | None = None           # Whitlock, margin-of-safety %
+    duration_sensitivity: str | None = None    # "high" | "medium" | "low" (sector-derived)
 
 
 class Top50Snapshot(BaseModel):

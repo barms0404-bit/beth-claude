@@ -59,6 +59,11 @@ export interface Top50Entry {
   thesis_summary: string;
   conviction_avg: number;
   time_horizon: string;
+  // --- Specialist overlays (populated by the orchestrator) ---
+  dividend_yield: number | null;        // Holloway, current yield %
+  dividend_safety: number | null;       // Holloway, 1-10
+  value_score: number | null;           // Whitlock, margin-of-safety %
+  duration_sensitivity: "high" | "medium" | "low" | null;
 }
 
 export interface Top50Snapshot {
