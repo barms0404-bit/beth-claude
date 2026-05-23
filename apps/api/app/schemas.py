@@ -68,6 +68,28 @@ class ProbabilisticForecast(BaseModel):
         return self
 
 
+class VariantPerception(str, Enum):
+    consensus = "consensus"        # team thesis matches the street consensus
+    variant = "variant"            # team has a differentiated angle, not opposite
+    contrarian = "contrarian"      # team takes the opposite side of consensus
+
+
+class MarketPositioning(BaseModel):
+    """The team's read on the trade's positioning + edge.
+
+    `consensus_target` and `crowding_score` are SPECIALIST ESTIMATES today —
+    a real positioning feed (13F concentration + options skew) and an analyst-
+    estimate aggregator are not yet wired. Strict citation mode still applies.
+    """
+
+    variant_perception: VariantPerception
+    crowding_score: int = Field(ge=1, le=10, description="1 untouched ... 10 maximally crowded long")
+    evidence_strength: int = Field(ge=1, le=10, description="1 weak ... 10 ironclad")
+    consensus_target: float | None = None       # 12m street PT, specialist estimate
+    consensus_target_vs_team_target_pct: float | None = None  # computed server-side
+    notes: str = ""
+
+
 class NewIdea(BaseModel):
     """A name the specialist is surfacing for the Top 50."""
 
@@ -80,6 +102,10 @@ class NewIdea(BaseModel):
     # in schema so binary/event-driven trades (where a distribution is wrong)
     # can set forecast=null and explain in the thesis.
     forecast: ProbabilisticForecast | None = None
+    # Variant perception + crowding + evidence strength. Mandated by OUTPUT_CONTRACT
+    # for every new_idea; optional in schema so the orchestrator can detect-and-drop
+    # contrarian+weak picks before engine ingest.
+    market_positioning: MarketPositioning | None = None
 
 
 class ChartRequest(BaseModel):
@@ -410,6 +436,13 @@ class SpecialistRecommendation(BaseModel):
     hit_target: bool | None = None
     thesis_validated: bool | None = None
     post_mortem_notes: str | None = None
+
+    # Variant perception + crowding + evidence (specialist-estimated today)
+    variant_perception: VariantPerception | None = None
+    crowding_score: int | None = Field(default=None, ge=1, le=10)
+    evidence_strength: int | None = Field(default=None, ge=1, le=10)
+    consensus_target: float | None = None
+    consensus_target_vs_team_target_pct: float | None = None  # computed server-side
 
 
 class CloseRecommendationRequest(BaseModel):

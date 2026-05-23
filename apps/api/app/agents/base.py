@@ -58,6 +58,13 @@ Respond with ONLY a single JSON object, no prose outside it, matching exactly:
        "bull_case_25pct": {"price": 0.0, "scenario": "what has to be true for bull"},
        "probability_thesis_correct": 0.65,
        "key_uncertainties": ["short strings — the live unknowns that move the case"]
+     },
+     "market_positioning": {
+       "variant_perception": "consensus | variant | contrarian",
+       "crowding_score": 5,
+       "evidence_strength": 7,
+       "consensus_target": 0.0,
+       "notes": "optional, one sentence"
      }
     }
   ],
@@ -92,6 +99,28 @@ PROBABILISTIC FORECAST (mandatory on EVERY new_idea):
 - If you cannot construct a probabilistic forecast for a name (e.g. event-driven
   trade with binary outcome), set forecast = null and explain the binary in the
   thesis.
+
+MARKET POSITIONING (mandatory on EVERY new_idea):
+- variant_perception classifies your thesis vs the street:
+    "consensus"  — your thesis matches the broad sell-side view
+    "variant"    — you see something materially different from consensus
+    "contrarian" — you take the OPPOSITE side of consensus
+- crowding_score (1-10): how crowded is the long? 1 = untouched / underowned,
+  5 = balanced, 10 = maximally crowded (hedge funds + retail piled in).
+  Today this is your ESTIMATE (real positioning data isn't wired); apply the
+  citation discipline anyway — say "estimate" in notes when uncertain.
+- evidence_strength (1-10): the rigor of your supporting evidence. 1 = hunch,
+  10 = filed-data + primary-source + verifiable triangulation.
+- consensus_target: the street's median 12-month price target as best you
+  can estimate it. The server computes consensus_target_vs_team_target_pct
+  against your base_case_50pct.price — do NOT emit the delta yourself.
+
+ALPHA / RISK / AVOID HEURISTIC — self-police BEFORE filing:
+- variant + evidence_strength >= 7   -> HIGHEST alpha, file it.
+- consensus + evidence_strength >= 7 -> lower alpha but lower risk, file it.
+- contrarian + evidence_strength >= 7 -> file it; the bear has to be loud.
+- contrarian + evidence_strength <  7 -> DO NOT FILE. The orchestrator will
+  drop it from engine ingest if you do, and the rejection logs to audit.
 """
 
 VOICE = "Voice: senior buyside analyst — direct, confident, no fluff, primary-source driven."

@@ -27,6 +27,7 @@ from app.engine.top50 import engine
 from app.schemas import (
     ChartSpec,
     CitationReport,
+    NewIdea,
     Recommendation,
     RecommendationAction,
     RecommendationVerification,
@@ -36,10 +37,16 @@ from app.schemas import (
     SpecialistRecommendation,
     SpecialistReport,
     Top50Snapshot,
+    VariantPerception,
 )
-from app.services import market_data, specialist_recommendations
+from app.services import audit, market_data, specialist_recommendations
 from app.services.duration import duration_for
 from app.services.macro_calendar import macro_event_today
+
+# Avoid rule — contrarian picks need strong evidence; otherwise the
+# orchestrator drops them before engine ingest (safety net for the
+# specialist's own self-policing instruction).
+AVOID_EVIDENCE_FLOOR = 7
 
 # Parseable tags emitted by Holloway and Whitlock at the start of every
 # covered_names_commentary narrative. See their mandates in registry.py.
@@ -138,6 +145,11 @@ class Beth:
         # mode, outputs are unchanged and only the citation_reports populate.
         citation_reports = await self._enforce_citations(outputs)
 
+        # Drop contrarian+weak picks from outputs[].new_ideas before engine
+        # ingest. Specialists are instructed to self-police this; the filter is
+        # the safety net. Drops audit-log to .audit/positioning_filter.jsonl.
+        self._apply_positioning_filter(outputs)
+
         # Four work items run concurrently:
         #   - render charts requested by specialists
         #   - PSV verifier on conviction>=8 ideas
@@ -217,6 +229,38 @@ class Beth:
         return flat
 
     @staticmethod
+    def _apply_positioning_filter(outputs: list[SpecialistReport]) -> int:
+        """Drop contrarian+weak new_ideas from outputs in place. Audits each drop."""
+        dropped = 0
+        for sr in outputs:
+            kept: list[NewIdea] = []
+            for idea in sr.new_ideas:
+                mp = idea.market_positioning
+                if (
+                    mp is not None
+                    and mp.variant_perception == VariantPerception.contrarian
+                    and mp.evidence_strength < AVOID_EVIDENCE_FLOOR
+                ):
+                    audit.log_event(
+                        "positioning_filter",
+                        {
+                            "agent_key": sr.agent_key,
+                            "specialist": sr.specialist,
+                            "ticker": idea.ticker,
+                            "rule": f"contrarian + evidence_strength < {AVOID_EVIDENCE_FLOOR}",
+                            "evidence_strength": mp.evidence_strength,
+                            "crowding_score": mp.crowding_score,
+                            "thesis": idea.thesis[:240],
+                        },
+                    )
+                    dropped += 1
+                    continue
+                kept.append(idea)
+            if dropped:
+                sr.new_ideas = kept
+        return dropped
+
+    @staticmethod
     async def _log_recommendations(outputs: list[SpecialistReport]) -> int:
         """Append every specialist's new_ideas to the SpecialistRecommendation store.
 
@@ -254,6 +298,28 @@ class Beth:
                 if idea.key_risk:
                     assumptions.append(idea.key_risk)
 
+                # Market positioning overlay + consensus delta.
+                variant = None
+                crowding = None
+                evidence = None
+                consensus_target = None
+                consensus_delta = None
+                if idea.market_positioning is not None:
+                    mp = idea.market_positioning
+                    variant = mp.variant_perception
+                    crowding = mp.crowding_score
+                    evidence = mp.evidence_strength
+                    consensus_target = mp.consensus_target
+                    if (
+                        consensus_target
+                        and idea.forecast
+                        and consensus_target != 0
+                    ):
+                        team_target = idea.forecast.base_case_50pct.price
+                        consensus_delta = round(
+                            (team_target - consensus_target) / consensus_target * 100, 4
+                        )
+
                 rec = SpecialistRecommendation(
                     agent_key=sr.agent_key,
                     specialist=sr.specialist,
@@ -267,6 +333,11 @@ class Beth:
                     target_price=target_price,
                     stop_loss=stop_loss,
                     thesis_assumptions=assumptions,
+                    variant_perception=variant,
+                    crowding_score=crowding,
+                    evidence_strength=evidence,
+                    consensus_target=consensus_target,
+                    consensus_target_vs_team_target_pct=consensus_delta,
                 )
                 specialist_recommendations.append(rec)
                 written += 1
