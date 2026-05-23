@@ -16,11 +16,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install deps first (better cache).
-COPY requirements.txt ./
+# Paths are repo-root-relative so this Dockerfile can be built either from
+# `apps/api/` (legacy local docker build) OR from repo root (Railway default
+# without setting Root Directory in the UI). The root-level `railway.json`
+# tells Railway to use this file with the repo root as build context.
+COPY apps/api/requirements.txt ./
 RUN pip install -r requirements.txt
 
 # App code.
-COPY app ./app
+COPY apps/api/app ./app
 
 # Railway injects PORT; default to 8000 for local docker run.
 ENV PORT=8000
