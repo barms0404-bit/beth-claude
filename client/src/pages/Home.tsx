@@ -472,10 +472,60 @@ export default function Home() {
 
         {/* MACROECONOMIC ADVISORY */}
         <section id={SECTIONS.macro}>
-          <SectionHeader title="Macroeconomic Advisory" subtitle="Chief Economist & Economic Advisory Pod" />
+          <SectionHeader title="Macroeconomic Advisory" subtitle="Economic Advisory Pod — 7 Specialists" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <AgentCard title="Chief Economist" agent="Chief Economist" content="Divergence between stock market performance and consumer sentiment. University of Michigan May Survey hit new lows. Fed funds rate steady at 3.50-3.75% with 37% probability of hikes in late 2026." highlight="Growth equity implication: Cautious on rate-sensitive sectors. Favor quality growth with pricing power." />
-            <AgentCard title="Fixed Income Strategy" agent="Fixed Income Specialist" content="Treasury yields elevated near 2007 levels. 10Y at 4.87%, 2s10s spread normalized at +35bps. IG spreads tight at ~90bps OAS. HY widened to ~350bps." highlight="Recommendation: Barbell strategy — short-duration T-bills + high-quality corporate credit." />
+            <AgentCard title="Chief Economist" agent="Dr. Robert Kessler" content="Divergence between stock market performance and consumer sentiment. University of Michigan May Survey hit new lows. Fed funds rate steady at 3.50-3.75% with 37% probability of hikes in late 2026." highlight="Growth equity implication: Cautious on rate-sensitive sectors. Favor quality growth with pricing power." />
+            <AgentCard title="Fixed Income Strategy" agent="Claire Donovan" content="Treasury yields elevated near 2007 levels. 10Y at 4.87%, 2s10s spread normalized at +35bps. IG spreads tight at ~90bps OAS. HY widened to ~350bps." highlight="Recommendation: Barbell strategy — short-duration T-bills + high-quality corporate credit." />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-4">
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Thomas Brennan</span>
+                <span className="text-[#8A7548] text-[10px]">— Inflation</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">CPI sticky at 3.4%. Supercore at 4.1%. Shelter lag model suggests gradual easing H2 but path to 2% extends into 2027.</p>
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Victoria Sterling</span>
+                <span className="text-[#8A7548] text-[10px]">— Geopolitical</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">U.S.-Iran negotiations progressing. Strait of Hormuz reopening could ease oil. China semiconductor restrictions tightening.</p>
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Wei Lin</span>
+                <span className="text-[#8A7548] text-[10px]">— China Economist</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">China recovery uneven. Property stabilization ongoing. Tech regulation easing. Semiconductor self-sufficiency push accelerating.</p>
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Maria Santos</span>
+                <span className="text-[#8A7548] text-[10px]">— Labor Economist</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">Labor market resilient but cooling. Wage growth 4.2% YoY above Fed comfort. JOLTS ratio normalized to 1.2x from 2.0x peak.</p>
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Alexander Petrov</span>
+                <span className="text-[#8A7548] text-[10px]">— FX & Commodities</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">DXY at 104.23, stable. WTI $72.40 on Iran talks. Gold $2,415 on safe-haven demand. Copper $4.82 on AI power thesis.</p>
+            </div>
+            <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
+                <span className="text-[#C9A961] text-xs font-semibold">Patricia Duval</span>
+                <span className="text-[#8A7548] text-[10px]">— Fiscal Policy</span>
+              </div>
+              <p className="text-[#F5E6C8] text-xs leading-relaxed">Fiscal deficit elevated. Bond supply concerns contributing to long-end yield pressure. Midterm elections adding policy uncertainty.</p>
+            </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             <MetricCard label="Fed Funds Rate" value="3.50-3.75%" status="neutral" />
@@ -899,18 +949,18 @@ export default function Home() {
 
         {/* AGENT STATUS */}
         <section id={SECTIONS.agentStatus}>
-          <SectionHeader title="Agent System Status" subtitle="39 Agents Deployed — Real-Time Health Monitor" />
+          <SectionHeader title="Agent System Status" subtitle="71 Total Agents — 39 Primary + 32 Embedded Chart Specialists" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Specialist Agents */}
             <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
-              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">32 Specialist Agents</h4>
-              <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
+              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">32 Specialist Analysts + Beth</h4>
+              <div className="space-y-1.5 max-h-[500px] overflow-y-auto">
                 {specialistAgents.map((agent) => (
                   <div key={agent.name} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-[#C9A961]/5">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
-                      <span className="text-[#F5E6C8] text-xs">{agent.name}</span>
-                      <span className="text-[#8A7548] text-[10px]">({agent.role})</span>
+                      <span className="text-[#C9A961] text-xs font-medium">{agent.name}</span>
+                      <span className="text-[#8A7548] text-[10px]">— {agent.role}</span>
                     </div>
                     <span className="text-[#8A7548] text-[10px]">{agent.lastDispatch}</span>
                   </div>
@@ -941,6 +991,54 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Chart Specialist Sub-Agents */}
+          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 mt-4">
+            <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">32 Embedded Chart Specialists</h4>
+            <p className="text-[#8A7548] text-xs mb-3">Each specialist analyst has a dedicated Chart Specialist sub-agent for data visualization.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto">
+              {[
+                { name: "Liam Crawford", parent: "Beth Harrington" },
+                { name: "Aisha Patel", parent: "Marcus Chen" },
+                { name: "Carlos Mendez", parent: "Elena Vasquez" },
+                { name: "Yuna Choi", parent: "David Park" },
+                { name: "Oliver Grant", parent: "Sarah Nakamura" },
+                { name: "Fatima Al-Rashid", parent: "James Okafor" },
+                { name: "Henrik Larsson", parent: "Priya Sharma" },
+                { name: "Maya Thompson", parent: "Michael Torres" },
+                { name: "Ravi Krishnan", parent: "Rachel Kim" },
+                { name: "Isabelle Fontaine", parent: "Andrew Walsh" },
+                { name: "Tomas Herrera", parent: "Sophia Reyes" },
+                { name: "Zoe Blackburn", parent: "Dr. Nathan Cole" },
+                { name: "Kenji Watanabe", parent: "Dr. Laura Mitchell" },
+                { name: "Amara Osei", parent: "Dr. Kevin Zhao" },
+                { name: "Ethan Gallagher", parent: "Catherine Brooks" },
+                { name: "Lucia Ferreira", parent: "Daniel Ortiz" },
+                { name: "Nikolai Volkov", parent: "Jessica Huang" },
+                { name: "Sienna Hartley", parent: "Dr. Robert Kessler" },
+                { name: "Dmitri Kozlov", parent: "Victoria Sterling" },
+                { name: "Mei-Ling Wu", parent: "Wei Lin" },
+                { name: "Oscar Johansson", parent: "Thomas Brennan" },
+                { name: "Adele Moreau", parent: "Patricia Duval" },
+                { name: "Ivan Petrov", parent: "Alexander Petrov" },
+                { name: "Rosa Delgado", parent: "Maria Santos" },
+                { name: "Callum Fraser", parent: "Richard Callahan" },
+                { name: "Nadia Kuznetsova", parent: "Gregory Ashford" },
+                { name: "Finn O'Brien", parent: "Claire Donovan" },
+                { name: "Leila Ahmadi", parent: "Jonathan Reed" },
+                { name: "Sebastian Wolfe", parent: "Samantha Liu" },
+                { name: "Ingrid Bergman", parent: "Christopher Vance" },
+                { name: "Tariq Hassan", parent: "Dr. Alan Whitfield" },
+                { name: "Valentina Rossi", parent: "Natasha Volkov" },
+              ].map((chart) => (
+                <div key={chart.name} className="flex items-center gap-2 py-1 px-2 rounded hover:bg-[#C9A961]/5">
+                  <div className="w-1 h-1 rounded-full bg-[#C9A961]"></div>
+                  <span className="text-[#F5E6C8] text-[11px]">{chart.name}</span>
+                  <span className="text-[#8A7548] text-[9px]">→ {chart.parent}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
