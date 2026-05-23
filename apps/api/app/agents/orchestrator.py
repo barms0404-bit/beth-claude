@@ -150,6 +150,16 @@ class Beth:
         # the safety net. Drops audit-log to .audit/positioning_filter.jsonl.
         self._apply_positioning_filter(outputs)
 
+        # Epistemic humility: any new_idea without a populated epistemic_check
+        # gets conviction_1_10 downgraded by 2 (clamped to >= 1). Runs BEFORE
+        # PSV so verify_high_conviction's conviction>=8 threshold sees the
+        # downgraded value. Audit-log every downgrade.
+        self._apply_epistemic_downgrade(outputs)
+
+        # Calibration check — warn on specialists filing >=3 picks all at
+        # conviction>=8. Audit-only; doesn't mutate conviction.
+        self._check_calibration(outputs)
+
         # Four work items run concurrently:
         #   - render charts requested by specialists
         #   - PSV verifier on conviction>=8 ideas
@@ -227,6 +237,71 @@ class Beth:
             elif isinstance(result, Exception):
                 logger.warning("Verifier batch failed: %s", result)
         return flat
+
+    @staticmethod
+    def _apply_epistemic_downgrade(outputs: list[SpecialistReport]) -> int:
+        """Downgrade conviction by 2 on every new_idea missing an epistemic_check.
+
+        A check is "incomplete" if any required text field is blank. Lists may
+        be empty (an honest "I have nothing to add" is acceptable for
+        unverified_data_points).
+        """
+        downgrades = 0
+        for sr in outputs:
+            for idea in sr.new_ideas:
+                ec = idea.epistemic_check
+                complete = (
+                    ec is not None
+                    and ec.what_would_change_my_mind.strip()
+                    and ec.most_likely_way_im_wrong.strip()
+                    and ec.counter_arguments_sought.strip()
+                    and ec.conviction_calibration.strip()
+                )
+                if complete:
+                    continue
+                original = idea.conviction_1_10
+                idea.conviction_1_10 = max(1, original - 2)
+                downgrades += 1
+                audit.log_event(
+                    "epistemic_downgrade",
+                    {
+                        "agent_key": sr.agent_key,
+                        "specialist": sr.specialist,
+                        "ticker": idea.ticker,
+                        "original_conviction": original,
+                        "downgraded_conviction": idea.conviction_1_10,
+                        "reason": (
+                            "epistemic_check missing"
+                            if ec is None
+                            else "epistemic_check incomplete"
+                        ),
+                        "thesis": idea.thesis[:240],
+                    },
+                )
+        return downgrades
+
+    @staticmethod
+    def _check_calibration(outputs: list[SpecialistReport]) -> int:
+        """Audit-log specialists with >=3 picks all at conviction>=8. No mutation."""
+        warned = 0
+        for sr in outputs:
+            ideas = sr.new_ideas
+            if len(ideas) < 3:
+                continue
+            if all(i.conviction_1_10 >= 8 for i in ideas):
+                warned += 1
+                audit.log_event(
+                    "calibration_warning",
+                    {
+                        "agent_key": sr.agent_key,
+                        "specialist": sr.specialist,
+                        "pick_count": len(ideas),
+                        "all_convictions": [i.conviction_1_10 for i in ideas],
+                        "tickers": [i.ticker for i in ideas],
+                        "rule": "every new_idea at conviction>=8 — calibration likely broken",
+                    },
+                )
+        return warned
 
     @staticmethod
     def _apply_positioning_filter(outputs: list[SpecialistReport]) -> int:

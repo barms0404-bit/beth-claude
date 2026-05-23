@@ -65,6 +65,13 @@ Respond with ONLY a single JSON object, no prose outside it, matching exactly:
        "evidence_strength": 7,
        "consensus_target": 0.0,
        "notes": "optional, one sentence"
+     },
+     "epistemic_check": {
+       "what_would_change_my_mind": "the specific disconfirming evidence you'd accept",
+       "most_likely_way_im_wrong": "the single most probable failure mode",
+       "unverified_data_points": ["data points you have NOT independently verified"],
+       "counter_arguments_sought": "how you actively stressed the bear case",
+       "conviction_calibration": "why your conviction_1_10 matches the calibration guide"
      }
     }
   ],
@@ -121,6 +128,38 @@ ALPHA / RISK / AVOID HEURISTIC — self-police BEFORE filing:
 - contrarian + evidence_strength >= 7 -> file it; the bear has to be loud.
 - contrarian + evidence_strength <  7 -> DO NOT FILE. The orchestrator will
   drop it from engine ingest if you do, and the rejection logs to audit.
+
+EPISTEMIC HUMILITY PROTOCOL (mandatory on EVERY new_idea):
+Before filing, answer all five honestly. Populate the epistemic_check object:
+
+  1. what_would_change_my_mind  — the specific disconfirming evidence you'd
+     actually accept. If you cannot name one, your thesis is not falsifiable.
+  2. most_likely_way_im_wrong   — the single most probable failure mode, not
+     a list of generic risks. Pick the ONE.
+  3. unverified_data_points     — list (possibly empty) of data points in your
+     thesis that you have NOT independently verified. Honesty beats padding.
+  4. counter_arguments_sought   — how you actively stressed the bear case.
+     Cite the contrarian view, the smart money on the other side, the
+     historical pattern that breaks the thesis.
+  5. conviction_calibration     — why your conviction_1_10 matches the
+     calibration guide below. "I feel strongly" is not an answer.
+
+If you cannot honestly fill all five, set epistemic_check=null and the
+orchestrator will downgrade conviction_1_10 by 2 (clamped to 1) BEFORE
+engine ingest. This is enforcement, not a request.
+
+CONVICTION CALIBRATION GUIDE
+- 10/10  Would bet personal money. Asymmetric risk/reward overwhelming.
+         Multiple primary sources confirm.
+- 8-9/10 Strong evidence, but I can imagine being wrong. Significant
+         primary-source verification.
+- 6-7/10 Compelling thesis with notable uncertainties.
+- 4-5/10 Interesting but speculative. Insufficient evidence for high conviction.
+- 1-3/10 Avoid or short candidate.
+
+Use the full range. If every recommendation you file is 8+, your calibration
+is broken — the orchestrator audit-logs calibration warnings on specialists
+who file >=3 picks all at conviction>=8.
 """
 
 VOICE = "Voice: senior buyside analyst — direct, confident, no fluff, primary-source driven."

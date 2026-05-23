@@ -90,6 +90,21 @@ class MarketPositioning(BaseModel):
     notes: str = ""
 
 
+class EpistemicCheck(BaseModel):
+    """The 5 self-reflection answers required by the epistemic humility protocol.
+
+    A missing or incomplete check triggers an orchestrator-side conviction
+    downgrade of 2 points (clamped to >= 1) before engine ingest. Specialists
+    who skip this discipline cannot file high-conviction picks by default.
+    """
+
+    what_would_change_my_mind: str           # the disconfirming evidence you'd accept
+    most_likely_way_im_wrong: str            # the single most probable failure mode
+    unverified_data_points: list[str] = []   # data you have NOT independently verified
+    counter_arguments_sought: str            # how you stressed the bear case
+    conviction_calibration: str              # why your 1-10 matches the calibration guide
+
+
 class NewIdea(BaseModel):
     """A name the specialist is surfacing for the Top 50."""
 
@@ -106,6 +121,10 @@ class NewIdea(BaseModel):
     # for every new_idea; optional in schema so the orchestrator can detect-and-drop
     # contrarian+weak picks before engine ingest.
     market_positioning: MarketPositioning | None = None
+    # Epistemic humility protocol — 5 self-reflection answers. Optional in
+    # schema so the orchestrator can detect missing answers and downgrade
+    # conviction by 2 before engine ingest.
+    epistemic_check: EpistemicCheck | None = None
 
 
 class ChartRequest(BaseModel):
