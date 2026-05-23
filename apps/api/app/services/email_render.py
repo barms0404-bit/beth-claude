@@ -841,21 +841,16 @@ def render_report_email(
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* Responsive sizing — email clients ignore <style> blocks; browsers honor them.
-       The web reader gets a wide, generously-sized layout; email stays at 640. */
+       Width does the heavy lifting on perceived "fills-the-page"; fonts only
+       nudge up modestly so the document still reads as research, not as a
+       presentation slide. (Tuned 2026-05-23 after Brian flagged previous
+       sizing as too large.) */
     @media screen and (min-width: 760px) {{
       .aa-container {{ width: 920px !important; max-width: 920px !important; }}
-      body {{ font-size: 16px !important; line-height: 1.65 !important; }}
-      .aa-section h1, .aa-section h2 {{ font-size: 30px !important; line-height: 1.25 !important; }}
-      .aa-section h3 {{ font-size: 22px !important; }}
-      .aa-section p, .aa-section li, .aa-section td, .aa-section div {{ font-size: 16px !important; line-height: 1.65 !important; }}
-      .aa-section .meta {{ font-size: 12px !important; }}
+      .aa-section td, .aa-section div {{ line-height: 1.55 !important; }}
     }}
     @media screen and (min-width: 1280px) {{
-      .aa-container {{ width: 1100px !important; max-width: 1100px !important; }}
-      body {{ font-size: 17px !important; }}
-      .aa-section h1, .aa-section h2 {{ font-size: 34px !important; }}
-      .aa-section h3 {{ font-size: 23px !important; }}
-      .aa-section p, .aa-section li, .aa-section td, .aa-section div {{ font-size: 17px !important; }}
+      .aa-container {{ width: 1080px !important; max-width: 1080px !important; }}
     }}
     /* Better link affordance for the web view */
     a {{ color: {GOLD}; text-decoration: none; border-bottom: 1px solid rgba(201, 169, 97, 0.4); }}
