@@ -86,7 +86,8 @@ function scrollToSection(id: string) {
 // Market data
 const indexData = [
   { name: "S&P 500", ticker: "SPY", value: "7,473.47", change: "+0.37%", up: true },
-  { name: "Nasdaq", ticker: "QQQ", value: "26,343.97", change: "+0.19%", up: true },
+  { name: "Nasdaq", ticker: "IXIC", value: "26,343.97", change: "+0.19%", up: true },
+  { name: "QQQ", ticker: "QQQ", value: "537.82", change: "+0.24%", up: true },
   { name: "Dow Jones", ticker: "DIA", value: "50,579.70", change: "+0.58%", up: true },
   { name: "Russell 2000", ticker: "IWM", value: "2,387.12", change: "+0.42%", up: true },
   { name: "VIX", ticker: "VIX", value: "13.82", change: "-0.45", up: true },
@@ -114,40 +115,48 @@ const top50Data = [
 ];
 
 const specialistAgents = [
-  { name: "Beth", role: "Chief of Staff Orchestrator", status: "active", lastDispatch: "2 min ago", model: "claude-opus-4-7" },
-  { name: "AI Data Center", role: "Growth/Thematic", status: "active", lastDispatch: "5 min ago", model: "claude-opus-4-7" },
-  { name: "Energy Infrastructure", role: "Growth/Thematic", status: "active", lastDispatch: "12 min ago", model: "claude-opus-4-7" },
-  { name: "Training Chip", role: "Growth/Thematic", status: "active", lastDispatch: "3 min ago", model: "claude-opus-4-7" },
-  { name: "Inference & AI Software", role: "Growth/Thematic", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
-  { name: "Robotics & Physical AI", role: "Growth/Thematic", status: "active", lastDispatch: "15 min ago", model: "claude-opus-4-7" },
-  { name: "Quantum Computing", role: "Growth/Thematic", status: "active", lastDispatch: "20 min ago", model: "claude-opus-4-7" },
-  { name: "Enterprise SaaS", role: "Technology", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
-  { name: "Cybersecurity", role: "Technology", status: "active", lastDispatch: "9 min ago", model: "claude-opus-4-7" },
-  { name: "Internet Platforms", role: "Technology", status: "active", lastDispatch: "7 min ago", model: "claude-opus-4-7" },
-  { name: "Fintech & Payments", role: "Technology", status: "active", lastDispatch: "11 min ago", model: "claude-opus-4-7" },
-  { name: "Biotech", role: "Healthcare", status: "active", lastDispatch: "14 min ago", model: "claude-opus-4-7" },
-  { name: "Big Pharma", role: "Healthcare", status: "active", lastDispatch: "10 min ago", model: "claude-opus-4-7" },
-  { name: "Healthcare Tools", role: "Healthcare", status: "active", lastDispatch: "18 min ago", model: "claude-opus-4-7" },
-  { name: "Consumer Discretionary", role: "Consumer", status: "active", lastDispatch: "13 min ago", model: "claude-opus-4-7" },
-  { name: "Travel & Leisure", role: "Consumer", status: "active", lastDispatch: "16 min ago", model: "claude-opus-4-7" },
-  { name: "E-Commerce", role: "Consumer", status: "active", lastDispatch: "19 min ago", model: "claude-opus-4-7" },
-  { name: "Chief Economist", role: "Economic Advisory", status: "active", lastDispatch: "4 min ago", model: "claude-opus-4-7" },
-  { name: "Geopolitical Strategist", role: "Economic Advisory", status: "active", lastDispatch: "22 min ago", model: "claude-opus-4-7" },
-  { name: "China Economist", role: "Economic Advisory", status: "active", lastDispatch: "25 min ago", model: "claude-opus-4-7" },
-  { name: "Inflation Specialist", role: "Economic Advisory", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
-  { name: "Dividend & Income", role: "Style/Factor", status: "active", lastDispatch: "30 min ago", model: "claude-opus-4-7" },
-  { name: "Value Investor", role: "Style/Factor", status: "active", lastDispatch: "28 min ago", model: "claude-opus-4-7" },
-  { name: "Fixed Income", role: "Style/Factor", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
+  { name: "Beth Harrington", role: "Chief of Staff Orchestrator", status: "active", lastDispatch: "2 min ago", model: "claude-opus-4-7" },
+  { name: "Marcus Chen", role: "AI Data Center Buildout", status: "active", lastDispatch: "5 min ago", model: "claude-opus-4-7" },
+  { name: "Elena Vasquez", role: "Energy Infrastructure", status: "active", lastDispatch: "12 min ago", model: "claude-opus-4-7" },
+  { name: "David Park", role: "Training Chip Specialist", status: "active", lastDispatch: "3 min ago", model: "claude-opus-4-7" },
+  { name: "Sarah Nakamura", role: "Inference & AI Software", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
+  { name: "James Okafor", role: "Robotics & Physical AI", status: "active", lastDispatch: "15 min ago", model: "claude-opus-4-7" },
+  { name: "Priya Sharma", role: "Quantum Computing", status: "active", lastDispatch: "20 min ago", model: "claude-opus-4-7" },
+  { name: "Michael Torres", role: "Enterprise SaaS", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
+  { name: "Rachel Kim", role: "Cybersecurity", status: "active", lastDispatch: "9 min ago", model: "claude-opus-4-7" },
+  { name: "Andrew Walsh", role: "Internet Platforms & Digital Ad", status: "active", lastDispatch: "7 min ago", model: "claude-opus-4-7" },
+  { name: "Sophia Reyes", role: "Fintech & Payments", status: "active", lastDispatch: "11 min ago", model: "claude-opus-4-7" },
+  { name: "Dr. Nathan Cole", role: "Biotech & Small Cap", status: "active", lastDispatch: "14 min ago", model: "claude-opus-4-7" },
+  { name: "Dr. Laura Mitchell", role: "Big Pharma & GLP-1", status: "active", lastDispatch: "10 min ago", model: "claude-opus-4-7" },
+  { name: "Dr. Kevin Zhao", role: "Healthcare Tools & CDMOs", status: "active", lastDispatch: "18 min ago", model: "claude-opus-4-7" },
+  { name: "Catherine Brooks", role: "Consumer Discretionary & Brands", status: "active", lastDispatch: "13 min ago", model: "claude-opus-4-7" },
+  { name: "Daniel Ortiz", role: "Travel, Leisure & Restaurants", status: "active", lastDispatch: "16 min ago", model: "claude-opus-4-7" },
+  { name: "Jessica Huang", role: "E-Commerce & Marketplaces", status: "active", lastDispatch: "19 min ago", model: "claude-opus-4-7" },
+  { name: "Dr. Robert Kessler", role: "Chief Economist", status: "active", lastDispatch: "4 min ago", model: "claude-opus-4-7" },
+  { name: "Victoria Sterling", role: "Geopolitical Strategist", status: "active", lastDispatch: "22 min ago", model: "claude-opus-4-7" },
+  { name: "Wei Lin", role: "China Economist", status: "active", lastDispatch: "25 min ago", model: "claude-opus-4-7" },
+  { name: "Thomas Brennan", role: "Inflation Specialist", status: "active", lastDispatch: "8 min ago", model: "claude-opus-4-7" },
+  { name: "Patricia Duval", role: "Fiscal Policy & Political Economy", status: "active", lastDispatch: "35 min ago", model: "claude-opus-4-7" },
+  { name: "Alexander Petrov", role: "Global FX & Commodities", status: "active", lastDispatch: "12 min ago", model: "claude-opus-4-7" },
+  { name: "Maria Santos", role: "Labor Economist", status: "active", lastDispatch: "20 min ago", model: "claude-opus-4-7" },
+  { name: "Richard Callahan", role: "Dividend & Income", status: "active", lastDispatch: "30 min ago", model: "claude-opus-4-7" },
+  { name: "Gregory Ashford", role: "Value Investor", status: "active", lastDispatch: "28 min ago", model: "claude-opus-4-7" },
+  { name: "Claire Donovan", role: "Fixed Income", status: "active", lastDispatch: "6 min ago", model: "claude-opus-4-7" },
+  { name: "Jonathan Reed", role: "Morning Packet Analyst", status: "active", lastDispatch: "45 min ago", model: "claude-opus-4-7" },
+  { name: "Samantha Liu", role: "Mid-Day Tactical Analyst", status: "active", lastDispatch: "3 hr ago", model: "claude-opus-4-7" },
+  { name: "Christopher Vance", role: "Market Close Analyst", status: "active", lastDispatch: "Yesterday", model: "claude-opus-4-7" },
+  { name: "Dr. Alan Whitfield", role: "Quantitative Analyst", status: "active", lastDispatch: "15 min ago", model: "claude-opus-4-7" },
+  { name: "Natasha Volkov", role: "Alt Data Specialist", status: "active", lastDispatch: "22 min ago", model: "claude-opus-4-7" },
 ];
 
 const accuracyAgents = [
-  { name: "Data Validation", status: "active", checks: 1247, lastRun: "< 1 min", temp: "0.0" },
-  { name: "Citation Enforcement", status: "active", checks: 892, lastRun: "< 1 min", temp: "0.0" },
-  { name: "Red Team", status: "active", checks: 34, lastRun: "5 min ago", temp: "0.5" },
-  { name: "Primary Source Verification", status: "active", checks: 12, lastRun: "8 min ago", temp: "0.0" },
-  { name: "Track Record", status: "active", checks: 1, lastRun: "Yesterday close", temp: "0.2" },
-  { name: "Market Regime Detection", status: "active", checks: 1, lastRun: "6:00 AM AZ", temp: "0.2" },
-  { name: "Consensus & Crowding", status: "active", checks: 1, lastRun: "6:30 AM AZ", temp: "0.2" },
+  { name: "SENTINEL", fullName: "Dr. Isaac Thornton", role: "Data Validation Agent", status: "active", checks: 1247, lastRun: "< 1 min", temp: "0.0" },
+  { name: "VERITAS", fullName: "Angela Moretti", role: "Citation Enforcement Agent", status: "active", checks: 892, lastRun: "< 1 min", temp: "0.0" },
+  { name: "ADVERSARY", fullName: "Dominic Hale", role: "Red Team Agent", status: "active", checks: 34, lastRun: "5 min ago", temp: "0.5" },
+  { name: "ORACLE", fullName: "Dr. Fiona Blackwell", role: "Primary Source Verification", status: "active", checks: 12, lastRun: "8 min ago", temp: "0.0" },
+  { name: "SCOREKEEPER", fullName: "Martin Hsu", role: "Track Record & Performance", status: "active", checks: 1, lastRun: "Yesterday close", temp: "0.2" },
+  { name: "COMPASS", fullName: "Dr. Yuki Tanaka", role: "Market Regime Detection", status: "active", checks: 1, lastRun: "6:00 AM AZ", temp: "0.2" },
+  { name: "CROWDWATCH", fullName: "Stefan Novak", role: "Consensus & Crowding Tracker", status: "active", checks: 1, lastRun: "6:30 AM AZ", temp: "0.2" },
 ];
 
 export default function Home() {
@@ -217,7 +226,7 @@ export default function Home() {
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
           <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
 
-          {/* Analysts Dropdown — All 39 Specialists */}
+          {/* Analysts Dropdown — All Specialists with Real Names */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm"
@@ -227,65 +236,78 @@ export default function Home() {
                 <ChevronDown className="w-2.5 h-2.5 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[280px] max-h-96 overflow-y-auto">
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[320px] max-h-[480px] overflow-y-auto">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Chief of Staff</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Beth — Master Orchestrator</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Daily Reporting Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Morning Packet Analyst</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Mid-Day Tactical Analyst</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Market Close Analyst</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style / Factor Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Dividend Aristocrat & Income Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Value Investor Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fixed Income Specialist</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Chief Economist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Geopolitical Strategist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">China Economist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inflation Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fiscal)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fiscal Policy & Political Economy</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Global FX & Commodities Strategist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Labor Economist</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Biotech & Small Cap Biotech Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Big Pharma & Specialty Pharma Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Healthcare Tools, CDMOs & Life Sciences</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Enterprise Software & SaaS Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Cybersecurity Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Internet Platforms & Digital Advertising</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fintech & Payments Specialist</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Consumer Discretionary & Brands Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Travel, Leisure & Restaurants Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">E-Commerce & Marketplaces Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Beth Harrington</span><span className="text-[#8A7548] ml-2 text-[10px]">— Orchestrator</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">AI Data Center Buildout Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Energy Infrastructure Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Training Chip Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inference & AI Software Stack Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Robotics & Physical AI Specialist</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantum Computing Specialist</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI Software</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">James Okafor</span><span className="text-[#8A7548] ml-2 text-[10px]">— Robotics & Physical AI</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Priya Sharma</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantum Computing</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Rachel Kim</span><span className="text-[#8A7548] ml-2 text-[10px]">— Cybersecurity</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Andrew Walsh</span><span className="text-[#8A7548] ml-2 text-[10px]">— Internet Platforms</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Sophia Reyes</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fintech & Payments</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Nathan Cole</span><span className="text-[#8A7548] ml-2 text-[10px]">— Biotech & Small Cap</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Laura Mitchell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Big Pharma & GLP-1</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Kevin Zhao</span><span className="text-[#8A7548] ml-2 text-[10px]">— Healthcare Tools & CDMOs</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Catherine Brooks</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consumer & Brands</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Daniel Ortiz</span><span className="text-[#8A7548] ml-2 text-[10px]">— Travel & Leisure</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Jessica Huang</span><span className="text-[#8A7548] ml-2 text-[10px]">— E-Commerce</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Robert Kessler</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief Economist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Victoria Sterling</span><span className="text-[#8A7548] ml-2 text-[10px]">— Geopolitical</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Wei Lin</span><span className="text-[#8A7548] ml-2 text-[10px]">— China Economist</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Thomas Brennan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inflation</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fiscal)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Patricia Duval</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fiscal Policy</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Alexander Petrov</span><span className="text-[#8A7548] ml-2 text-[10px]">— FX & Commodities</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Maria Santos</span><span className="text-[#8A7548] ml-2 text-[10px]">— Labor Economist</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style / Factor Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Richard Callahan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Dividend & Income</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Gregory Ashford</span><span className="text-[#8A7548] ml-2 text-[10px]">— Value Investor</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Claire Donovan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fixed Income</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Daily Reporting</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Jonathan Reed</span><span className="text-[#8A7548] ml-2 text-[10px]">— Morning Packet</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Samantha Liu</span><span className="text-[#8A7548] ml-2 text-[10px]">— Mid-Day Tactical</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Christopher Vance</span><span className="text-[#8A7548] ml-2 text-[10px]">— Market Close</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Functional Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantitative Analyst</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Alt Data Specialist</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Accuracy Infrastructure</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Data Validation Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Citation Enforcement Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Red Team Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Primary Source Verification Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Track Record & Performance Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Market Regime Detection Agent</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Consensus & Crowding Tracker</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Alan Whitfield</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantitative Analyst</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Natasha Volkov</span><span className="text-[#8A7548] ml-2 text-[10px]">— Alt Data</span></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Agents Dropdown — 7 Accuracy Infrastructure Agents */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm"
+                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Shield className="w-3 h-3" />
+                <span className="ml-1">Agents</span>
+                <ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[320px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Accuracy Infrastructure Agents</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Isaac Thornton</span><span className="text-[#8A7548] ml-2 text-[10px]">— Data Validation (SENTINEL)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Angela Moretti</span><span className="text-[#8A7548] ml-2 text-[10px]">— Citation Enforcement (VERITAS)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dominic Hale</span><span className="text-[#8A7548] ml-2 text-[10px]">— Red Team (ADVERSARY)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Fiona Blackwell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Primary Source (ORACLE)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Martin Hsu</span><span className="text-[#8A7548] ml-2 text-[10px]">— Track Record (SCOREKEEPER)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Yuki Tanaka</span><span className="text-[#8A7548] ml-2 text-[10px]">— Regime Detection (COMPASS)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Stefan Novak</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consensus & Crowding (CROWDWATCH)</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -905,12 +927,14 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#4ADE80]"></div>
-                        <span className="text-[#F5E6C8] text-xs font-medium">{agent.name}</span>
+                        <span className="text-[#C9A961] text-xs font-semibold">{agent.name}</span>
+                        <span className="text-[#F5E6C8] text-xs">{agent.fullName}</span>
                       </div>
                       <span className="text-[#4ADE80] text-[10px] uppercase">Active</span>
                     </div>
                     <div className="flex items-center gap-4 mt-1">
-                      <span className="text-[#8A7548] text-[10px]">Checks today: {agent.checks}</span>
+                      <span className="text-[#8A7548] text-[10px]">{agent.role}</span>
+                      <span className="text-[#8A7548] text-[10px]">Checks: {agent.checks}</span>
                       <span className="text-[#8A7548] text-[10px]">Last: {agent.lastRun}</span>
                       <span className="text-[#8A7548] text-[10px]">Temp: {agent.temp}</span>
                     </div>
