@@ -51,7 +51,15 @@ Respond with ONLY a single JSON object, no prose outside it, matching exactly:
   "new_ideas": [
     {"ticker": "TICKER", "thesis": "why this name, 1-3 sentences",
      "conviction_1_10": 7, "time_horizon": "e.g. 2-6 weeks | 6-12 months",
-     "key_risk": "the single thing that breaks the thesis"}
+     "key_risk": "the single thing that breaks the thesis",
+     "forecast": {
+       "bear_case_25pct": {"price": 0.0, "scenario": "what has to be true for bear"},
+       "base_case_50pct": {"price": 0.0, "scenario": "what has to be true for base"},
+       "bull_case_25pct": {"price": 0.0, "scenario": "what has to be true for bull"},
+       "probability_thesis_correct": 0.65,
+       "key_uncertainties": ["short strings — the live unknowns that move the case"]
+     }
+    }
   ],
   "chart_request": {
     "chart_type": "line | bar | candlestick | scatter | area",
@@ -66,6 +74,24 @@ Rules:
 - "move_pct" is a number or null. "chart_request" may be null if no chart is warranted.
 - Include 0-8 new_ideas; surface only names you would defend to the PM.
 - "covered_names_commentary" covers names already in your coverage universe.
+
+PROBABILISTIC FORECAST (mandatory on EVERY new_idea):
+- Replace single-point price targets with a three-scenario distribution. The
+  probability weights are FIXED at 25 / 50 / 25 — do NOT change them; vary the
+  prices and scenarios.
+- bear_case_25pct.price MUST be < base_case_50pct.price < bull_case_25pct.price.
+- Each scenario.scenario field states what has to be TRUE for that price to
+  print — not a wish, a causal chain.
+- probability_thesis_correct is your calibrated 0.0-1.0 probability that the
+  base case (or better) is realized. This is DISTINCT from conviction_1_10
+  (which weights conviction on a 1-10 buyside scale). Both required.
+- key_uncertainties: the 2-5 live unknowns whose resolution most moves the
+  three scenarios. Name them specifically.
+- expected_value is computed server-side as 0.25*bear + 0.50*base + 0.25*bull —
+  do NOT emit it; do NOT pre-calculate it.
+- If you cannot construct a probabilistic forecast for a name (e.g. event-driven
+  trade with binary outcome), set forecast = null and explain the binary in the
+  thesis.
 """
 
 VOICE = "Voice: senior buyside analyst — direct, confident, no fluff, primary-source driven."

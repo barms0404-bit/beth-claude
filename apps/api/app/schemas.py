@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 # --------------------------------------------------------------------------
@@ -35,6 +35,39 @@ class CoveredName(BaseModel):
     action: str = Field(description="hold | add | trim | buy | sell | watch")
 
 
+class PriceScenario(BaseModel):
+    """One leg of a three-scenario probabilistic forecast."""
+
+    price: float
+    scenario: str               # what has to be TRUE for this price to print
+
+
+class ProbabilisticForecast(BaseModel):
+    """Three-scenario forecast replacing single-point price targets.
+
+    Probability weights are FIXED 25 / 50 / 25; specialists vary prices and
+    scenario narratives. `expected_value` is computed server-side from the
+    three prices — specialists do NOT emit it.
+    """
+
+    bear_case_25pct: PriceScenario
+    base_case_50pct: PriceScenario
+    bull_case_25pct: PriceScenario
+    probability_thesis_correct: float = Field(ge=0.0, le=1.0)
+    expected_value: float = 0.0     # computed below; ignored on input
+    key_uncertainties: list[str] = []
+
+    @model_validator(mode="after")
+    def _compute_expected_value(self) -> "ProbabilisticForecast":
+        self.expected_value = round(
+            0.25 * self.bear_case_25pct.price
+            + 0.50 * self.base_case_50pct.price
+            + 0.25 * self.bull_case_25pct.price,
+            4,
+        )
+        return self
+
+
 class NewIdea(BaseModel):
     """A name the specialist is surfacing for the Top 50."""
 
@@ -43,6 +76,10 @@ class NewIdea(BaseModel):
     conviction_1_10: int = Field(ge=1, le=10)
     time_horizon: str = Field(description="e.g. '2-6 weeks', '6-12 months'")
     key_risk: str
+    # Probabilistic forecast — required by the OUTPUT_CONTRACT but optional
+    # in schema so binary/event-driven trades (where a distribution is wrong)
+    # can set forecast=null and explain in the thesis.
+    forecast: ProbabilisticForecast | None = None
 
 
 class ChartRequest(BaseModel):

@@ -241,6 +241,19 @@ class Beth:
                 if not ticker:
                     continue
                 quote = quotes.get(ticker)
+                # Populate target_price + stop_loss from the probabilistic
+                # forecast when present: base_case is the target, bear_case is
+                # the stop. Assumptions surface key_uncertainties + key_risk.
+                target_price: float | None = None
+                stop_loss: float | None = None
+                assumptions: list[str] = []
+                if idea.forecast is not None:
+                    target_price = idea.forecast.base_case_50pct.price
+                    stop_loss = idea.forecast.bear_case_25pct.price
+                    assumptions.extend(idea.forecast.key_uncertainties)
+                if idea.key_risk:
+                    assumptions.append(idea.key_risk)
+
                 rec = SpecialistRecommendation(
                     agent_key=sr.agent_key,
                     specialist=sr.specialist,
@@ -251,7 +264,9 @@ class Beth:
                     thesis_summary=idea.thesis,
                     entry_price=(quote.price if quote else None),
                     entry_timestamp=sr.timestamp or datetime.now(timezone.utc),
-                    thesis_assumptions=[idea.key_risk] if idea.key_risk else [],
+                    target_price=target_price,
+                    stop_loss=stop_loss,
+                    thesis_assumptions=assumptions,
                 )
                 specialist_recommendations.append(rec)
                 written += 1
