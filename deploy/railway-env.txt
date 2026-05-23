@@ -1,0 +1,39 @@
+# --- Railway env vars — paste into Railway Variables → Raw Editor ---
+# Fill the <REPLACE_*> tokens before saving.
+# Real values pulled from apps/api/.env where present.
+
+# === Anthropic (orchestrator + 22 specialists per dispatch) ===
+ANTHROPIC_API_KEY=<REPLACE_WITH_REAL_KEY_FROM_console.anthropic.com>
+ANTHROPIC_MODEL=claude-sonnet-4-6
+
+# === Polygon (real-time market data + WebSocket) ===
+POLYGON_API_KEY=xkvn5YfHFdQqCixAsR1fXobl9hJ5K3oy
+POLYGON_WS_URL=wss://socket.polygon.io/stocks
+
+# === Supabase (after Step B — create project, copy from Settings → API) ===
+SUPABASE_URL=<REPLACE_WITH_https://YOUR-PROJECT.supabase.co>
+SUPABASE_SERVICE_ROLE_KEY=<REPLACE_WITH_service_role_key>
+SUPABASE_JWT_SECRET=<REPLACE_WITH_JWT_Settings_secret>
+
+# === Resend (email delivery; safe to leave blank for first deploy) ===
+RESEND_API_KEY=<REPLACE_or_leave_blank>
+RESEND_WEBHOOK_SECRET=<set_after_creating_webhook_in_Resend_dashboard>
+REPORT_FROM_EMAIL=research@armstrongarikat.com
+REPORT_TO_EMAIL=brian@cccballers.com
+
+# === Scheduler + CORS ===
+SCHEDULE_TIMEZONE=America/Phoenix
+ALLOWED_ORIGINS=<REPLACE_WITH_https://YOUR.vercel.app_AFTER_STEP_D>
+
+# === Environment + monitoring ===
+ENVIRONMENT=production
+SENTRY_DSN=<paste_api_sentry_dsn_OR_blank>
+REQUIRE_AUTH=false
+RATE_LIMIT_DEFAULT=60/minute
+
+# === Feature flags (defaults are fine; tune later) ===
+CITATION_STRICT_MODE=false
+STALE_THRESHOLD_MINUTES=5
+COVERAGE_GAP_DAYS=7
+FRED_API_KEY=
+SENTRY_TRACES_SAMPLE_RATE=0.1

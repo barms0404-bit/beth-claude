@@ -1,0 +1,20 @@
+# --- Vercel env vars — paste into Project Settings → Environment Variables ---
+# Fill <REPLACE_*> tokens before saving.
+
+# === Backend connection (Railway URL from Step C) ===
+NEXT_PUBLIC_API_BASE_URL=<REPLACE_WITH_https://YOUR-app.up.railway.app>
+
+# === Supabase (anon key is safe to expose to browser) ===
+NEXT_PUBLIC_SUPABASE_URL=<REPLACE_WITH_https://YOUR-PROJECT.supabase.co>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<REPLACE_WITH_anon_public_key>
+
+# === Environment label ===
+NEXT_PUBLIC_ENVIRONMENT=production
+
+# === Sentry (optional — leave blank to disable) ===
+NEXT_PUBLIC_SENTRY_DSN=<paste_web_sentry_dsn_OR_blank>
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_DSN=<same_as_above_OR_blank>
+SENTRY_AUTH_TOKEN=<optional_for_source_maps>
+SENTRY_ORG=
+SENTRY_PROJECT=
