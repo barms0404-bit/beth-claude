@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -484,9 +485,9 @@ export default function Home() {
                 </thead>
                 <tbody>
                   {top50Data.map((s) => (
-                    <tr key={s.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5 transition-colors cursor-pointer">
+                    <tr key={s.ticker} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5 transition-colors cursor-pointer" onClick={() => window.location.href = `/stock/${s.ticker}`}>
                       <td className="py-2.5 px-3 text-[#8A7548] text-xs">{s.rank}</td>
-                      <td className="py-2.5 px-3 text-[#C9A961] font-semibold text-xs">{s.ticker}</td>
+                      <td className="py-2.5 px-3 text-[#C9A961] font-semibold text-xs underline decoration-[#C9A961]/30 hover:decoration-[#C9A961]">{s.ticker}</td>
                       <td className="py-2.5 px-3 text-[#F5E6C8] text-xs">{s.company}</td>
                       <td className="py-2.5 px-3 text-[#8A7548] text-xs">{s.sector}</td>
                       <td className="py-2.5 px-3 text-center">
@@ -1329,10 +1330,10 @@ function TacticalItem({ priority, title, action, color, description }: { priorit
 
 function StockCard({ ticker, name, price, change, note }: { ticker: string; name: string; price: string; change: string; note: string }) {
   return (
-    <div className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-3.5 hover:border-[#3A2F1F] transition-colors">
+    <div className="bg-[#0A0A0A] border border-[#1F1A0F] rounded-lg p-3.5 hover:border-[#3A2F1F] transition-colors cursor-pointer" onClick={() => window.location.href = `/stock/${ticker}`}>
       <div className="flex justify-between items-start mb-1.5">
         <div>
-          <span className="text-[#C9A961] font-semibold text-sm">{ticker}</span>
+          <span className="text-[#C9A961] font-semibold text-sm underline decoration-[#C9A961]/30">{ticker}</span>
           <span className="text-[#8A7548] text-[10px] ml-1.5">{name}</span>
         </div>
         <div className="text-right">
@@ -1347,7 +1348,7 @@ function StockCard({ ticker, name, price, change, note }: { ticker: string; name
 
 function StockMini({ ticker, price, change }: { ticker: string; price: string; change: string }) {
   return (
-    <div className="p-2.5 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
+    <div className="p-2.5 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center cursor-pointer hover:border-[#3A2F1F] transition-colors" onClick={() => window.location.href = `/stock/${ticker}`}>
       <p className="text-[#C9A961] text-xs font-semibold">{ticker}</p>
       <p className="text-[#F5E6C8] text-xs" style={{ fontVariantNumeric: "tabular-nums" }}>{price}</p>
       <p className={`text-[10px] ${change.startsWith("+") ? "text-[#4ADE80]" : "text-[#EF4444]"}`}>{change}</p>
