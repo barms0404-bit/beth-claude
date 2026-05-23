@@ -19,11 +19,13 @@ from datetime import datetime, timezone
 
 from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
+from app.agents.citation_enforcer import enforcer as citation_enforcer
 from app.agents.registry import SPECIALISTS, roster_for
 from app.agents.verifier import verify_high_conviction
 from app.engine.top50 import engine
 from app.schemas import (
     ChartSpec,
+    CitationReport,
     Recommendation,
     RecommendationVerification,
     Report,
@@ -127,6 +129,11 @@ class Beth:
     ) -> Report:
         outputs = await self.dispatch(slot, market_brief=market_brief)
 
+        # Citation Enforcement runs BEFORE the engine ingests anything, so in
+        # strict mode sanitized text flows downstream. In default (non-strict)
+        # mode, outputs are unchanged and only the citation_reports populate.
+        citation_reports = await self._enforce_citations(outputs)
+
         # Three LLM-heavy passes run concurrently:
         #   - render charts requested by specialists
         #   - PSV verifier on conviction>=8 ideas
@@ -158,6 +165,7 @@ class Beth:
             charts=charts,
             specialist_reports=outputs,
             verifications=verifications,
+            citation_reports=citation_reports,
             lead_specialist_key=lead_key,
             bear_case_addendum=bear_case,
             macro_event=macro_event,
@@ -194,6 +202,23 @@ class Beth:
             elif isinstance(result, Exception):
                 logger.warning("Verifier batch failed: %s", result)
         return flat
+
+    @staticmethod
+    async def _enforce_citations(
+        outputs: list[SpecialistReport],
+    ) -> list[CitationReport]:
+        """Run the Citation Enforcement Agent on every specialist filing."""
+        reports = await asyncio.gather(
+            *(citation_enforcer.enforce(sr) for sr in outputs),
+            return_exceptions=True,
+        )
+        out: list[CitationReport] = []
+        for r in reports:
+            if isinstance(r, CitationReport):
+                out.append(r)
+            elif isinstance(r, Exception):
+                logger.warning("Citation enforcement failed: %s", r)
+        return out
 
     @staticmethod
     async def _maybe_focused_contrarian(

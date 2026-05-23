@@ -60,6 +60,11 @@ class Settings(BaseSettings):
     fomc_dates: str = ""
     cpi_dates: str = ""
 
+    # Citation Enforcement Agent — strip uncited factual claims from specialist
+    # output when true. Keep false until specialists emit citation tags
+    # (requires tool-use in the specialist pipeline, not yet wired).
+    citation_strict_mode: bool = False
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

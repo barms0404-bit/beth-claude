@@ -45,6 +45,7 @@ from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
 from app.routes import webhooks as webhook_routes
 from app.services import market_data
+from app.services import specialist_metrics
 from app.services.charts import charts_cache_dir
 from app.services.email_send import archive_root, list_archive, send_report
 from app.services.polygon_ws import PolygonStream
@@ -174,6 +175,12 @@ async def health() -> dict:
         "reports_cached": [s.value for s in _LATEST],
         "top50_size": len(engine.current().entries) if engine.current() else 0,
     }
+
+
+@app.get("/api/citations/metrics")
+async def citations_metrics() -> dict:
+    """Per-specialist running counters from the Citation Enforcement Agent."""
+    return specialist_metrics.all_metrics()
 
 
 @app.get("/api/validation/equity/{ticker}", response_model=VerifiedDataPoint)

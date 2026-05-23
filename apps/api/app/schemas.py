@@ -293,6 +293,43 @@ class VerifiedDataPacket(BaseModel):
     overall_confidence: float = Field(ge=0.0, le=1.0)
 
 
+# --------------------------------------------------------------------------
+# Citation Enforcement Agent — breadth sweep on every specialist output
+# --------------------------------------------------------------------------
+class CitationRuling(str, Enum):
+    verified = "verified"          # claim is accompanied by a citation tag
+    distorted = "distorted"        # cited source exists but claim misrepresents it
+    uncited = "uncited"            # factual claim without any citation tag
+    fabricated = "fabricated"      # cited source does not contain the claim
+
+
+class ClaimRuling(BaseModel):
+    claim: str                     # short snippet of the claim
+    sentence: str                  # full sentence containing the claim
+    field_path: str                # e.g. 'key_takeaway' or 'new_ideas[2].thesis'
+    ruling: CitationRuling
+    cited_source: str | None = None
+    action_taken: str              # 'passed_through' | 'marked_uncited' | 'stripped' | 'rewritten'
+    notes: str = ""
+
+
+class CitationReport(BaseModel):
+    """Per-specialist enforcement output. Attached to every Report."""
+
+    agent_key: str
+    specialist: str                # persona name
+    original_output_id: str        # uuid generated at enforcement time
+    rulings: list[ClaimRuling] = []
+    claims_total: int = 0
+    verified_count: int = 0
+    uncited_count: int = 0
+    distorted_count: int = 0
+    fabricated_count: int = 0
+    hallucination_rate: float = 0.0   # (uncited + distorted + fabricated) / claims_total
+    strict_mode: bool = False         # whether sanitization was applied to the SpecialistReport
+    verified_at: datetime
+
+
 class RecommendationVerification(BaseModel):
     """One high-conviction `new_idea` after PSV. Keyed by (agent_key, ticker)."""
 
@@ -328,6 +365,7 @@ class Report(BaseModel):
     charts: list[ChartSpec] = []
     specialist_reports: list[SpecialistReport] = []  # raw filings, retained for drill-down
     verifications: list["RecommendationVerification"] = []  # PSV results, conviction>=8 only
+    citation_reports: list[CitationReport] = []     # breadth-sweep citation enforcement
     lead_specialist_key: str | None = None          # e.g. 'fixed_income' on FOMC/CPI/NFP
     bear_case_addendum: SpecialistReport | None = None  # focused contrarian pass by value_investor
     macro_event: str | None = None                  # 'FOMC' | 'CPI' | 'NFP' | None
