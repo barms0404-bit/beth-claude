@@ -42,7 +42,13 @@ Or via the GitHub UI: create empty private repo, then `git remote add origin <ur
    supabase db push
    supabase db execute --file supabase/seed.sql
    ```
-   *Or:* Supabase Dashboard → SQL Editor → paste `supabase/migrations/20260522000000_init.sql`, run; then paste `supabase/seed.sql`, run.
+   *Or* via SQL Editor (run in this order):
+   1. `supabase/migrations/20260522000000_init.sql` (base schema + RLS)
+   2. `supabase/migrations/20260522010000_specialist_recommendations.sql`
+   3. `supabase/migrations/20260522020000_market_positioning.sql`
+   4. `supabase/migrations/20260522030000_audit_log.sql`
+   5. `supabase/migrations/20260523000000_healthcare_command_center.sql` (5 healthcare tables)
+   6. `supabase/seed.sql` (25 specialists, idempotent — also retires the legacy `healthcare_biotech` row)
 3. **Collect three keys** from Project Settings → API:
    - `SUPABASE_URL` → both `apps/api/.env` and `apps/web/.env`
    - `SUPABASE_SERVICE_ROLE_KEY` → `apps/api/.env` (backend only — never client)
@@ -152,6 +158,22 @@ python scripts/smoke.py --base https://<your-railway-url> --include-cron
 ```
 
 The script hits every endpoint, validates JSON shape, and (with `--include-cron`) POSTs to each report-run endpoint. Exit code is non-zero on any failure — CI-friendly.
+
+**Manual healthcare smoke** (5 healthcare endpoints + 8 frontend routes):
+```bash
+curl https://<railway>/api/agents | grep -c '"key"'     # expect 25
+curl https://<railway>/api/healthcare                   # composite landing
+curl https://<railway>/api/healthcare/clinical-catalysts
+curl https://<railway>/api/healthcare/pdufas
+curl https://<railway>/api/healthcare/glp1/latest
+curl https://<railway>/api/healthcare/pipeline
+curl https://<railway>/api/healthcare/patent-cliffs
+# Frontend (after Vercel deploy):
+# /healthcare /healthcare/biotech /healthcare/big-pharma /healthcare/tools
+# /healthcare/glp1 /healthcare/ai-drug-discovery
+# /healthcare/clinical-calendar /healthcare/fda-calendar
+```
+All five healthcare GETs return empty arrays on a fresh DB — that is the expected state until specialists populate the tables via their filings or a manual seed.
 
 ---
 

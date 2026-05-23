@@ -35,8 +35,6 @@ insert into agents (key, name, persona, kind, role, sort_order) values
    'IONQ, RGTI, competing quantum approaches.', 9),
   ('tech_generalist',    'Technology / Software Generalist',      'Sofia Reyes',     'specialist',
    'SaaS, cloud, internet platforms.', 10),
-  ('healthcare_biotech', 'Healthcare Biotech Specialist',         'James Whitfield', 'specialist',
-   'Catalysts, clinical trials, FDA decisions.', 11),
   ('consumer_internet',  'Consumer / Internet Specialist',        'Olivia Chen',     'specialist',
    'DTC, e-commerce, digital advertising.', 12),
   ('macro_strategy',     'Macro Strategy Analyst',                'Robert Sterling', 'specialist',
@@ -59,11 +57,21 @@ insert into agents (key, name, persona, kind, role, sort_order) values
    'Aristocrats/Kings, dividend safety + growth scoring, total-return-via-compounding income.', 21),
   ('biotech_smid',          'Biotech & Small Cap Biotech Specialist','Dr. Rachel Sinclair','specialist',
    'Deep small-mid-cap biotech — PoS modeling, rNPV per asset, clinical-trial evaluation, conference dives, M&A targets.', 22),
+  ('big_pharma',            'Big Pharma & Specialty Pharma Specialist','Dr. Patricia Lansing','specialist',
+   'Large-cap commercial pharma — GLP-1 megacycle, patent-cliff/LOE modeling, capital allocation, M&A framework, pipeline NPV.', 23),
+  ('healthcare_tools',      'Healthcare Tools, CDMOs & Life Sciences Specialist','Dr. Ian Faulkner','specialist',
+   'Picks-and-shovels of healthcare — tools, CDMOs, AI drug discovery, diagnostics. Bridges AI thesis to healthcare via drug discovery + GLP-1 manufacturing buildout.', 24),
   ('alt_data',              'Alt Data Specialist',                   'Kevin Park',        'specialist',
-   'Web traffic, app downloads, credit-card panels.', 23)
+   'Web traffic, app downloads, credit-card panels.', 25)
 on conflict (key) do update
   set name = excluded.name, persona = excluded.persona,
       role = excluded.role, sort_order = excluded.sort_order;
+
+-- --- Retire deprecated seats --------------------------------------------
+-- healthcare_biotech (Whitfield) was restructured into three specialized
+-- seats: biotech_smid, big_pharma, healthcare_tools. Idempotent — safe to
+-- re-run; no-op once removed.
+delete from agents where key = 'healthcare_biotech';
 
 -- --- Compliance disclaimer (v1) ------------------------------------------
 insert into disclaimers (version, body, active) values

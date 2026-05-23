@@ -12,7 +12,7 @@ conviction-ranked Top 50 from specialist `new_ideas`, runs its own synthesis tur
 (executive summary + conflict adjudication + escalated risk flags), and returns a
 `Report`.
 
-## The 23 Specialists
+## The 24 Specialists
 
 `apps/api/app/agents/registry.py`. Each is a `Specialist` with a `persona`, a
 functional title, a `coverage` universe, and a `mandate`. System prompt = shared
@@ -31,7 +31,6 @@ contract (the shared fragments are prompt-cached).
 | `robotics` | Hannah Mueller | Robotics & Physical AI Specialist | Humanoids, automation, AVs |
 | `quantum` | Daniel Brandt | Quantum Computing Specialist | IONQ, RGTI, quantum modalities |
 | `tech_generalist` | Sofia Reyes | Technology / Software Generalist | SaaS, cloud, internet platforms |
-| `healthcare_biotech` | James Whitfield | Healthcare Biotech Specialist | Catalysts, trials, FDA |
 | `consumer_internet` | Olivia Chen | Consumer / Internet Specialist | DTC, e-commerce, digital ads |
 | `macro_strategy` | Robert Sterling | Macro Strategy Analyst | Rates, Fed, factor rotation |
 | `quant` | Anika Sharma | Quantitative Analyst | Factor exposure, screens, momentum |
@@ -43,10 +42,13 @@ contract (the shared fragments are prompt-cached).
 | `value_investor` | Henry Whitlock | Value Investor Specialist | Intrinsic value, margin of safety, special situations, AI bubble bear case |
 | `dividend_aristocrat` | Margaret Holloway | Dividend Aristocrat & Income Specialist | Aristocrats/Kings, dividend safety + growth, REITs/BDCs |
 | `biotech_smid` | Dr. Rachel Sinclair | Biotech & Small Cap Biotech Specialist | PoS modeling, rNPV per asset, clinical trial design, conference dives — small-mid-cap |
+| `big_pharma` | Dr. Patricia Lansing | Big Pharma & Specialty Pharma Specialist | Large-cap commercial pharma — GLP-1 megacycle, patent-cliff/LOE, capital allocation, M&A, pipeline NPV |
+| `healthcare_tools` | Dr. Ian Faulkner | Healthcare Tools, CDMOs & Life Sciences Specialist | Tools, CDMOs, AI drug discovery, diagnostics — picks-and-shovels of healthcare + GLP-1 manufacturing buildout |
 | `alt_data` | Kevin Park | Alt Data Specialist | Web traffic, app downloads, card panels |
 
 Dispatch rule (`roster_for`): the one window analyst whose `lead_slot` matches the
-report, plus all 20 non-window specialists.
+report, plus all 21 non-window specialists. Healthcare-specific dispatch rules and
+cross-specialist coordination protocols live in [docs/DISPATCH_PROTOCOLS.md](DISPATCH_PROTOCOLS.md).
 
 ## Canonical specialist contract
 

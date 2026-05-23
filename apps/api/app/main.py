@@ -46,6 +46,7 @@ from app.schemas import (
 )
 from app.middleware.auth import auth_middleware, verify_ws_token
 from app.middleware.rate_limit import limiter
+from app.routes import healthcare as healthcare_routes
 from app.routes import webhooks as webhook_routes
 from app.services import market_data, regime as regime_service
 from app.services import audit_log, specialist_metrics, specialist_recommendations
@@ -153,6 +154,9 @@ app.middleware("http")(auth_middleware)
 
 # Resend webhook (Svix-signed; auth via signature, bypasses bearer-token check).
 app.include_router(webhook_routes.router)
+
+# Healthcare Command Center — /api/healthcare/* (catalysts, PDUFAs, GLP-1, pipeline, LOE).
+app.include_router(healthcare_routes.router)
 
 beth = Beth()
 

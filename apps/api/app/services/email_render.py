@@ -491,6 +491,147 @@ def _section(title: str, body_html: str) -> str:
 </td></tr>"""
 
 
+# --- Healthcare three-seat composer --------------------------------------
+# Mirrors docs/DISPATCH_PROTOCOLS.md — Biotech / Big Pharma / Tools subsections
+# + GLP-1 megacycle synthesis + today's healthcare catalysts.
+HEALTHCARE_SEAT_KEYS = ("biotech_smid", "big_pharma", "healthcare_tools")
+HEALTHCARE_LABELS = {
+    "biotech_smid":     "Biotech (small/mid cap)",
+    "big_pharma":       "Big Pharma & Specialty",
+    "healthcare_tools": "Tools & Life Sciences",
+}
+
+
+def _healthcare_subsection(label: str, sr: SpecialistReport | None) -> str:
+    """One subsection inside the consolidated Healthcare block."""
+    if sr is None:
+        return f"""
+<div style="margin:6px 0 14px 0;">
+  <div style="font-family:Inter,Arial,sans-serif;font-size:13px;color:{GOLD};font-weight:600;margin-bottom:4px;">{_esc(label)}</div>
+  <div style="font-family:Inter,Arial,sans-serif;font-size:12px;color:{GOLD_MUTED};font-style:italic;">No filing today.</div>
+</div>"""
+
+    takeaway = (sr.key_takeaway or "").strip() or "No takeaway filed."
+    flags_html = ""
+    if sr.risk_flags:
+        chips = " ".join(
+            f"""<span style="display:inline-block;margin:1px 4px 1px 0;padding:2px 6px;background:{CARD_BORDER};color:{DANGER};border-radius:3px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;">{_esc(rf[:60])}</span>"""
+            for rf in sr.risk_flags[:5]
+        )
+        flags_html = f"""<div style="margin-top:6px;">{chips}</div>"""
+
+    return f"""
+<div style="margin:6px 0 14px 0;">
+  <div style="font-family:Inter,Arial,sans-serif;font-size:13px;color:{GOLD};font-weight:600;margin-bottom:4px;">{_esc(label)} · <span style="color:{GOLD_MUTED};font-weight:400;">{_esc(sr.specialist)}</span></div>
+  <div style="font-family:Inter,Arial,sans-serif;font-size:13px;color:{CREAM};line-height:1.55;">{_esc(takeaway)}</div>
+  {flags_html}
+</div>"""
+
+
+def _glp1_synthesis(
+    pharma_sr: SpecialistReport | None,
+    tools_sr: SpecialistReport | None,
+) -> str:
+    """Cross-specialist GLP-1 block. Pulls any covered-name commentary on LLY/NVO
+    plus risk-flag entries that mention GLP-1 / capacity / Ozempic / Mounjaro /
+    Wegovy / Zepbound / tirzepatide / semaglutide."""
+    glp1_terms = (
+        "glp-1", "glp1", "ozempic", "wegovy", "mounjaro", "zepbound",
+        "tirzepatide", "semaglutide", "retatrutide", "orforglipron",
+    )
+
+    def _hits(sr: SpecialistReport | None) -> list[str]:
+        if sr is None:
+            return []
+        lines: list[str] = []
+        # LLY / NVO direct mentions
+        for cn in sr.covered_names_commentary:
+            if cn.ticker and cn.ticker.upper() in {"LLY", "NVO"}:
+                lines.append(f"<b>{_esc(cn.ticker)}</b> · {_esc(cn.narrative)}")
+        # Any covered name commentary mentioning a GLP-1 term
+        for cn in sr.covered_names_commentary:
+            if cn.ticker and cn.ticker.upper() in {"LLY", "NVO"}:
+                continue
+            blob = (cn.narrative or "").lower()
+            if any(t in blob for t in glp1_terms):
+                lines.append(f"<b>{_esc(cn.ticker)}</b> · {_esc(cn.narrative)}")
+        # Risk flags mentioning GLP-1 — they're often the cleanest signal
+        for rf in sr.risk_flags:
+            blob = rf.lower()
+            if any(t in blob for t in glp1_terms):
+                lines.append(f"<span style='color:{DANGER};'>RISK</span> · {_esc(rf)}")
+        return lines
+
+    bullets = _hits(pharma_sr) + _hits(tools_sr)
+    if not bullets:
+        return ""
+
+    items = "".join(
+        f"""<li style="margin:0 0 8px 0;color:{CREAM};line-height:1.55;font-family:Inter,Arial,sans-serif;font-size:13px;">{b}</li>"""
+        for b in bullets[:8]
+    )
+    return f"""
+<div style="margin:8px 0 4px 0;padding-top:12px;border-top:1px solid {CARD_BORDER};">
+  <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};margin-bottom:8px;">GLP-1 megacycle update</div>
+  <ul style="margin:0;padding-left:18px;">{items}</ul>
+</div>"""
+
+
+def _healthcare_catalysts_block(report: Report) -> str:
+    """Today's healthcare catalysts — pulled from the three healthcare seats' risk
+    flags. Pattern-match for clinical-readout / PDUFA / AdComm / conference language."""
+    catalyst_terms = (
+        "pdufa", "adcomm", "advisory committee", "phase 1", "phase 2", "phase 3",
+        "readout", "data drop", "asco", "esmo", "ash", "aacr", "jpm",
+        "ada", "aha", "interim",
+    )
+    hits: list[str] = []
+    for key in HEALTHCARE_SEAT_KEYS:
+        sr = _find_specialist(report, key)
+        if sr is None:
+            continue
+        for rf in sr.risk_flags:
+            blob = rf.lower()
+            if any(t in blob for t in catalyst_terms):
+                hits.append(f"<b>{_esc(HEALTHCARE_LABELS[key])}</b> · {_esc(rf)}")
+    if not hits:
+        return ""
+    items = "".join(
+        f"""<li style="margin:0 0 6px 0;color:{CREAM};line-height:1.5;font-family:Inter,Arial,sans-serif;font-size:12px;">{b}</li>"""
+        for b in hits[:8]
+    )
+    return f"""
+<div style="margin:8px 0 4px 0;padding-top:12px;border-top:1px solid {CARD_BORDER};">
+  <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};margin-bottom:8px;">Today&#39;s healthcare catalysts</div>
+  <ul style="margin:0;padding-left:18px;">{items}</ul>
+</div>"""
+
+
+def _healthcare_section(report: Report) -> str:
+    """Consolidated healthcare block — bails when no healthcare seat contributed."""
+    seats = {k: _find_specialist(report, k) for k in HEALTHCARE_SEAT_KEYS}
+    if not any(_seat_has_content(sr) for sr in seats.values()):
+        return ""
+
+    subsections = "".join(
+        _healthcare_subsection(HEALTHCARE_LABELS[k], seats[k])
+        for k in HEALTHCARE_SEAT_KEYS
+    )
+    glp1 = _glp1_synthesis(seats["big_pharma"], seats["healthcare_tools"])
+    catalysts = _healthcare_catalysts_block(report)
+    return _section("Healthcare", subsections + glp1 + catalysts)
+
+
+def _seat_has_content(sr: SpecialistReport | None) -> bool:
+    if sr is None:
+        return False
+    if (sr.key_takeaway or "").strip():
+        return True
+    if sr.covered_names_commentary or sr.new_ideas or sr.risk_flags:
+        return True
+    return False
+
+
 def _footer(report: Report) -> str:
     return f"""
 <tr><td style="padding:20px 32px;background:{INK};">
@@ -516,6 +657,8 @@ def render_report_email(
       executive summary
       bear case addendum (when triggered by the contrarian rule)
       top 50 changes (with Holloway income overlay)
+      healthcare (three sub-sections + GLP-1 + healthcare catalysts; when any
+        of biotech_smid / big_pharma / healthcare_tools contributed)
       rates & cross-asset setup (morning reports — Fixed Income dedicated)
       slot lead specialist
       other specialist filings (already-rendered specialists excluded)
@@ -546,6 +689,11 @@ def render_report_email(
 
     parts.append(_top50_changes(snapshot, dividend_lookup))
 
+    # Consolidated Healthcare block — three sub-sections + GLP-1 + catalysts.
+    healthcare_html = _healthcare_section(report)
+    if healthcare_html:
+        parts.append(healthcare_html)
+
     rates_html = _rates_setup_section(report)
     if rates_html:
         parts.append(rates_html)
@@ -556,6 +704,8 @@ def render_report_email(
         rendered_keys.add(report.lead_specialist_key)
     if rates_html:
         rendered_keys.add("fixed_income")
+    if healthcare_html:
+        rendered_keys.update(HEALTHCARE_SEAT_KEYS)
 
     slot_lead_keys = {"morning_packet", "midday_tactical", "market_close"}
     leads = [

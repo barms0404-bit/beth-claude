@@ -194,6 +194,112 @@ export function apiUrl(path: string): string {
   return `${BASE}${path}`;
 }
 
+// ---- Healthcare Command Center types ----------------------------------
+export type CatalystType =
+  | "phase_1_data" | "phase_2_data" | "phase_3_data"
+  | "interim_analysis" | "pdufa" | "adcomm" | "filing"
+  | "approval" | "launch" | "conference";
+
+export type AsymmetryScore = "favorable" | "neutral" | "unfavorable";
+export type CatalystStatus = "upcoming" | "occurred" | "postponed";
+export type ReviewType = "standard" | "priority" | "breakthrough" | "accelerated";
+export type PDUFAStatus = "upcoming" | "approved" | "crl" | "withdrawn" | "delayed";
+export type PipelinePhase =
+  | "preclinical" | "phase_1" | "phase_2" | "phase_3" | "filed" | "approved";
+export type HealthcareSpecialistOwner = "biotech_smid" | "big_pharma" | "healthcare_tools";
+
+export interface ClinicalCatalyst {
+  id?: string;
+  ticker: string;
+  company_name?: string | null;
+  drug_name: string;
+  indication?: string | null;
+  catalyst_type: CatalystType;
+  catalyst_date?: string | null;
+  catalyst_date_estimate_range?: string | null;
+  probability_of_success?: number | null;
+  our_view?: string | null;
+  expected_stock_move_pct?: number | null;
+  asymmetry_score?: AsymmetryScore | null;
+  position_recommendation?: string | null;
+  related_companies?: string[];
+  status: CatalystStatus;
+  result?: string | null;
+  result_stock_move_pct?: number | null;
+}
+
+export interface PDUFAEntry {
+  id?: string;
+  ticker: string;
+  drug_name: string;
+  indication?: string | null;
+  pdufa_date: string;
+  review_type?: ReviewType | null;
+  advisory_committee_meeting: boolean;
+  adcomm_date?: string | null;
+  approval_probability?: number | null;
+  our_view?: string | null;
+  commercial_potential_peak_sales_estimate?: number | null;
+  status: PDUFAStatus;
+  outcome?: string | null;
+}
+
+export interface GLP1Snapshot {
+  id?: string;
+  snapshot_date: string;
+  lly_revenue_qoq?: number | null;
+  nvo_revenue_qoq?: number | null;
+  lly_market_share?: number | null;
+  nvo_market_share?: number | null;
+  weekly_prescriptions_us?: number | null;
+  weekly_new_starts?: number | null;
+  manufacturing_capacity_estimate?: string | null;
+  pricing_trend_commentary?: string | null;
+  insurance_coverage_pct?: number | null;
+  recent_indication_expansions?: string[];
+  competitive_pipeline_updates?: string | null;
+  cross_sector_impact_observations?: string | null;
+}
+
+export interface PipelineAsset {
+  id?: string;
+  ticker: string;
+  asset_name: string;
+  mechanism?: string | null;
+  indication?: string | null;
+  therapeutic_area?: string | null;
+  current_phase: PipelinePhase;
+  probability_of_success?: number | null;
+  peak_sales_estimate?: number | null;
+  next_catalyst?: string | null;
+  next_catalyst_date?: string | null;
+  rnpv_estimate?: number | null;
+  specialist_owner?: HealthcareSpecialistOwner | null;
+}
+
+export interface PatentCliffEntry {
+  id?: string;
+  ticker: string;
+  drug_name: string;
+  current_annual_revenue?: number | null;
+  composition_patent_expiration?: string | null;
+  estimated_loe_date?: string | null;
+  biosimilar_or_generic?: "biosimilar" | "generic" | "both" | null;
+  expected_first_competitor_date?: string | null;
+  modeled_revenue_year_1?: number | null;
+  modeled_revenue_year_2?: number | null;
+  modeled_revenue_year_3?: number | null;
+  mitigation_strategy?: string | null;
+}
+
+export interface HealthcareLanding {
+  next_catalysts: ClinicalCatalyst[];
+  next_pdufas: PDUFAEntry[];
+  latest_glp1: GLP1Snapshot | null;
+  high_pos_pipeline: PipelineAsset[];
+  near_loe_drugs: PatentCliffEntry[];
+}
+
 export const api = {
   topRecommendations: () => getJson<Recommendation[]>("/api/recommendations/top"),
   ticker: (symbol: string) => getJson<TickerDetail>(`/api/tickers/${symbol}`),
@@ -208,4 +314,35 @@ export const api = {
   reportArchive: () => getJson<ArchivedReport[]>("/api/reports/archive", 60),
   tickerVerifications: (symbol: string) =>
     getJson<RecommendationVerification[]>(`/api/verifications/${symbol}`, 60),
+
+  // Healthcare Command Center
+  healthcareLanding: () => getJson<HealthcareLanding>("/api/healthcare", 60),
+  clinicalCatalysts: (status: CatalystStatus = "upcoming") =>
+    getJson<ClinicalCatalyst[]>(`/api/healthcare/clinical-catalysts?status=${status}`, 120),
+  pdufas: (status: PDUFAStatus = "upcoming") =>
+    getJson<PDUFAEntry[]>(`/api/healthcare/pdufas?status=${status}`, 120),
+  glp1Latest: () => getJson<GLP1Snapshot | null>("/api/healthcare/glp1/latest", 120),
+  glp1History: (limit = 52) =>
+    getJson<GLP1Snapshot[]>(`/api/healthcare/glp1/history?limit=${limit}`, 120),
+  pipeline: (params?: {
+    specialist_owner?: HealthcareSpecialistOwner;
+    phase?: PipelinePhase;
+    min_pos?: number;
+    ticker?: string;
+  }) => {
+    const q = new URLSearchParams();
+    if (params?.specialist_owner) q.set("specialist_owner", params.specialist_owner);
+    if (params?.phase) q.set("phase", params.phase);
+    if (params?.min_pos !== undefined) q.set("min_pos", String(params.min_pos));
+    if (params?.ticker) q.set("ticker", params.ticker);
+    const qs = q.toString();
+    return getJson<PipelineAsset[]>(
+      `/api/healthcare/pipeline${qs ? `?${qs}` : ""}`,
+      120,
+    );
+  },
+  patentCliffs: (ticker?: string) => {
+    const qs = ticker ? `?ticker=${encodeURIComponent(ticker)}` : "";
+    return getJson<PatentCliffEntry[]>(`/api/healthcare/patent-cliffs${qs}`, 120);
+  },
 };

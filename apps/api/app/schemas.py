@@ -710,3 +710,180 @@ class Report(BaseModel):
     macro_event: str | None = None                  # 'FOMC' | 'CPI' | 'NFP' | None
     disclaimer: str
     generated_at: datetime
+
+
+# --------------------------------------------------------------------------
+# Healthcare Command Center — 5 tables backing /api/healthcare/*
+# Mirrors supabase/migrations/20260523000000_healthcare_command_center.sql
+# --------------------------------------------------------------------------
+class CatalystType(str, Enum):
+    phase_1_data = "phase_1_data"
+    phase_2_data = "phase_2_data"
+    phase_3_data = "phase_3_data"
+    interim_analysis = "interim_analysis"
+    pdufa = "pdufa"
+    adcomm = "adcomm"
+    filing = "filing"
+    approval = "approval"
+    launch = "launch"
+    conference = "conference"
+
+
+class CatalystStatus(str, Enum):
+    upcoming = "upcoming"
+    occurred = "occurred"
+    postponed = "postponed"
+
+
+class AsymmetryScore(str, Enum):
+    favorable = "favorable"
+    neutral = "neutral"
+    unfavorable = "unfavorable"
+
+
+class ReviewType(str, Enum):
+    standard = "standard"
+    priority = "priority"
+    breakthrough = "breakthrough"
+    accelerated = "accelerated"
+
+
+class PDUFAStatus(str, Enum):
+    upcoming = "upcoming"
+    approved = "approved"
+    crl = "crl"
+    withdrawn = "withdrawn"
+    delayed = "delayed"
+
+
+class PipelinePhase(str, Enum):
+    preclinical = "preclinical"
+    phase_1 = "phase_1"
+    phase_2 = "phase_2"
+    phase_3 = "phase_3"
+    filed = "filed"
+    approved = "approved"
+
+
+class BiosimilarOrGeneric(str, Enum):
+    biosimilar = "biosimilar"
+    generic = "generic"
+    both = "both"
+
+
+class HealthcareSpecialistOwner(str, Enum):
+    biotech_smid = "biotech_smid"
+    big_pharma = "big_pharma"
+    healthcare_tools = "healthcare_tools"
+
+
+class ClinicalCatalyst(BaseModel):
+    """One row of the clinical catalyst calendar."""
+
+    id: uuid.UUID | None = None
+    ticker: str
+    company_name: str | None = None
+    drug_name: str
+    indication: str | None = None
+    catalyst_type: CatalystType
+    catalyst_date: datetime | None = None  # serialized as date
+    catalyst_date_estimate_range: str | None = None
+    probability_of_success: float | None = Field(default=None, ge=0.0, le=1.0)
+    our_view: str | None = None
+    expected_stock_move_pct: float | None = None
+    asymmetry_score: AsymmetryScore | None = None
+    position_recommendation: str | None = None
+    related_companies: list[str] = []
+    status: CatalystStatus = CatalystStatus.upcoming
+    result: str | None = None
+    result_stock_move_pct: float | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class PDUFAEntry(BaseModel):
+    """One row of the PDUFA calendar."""
+
+    id: uuid.UUID | None = None
+    ticker: str
+    drug_name: str
+    indication: str | None = None
+    pdufa_date: datetime  # date
+    review_type: ReviewType | None = None
+    advisory_committee_meeting: bool = False
+    adcomm_date: datetime | None = None
+    approval_probability: float | None = Field(default=None, ge=0.0, le=1.0)
+    our_view: str | None = None
+    commercial_potential_peak_sales_estimate: float | None = None
+    status: PDUFAStatus = PDUFAStatus.upcoming
+    outcome: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class GLP1Snapshot(BaseModel):
+    """One snapshot of the GLP-1 megacycle (typically one per week or per data drop)."""
+
+    id: uuid.UUID | None = None
+    snapshot_date: datetime  # date
+    lly_revenue_qoq: float | None = None
+    nvo_revenue_qoq: float | None = None
+    lly_market_share: float | None = Field(default=None, ge=0.0, le=1.0)
+    nvo_market_share: float | None = Field(default=None, ge=0.0, le=1.0)
+    weekly_prescriptions_us: int | None = None
+    weekly_new_starts: int | None = None
+    manufacturing_capacity_estimate: str | None = None
+    pricing_trend_commentary: str | None = None
+    insurance_coverage_pct: float | None = Field(default=None, ge=0.0, le=1.0)
+    recent_indication_expansions: list[str] = []
+    competitive_pipeline_updates: str | None = None
+    cross_sector_impact_observations: str | None = None
+    created_at: datetime | None = None
+
+
+class PipelineAsset(BaseModel):
+    """One pipeline asset for any covered name (biotech, big pharma, or tools)."""
+
+    id: uuid.UUID | None = None
+    ticker: str
+    asset_name: str
+    mechanism: str | None = None
+    indication: str | None = None
+    therapeutic_area: str | None = None
+    current_phase: PipelinePhase
+    probability_of_success: float | None = Field(default=None, ge=0.0, le=1.0)
+    peak_sales_estimate: float | None = None
+    next_catalyst: str | None = None
+    next_catalyst_date: datetime | None = None
+    rnpv_estimate: float | None = None
+    specialist_owner: HealthcareSpecialistOwner | None = None
+    last_updated: datetime | None = None
+
+
+class PatentCliffEntry(BaseModel):
+    """One LOE / patent-cliff entry for a marketed drug."""
+
+    id: uuid.UUID | None = None
+    ticker: str
+    drug_name: str
+    current_annual_revenue: float | None = None
+    composition_patent_expiration: datetime | None = None
+    estimated_loe_date: datetime | None = None
+    biosimilar_or_generic: BiosimilarOrGeneric | None = None
+    expected_first_competitor_date: datetime | None = None
+    modeled_revenue_year_1: float | None = None
+    modeled_revenue_year_2: float | None = None
+    modeled_revenue_year_3: float | None = None
+    mitigation_strategy: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class HealthcareLanding(BaseModel):
+    """Composite payload for /api/healthcare (landing dashboard)."""
+
+    next_catalysts: list[ClinicalCatalyst] = []
+    next_pdufas: list[PDUFAEntry] = []
+    latest_glp1: GLP1Snapshot | None = None
+    high_pos_pipeline: list[PipelineAsset] = []
+    near_loe_drugs: list[PatentCliffEntry] = []

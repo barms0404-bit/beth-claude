@@ -21,6 +21,7 @@ from app.agents.base import build_context
 from app.agents.chart_specialist import ChartSpecialist
 from app.agents.citation_enforcer import enforcer as citation_enforcer
 from app.agents.conflict_resolver import resolver as conflict_resolver
+from app.agents.disclaimers import append_addenda
 from app.agents.red_team import red_team
 from app.agents.registry import SPECIALISTS, roster_for
 from app.agents.verifier import verify_high_conviction
@@ -85,7 +86,7 @@ DISCLAIMER = (
 
 _BETH_SYSTEM = """\
 You are BETH, Chief of Staff and research orchestrator at Armstrong Arikat Private
-Wealth Group. You report to Brian, the Portfolio Manager. Your 15 specialists have
+Wealth Group. You report to Brian, the Portfolio Manager. Your specialist team has
 each filed a structured report. Synthesize them for Brian.
 
 Your job:
@@ -213,7 +214,7 @@ class Beth:
             lead_specialist_key=lead_key,
             bear_case_addendum=bear_case,
             macro_event=macro_event,
-            disclaimer=DISCLAIMER,
+            disclaimer=append_addenda(DISCLAIMER, outputs),
             generated_at=datetime.now(timezone.utc),
         )
 
