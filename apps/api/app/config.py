@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     polygon_api_key: str = ""
     polygon_ws_url: str = "wss://socket.polygon.io/stocks"
 
+    # FRED (Federal Reserve Economic Data) — treasury yields, spreads, macro
+    fred_api_key: str = ""
+
     # Supabase (service-role key — backend only)
     supabase_url: str = ""
     supabase_service_role_key: str = ""

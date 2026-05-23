@@ -12,7 +12,7 @@ conviction-ranked Top 50 from specialist `new_ideas`, runs its own synthesis tur
 (executive summary + conflict adjudication + escalated risk flags), and returns a
 `Report`.
 
-## The 17 Specialists
+## The 18 Specialists
 
 `apps/api/app/agents/registry.py`. Each is a `Specialist` with a `persona`, a
 functional title, a `coverage` universe, and a `mandate`. System prompt = shared
@@ -35,12 +35,13 @@ contract (the shared fragments are prompt-cached).
 | `consumer_internet` | Olivia Chen | Consumer / Internet Specialist | DTC, e-commerce, digital ads |
 | `macro_strategy` | Robert Sterling | Macro Strategy Analyst | Rates, Fed, factor rotation |
 | `quant` | Anika Sharma | Quantitative Analyst | Factor exposure, screens, momentum |
+| `fixed_income` | Edward Vance | Fixed Income Specialist | Rates, curve, credit, Fed — with growth-equity implication |
 | `value_investor` | Henry Whitlock | Value Investor Specialist | Intrinsic value, margin of safety, special situations, AI bubble bear case |
 | `dividend_aristocrat` | Margaret Holloway | Dividend Aristocrat & Income Specialist | Aristocrats/Kings, dividend safety + growth, REITs/BDCs |
 | `alt_data` | Kevin Park | Alt Data Specialist | Web traffic, app downloads, card panels |
 
 Dispatch rule (`roster_for`): the one window analyst whose `lead_slot` matches the
-report, plus all 14 non-window specialists.
+report, plus all 15 non-window specialists.
 
 ## Canonical specialist contract
 
