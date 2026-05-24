@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import StockDetail from "./pages/StockDetail";
 import AnalystPage from "./pages/AnalystPage";
 import CnbcNews from "./pages/CnbcNews";
+import Performance from "./pages/Performance";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/stock/:ticker"} component={StockDetail} />
       <Route path={"/analyst/:slug"} component={AnalystPage} />
       <Route path={"/cnbc"} component={CnbcNews} />
+      <Route path={"/performance"} component={Performance} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
