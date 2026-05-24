@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import StockDetail from "./pages/StockDetail";
 import AnalystPage from "./pages/AnalystPage";
+import CnbcNews from "./pages/CnbcNews";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/stock/:ticker"} component={StockDetail} />
       <Route path={"/analyst/:slug"} component={AnalystPage} />
+      <Route path={"/cnbc"} component={CnbcNews} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
