@@ -12,6 +12,13 @@ const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 const SPY_CHART = "/manus-storage/spy_chart_699a562f.png";
 const NVDA_CHART = "/manus-storage/nvda_chart_7bda8308.png";
 const LLY_CHART = "/manus-storage/lly_chart_b1ec7ac4.png";
+const AVGO_CHART = "/manus-storage/avgo_chart_7cc2f7b0.png";
+const MSFT_CHART = "/manus-storage/msft_chart_64eb7cfd.png";
+const AMD_CHART = "/manus-storage/amd_chart_03661d22.png";
+const QCOM_CHART = "/manus-storage/qcom_chart_670fb6f1.png";
+const DELL_CHART = "/manus-storage/dell_chart_1e039f44.png";
+const COST_CHART = "/manus-storage/cost_chart_7d617c0a.png";
+const JPM_CHART = "/manus-storage/jpm_chart_1989321a.png";
 
 // Stock database with company info, returns, and specialist research
 const stockDatabase: Record<string, StockData> = {
@@ -97,7 +104,7 @@ const stockDatabase: Record<string, StockData> = {
     founded: "1961",
     hq: "Palo Alto, CA",
     returns: { day: "+2.8%", thirtyDay: "+22.1%", threeMonth: "+38.6%", sixMonth: "+52.1%", ytd: "+52.1%" },
-    chart: NVDA_CHART,
+    chart: AVGO_CHART,
     specialistResearch: [
       {
         analystName: "Marcus Chen",
@@ -127,7 +134,7 @@ const stockDatabase: Record<string, StockData> = {
     founded: "1975",
     hq: "Redmond, WA",
     returns: { day: "-0.12%", thirtyDay: "+5.3%", threeMonth: "+12.8%", sixMonth: "+18.4%", ytd: "+18.4%" },
-    chart: SPY_CHART,
+    chart: MSFT_CHART,
     specialistResearch: [
       {
         analystName: "Michael Torres",
@@ -226,7 +233,7 @@ const stockDatabase: Record<string, StockData> = {
     founded: "1969",
     hq: "Santa Clara, CA",
     returns: { day: "+3.9%", thirtyDay: "+15.2%", threeMonth: "+28.7%", sixMonth: "+38.9%", ytd: "+38.9%" },
-    chart: NVDA_CHART,
+    chart: AMD_CHART,
     specialistResearch: [
       {
         analystName: "David Park",
@@ -263,6 +270,19 @@ const defaultStock: StockData = {
   specialistResearch: []
 };
 
+// Map additional tickers to their charts
+const chartMap: Record<string, string> = {
+  QCOM: QCOM_CHART,
+  DELL: DELL_CHART,
+  COST: COST_CHART,
+  JPM: JPM_CHART,
+  ARM: NVDA_CHART,
+  SMCI: NVDA_CHART,
+  MRVL: AVGO_CHART,
+  PANW: MSFT_CHART,
+  V: JPM_CHART,
+};
+
 interface SpecialistResearch {
   analystName: string;
   role: string;
@@ -297,7 +317,8 @@ interface StockData {
 export default function StockDetail() {
   const params = useParams<{ ticker: string }>();
   const ticker = params.ticker?.toUpperCase() || "";
-  const stock = stockDatabase[ticker] || { ...defaultStock, ticker, name: `${ticker} Research` };
+  const dbStock = stockDatabase[ticker];
+  const stock = dbStock || { ...defaultStock, ticker, name: `${ticker} Research`, chart: chartMap[ticker] || SPY_CHART };
 
   return (
     <div className="min-h-screen bg-[#000000] relative">
