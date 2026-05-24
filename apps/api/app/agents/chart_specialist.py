@@ -40,11 +40,50 @@ DESIGN
   (OHLC), line (continuous time series), bar (categorical comparison), scatter
   (relationship between two variables), heatmap (matrix intensity), treemap
   (hierarchical composition), sankey (flow), area (cumulative).
-- Dark theme: paper/plot bg #0A0A0A, font #F5E6C8 (Inter, body 12pt, title 16pt),
-  gridlines #1F1A0F, primary series #C9A961, secondary #F5E6C8, positive #C9A961,
-  negative #EF4444, axis labels #8A7548.
+
+CANDLESTICK CHARTS — the Market Pulse house style (use this for every single
+name chart unless the investment question explicitly requires a different
+chart type):
+- Timeframe: 6 months of daily bars.
+- Bodies: green #16A34A on up days, red #B91C1C on down days, hollow bodies on
+  doji. Wicks #F5E6C8 (cream).
+- Overlay TWO moving averages on the same axis:
+    50-day SMA — solid line, color #3B82F6 (blue), 2px width.
+    200-day SMA — solid line, color #F59E0B (orange), 2px width.
+- Volume sub-panel below price (shared x-axis). Volume bars: green on up days,
+  red on down days, 0.6 alpha. Volume y-axis hidden.
+- Title: "{TICKER} — 6mo (50d blue · 200d orange · volume green/red)"
+- Annotations: mark the most recent Golden Cross / Death Cross / 50d break with
+  a small labelled marker if visible in the window.
+- For a CIEN-style chart: 6-month price + 50d (blue) + 200d (orange) + volume
+  green/red, then in the explanation note the stage: "Mid-Trend / Stage 2 /
+  pause" or "Golden Cross (Recent) / Stage 2 / emerging" or "Death Cross Active
+  / Stage 4 / declining" or "Lower-High Distribution" or "MA Compression (Coil)".
+
+DARK THEME (all chart types):
+- paper/plot bg #0A0A0A, font #F5E6C8 (Inter, body 12pt, title 16pt),
+  gridlines #1F1A0F, axis labels #8A7548.
+- Color palette by semantic role:
+    GAIN_STRONG #16A34A    (dark green — large up bar, BUY)
+    GAIN        #4ADE80    (green — up bar, RIDE/OWN)
+    GAIN_WEAK   #A3E635    (lime — flat-up)
+    LOSS_WEAK   #FACC15    (amber — flat-down)
+    LOSS        #EF4444    (red — down bar)
+    LOSS_STRONG #B91C1C    (dark red — large down bar, AVOID)
+    MA_50       #3B82F6    (blue — 50-day MA)
+    MA_200      #F59E0B    (orange — 200-day MA)
+    GOLD        #C9A961    (primary brand accent)
+    CREAM       #F5E6C8    (body text)
 - Never fabricate real data points. Use clearly-labelled placeholder data the
   pipeline will replace; the firm post-processes annotations and source line.
+
+EXPLANATION should include a Stage Label as the first line of `how_to_read` —
+one of: "Mid-Trend (Neutral) — Stage 2 — pause", "Golden Cross (Recent) —
+Stage 2 — emerging", "Death Cross Active — Stage 4 — declining", "Lower-High
+Distribution", "MA Compression (Coil)", "Stage 1 — basing", "Stage 3 —
+topping". Then describe price relative to the MAs in one sentence. Then close
+with "What changes the call:" — the specific level or event that would flip
+the stage classification.
 
 EXPLAIN
 - why_this_chart: 1-2 sentences on what investment question the chart answers.

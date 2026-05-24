@@ -303,6 +303,21 @@ async def run_and_send_report(slot: ReportSlot) -> dict:
     return await send_report(report)
 
 
+@app.post("/api/reports/rerender/{slot}")
+async def rerender_latest_report(slot: ReportSlot) -> dict:
+    """Re-render the most-recent cached report for `slot` through the current
+    HTML template — NO new specialist dispatch, NO Anthropic spend. Useful for
+    iterating on design changes without paying for fresh analysis. Returns
+    archive paths same shape as /run."""
+    cached = _LATEST.get(slot)
+    if cached is None:
+        raise HTTPException(
+            404,
+            f"No cached report for slot={slot.value}. Run /api/reports/run/{slot.value} first.",
+        )
+    return await send_report(cached)
+
+
 @app.get("/api/reports/archive", response_model=list[ArchivedReport])
 async def reports_archive() -> list[ArchivedReport]:
     """Recent archived HTML reports on disk — the dashboard archive widget."""

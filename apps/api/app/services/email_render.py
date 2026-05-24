@@ -23,8 +23,58 @@ GOLD_MUTED = "#8A7548"
 CREAM = "#F5E6C8"
 CARD = "#0A0A0A"
 CARD_BORDER = "#1F1A0F"
-SUCCESS = "#4ADE80"
-DANGER = "#EF4444"
+
+# Gain / loss palette — pairs with the gold/black for verdict badges, candle
+# bodies, volume bars, and the per-cell color gradient in the returns scorecard
+# (dark green = +20%+, green = +5-20%, lime = 0-5%, amber = 0 to -5%,
+# red = -5 to -15%, dark red = <-15%). Added 2026-05-23 per Brian directive
+# to match the Market Pulse reference design.
+GAIN_STRONG = "#16A34A"    # dark green — >+20%, BUY/ADD verdicts
+GAIN = "#4ADE80"           # green — +5 to +20%, RIDE/OWN
+GAIN_WEAK = "#A3E635"      # lime — 0 to +5%, HOLD with bias up
+LOSS_WEAK = "#FACC15"      # amber — 0 to -5%, TRIM
+LOSS = "#EF4444"           # red — -5 to -15%, AVOID
+LOSS_STRONG = "#B91C1C"    # dark red — <-15%, EXIT
+NEUTRAL_FLAT = "#9CA3AF"   # cool grey — flat / no-position calls
+
+# Legacy aliases — keep existing usage stable
+SUCCESS = GAIN
+DANGER = LOSS
+
+# --- Verdict color map — controlled vocabulary from OUTPUT_CONTRACT -------
+# Maps each canonical verdict phrase to a badge color family. The renderer
+# does a substring match (case-insensitive) so variations like "BUY STARTER",
+# "BUY ON TRIGGER", "BUY -- " all route to the BUY family.
+VERDICT_FAMILIES: list[tuple[str, str]] = [
+    # Order matters — more specific phrases first.
+    ("AVOID",          LOSS_STRONG),
+    ("EXIT",           LOSS_STRONG),
+    ("SELL",           LOSS),
+    ("TRIM",           LOSS_WEAK),
+    ("RAISE",          LOSS_WEAK),  # "RAISE cash"
+    ("OWN",            GAIN_STRONG),
+    ("ACCUMULATE",     GAIN_STRONG),
+    ("ADD",            GAIN_STRONG),
+    ("BUY",            GAIN_STRONG),
+    ("STARTER",        GAIN),
+    ("RIDE",           GAIN),
+    ("THEME BE",       GAIN_WEAK),  # "THEME BENEFICIARY"
+    ("HOLD INTO PRINT", GOLD),
+    ("HOLD",           GOLD),
+    ("WATCH",          GOLD_MUTED),
+    ("FLOW BACKS",     GOLD),
+    ("FLOW WARNS",     LOSS_WEAK),
+]
+
+
+def _verdict_color(verdict: str | None) -> str:
+    if not verdict:
+        return GOLD_MUTED
+    v = verdict.upper()
+    for needle, color in VERDICT_FAMILIES:
+        if needle in v:
+            return color
+    return GOLD_MUTED
 
 # --- Subject lines (per Brian's spec) -------------------------------------
 SUBJECTS: dict[ReportSlot, str] = {
@@ -386,6 +436,52 @@ def _top50_changes(
     return _section("Top 50 — Changes", "".join(parts))
 
 
+def _verdict_badge(verdict: str) -> str:
+    """Color-coded uppercase pill — matches the Market Pulse reference."""
+    color = _verdict_color(verdict)
+    return (
+        f"""<span style="display:inline-block;padding:3px 8px;background:{color};"""
+        f"""color:{INK};font-weight:700;font-size:10px;letter-spacing:0.12em;"""
+        f"""text-transform:uppercase;border-radius:3px;font-family:Inter,Arial,sans-serif;">"""
+        f"""{_esc(verdict)}</span>"""
+    )
+
+
+def _picks_table(picks) -> str:
+    """Per-specialist structured picks table — Ticker / Verdict / Setup /
+    Entry / Stop / Target / Sizing. Matches the Market Pulse reference design
+    on pages 13-22 of the reference PDF."""
+    if not picks:
+        return ""
+    rows: list[str] = []
+    for p in picks[:10]:
+        rows.append(f"""
+<tr>
+  <td style="padding:8px 10px;color:{GOLD};font-weight:700;font-size:13px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;white-space:nowrap;">{_esc(p.ticker)}</td>
+  <td style="padding:8px 10px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;">{_verdict_badge(p.verdict)}</td>
+  <td style="padding:8px 10px;color:{CREAM};font-size:12px;border-bottom:1px solid {CARD_BORDER};line-height:1.5;vertical-align:top;">{_esc(p.setup)}</td>
+  <td style="padding:8px 10px;color:{CREAM};font-size:12px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;white-space:nowrap;">{_esc(p.entry or '—')}</td>
+  <td style="padding:8px 10px;color:{LOSS_WEAK};font-size:12px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;white-space:nowrap;">{_esc(p.stop or '—')}</td>
+  <td style="padding:8px 10px;color:{GAIN};font-size:12px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;white-space:nowrap;">{_esc(p.target or '—')}</td>
+  <td style="padding:8px 10px;color:{GOLD_MUTED};font-size:11px;border-bottom:1px solid {CARD_BORDER};vertical-align:top;white-space:nowrap;">{_esc(p.sizing or '—')}</td>
+</tr>""")
+    return f"""
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%;font-family:Inter,Arial,sans-serif;border-collapse:collapse;margin:10px 0;">
+  <thead>
+    <tr>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Ticker</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Verdict</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Setup</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Entry</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Stop</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Target</th>
+      <th style="text-align:left;padding:6px 10px;color:{GOLD_MUTED};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;border-bottom:1px solid {GOLD};font-weight:600;">Sizing</th>
+    </tr>
+  </thead>
+  <tbody>{''.join(rows)}</tbody>
+</table>"""
+
+
 def _specialist_report_html(sr: SpecialistReport) -> str:
     covered_rows = "".join(
         f"""<tr>
@@ -416,11 +512,16 @@ def _specialist_report_html(sr: SpecialistReport) -> str:
             + "</div>"
         )
 
+    # NEW: structured picks table — top placement after key_takeaway because
+    # it's the action layer Brian acts on. Matches Market Pulse reference.
+    picks_table = _picks_table(sr.picks)
+
     return f"""
-<div style="margin:16px 0;">
-  <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:{GOLD};">{_esc(sr.specialist)}</div>
-  <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:{GOLD_MUTED};text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;">{_esc(sr.agent_key)}</div>
-  <div style="font-family:Inter,Arial,sans-serif;font-size:14px;color:{CREAM};line-height:1.55;margin-bottom:10px;">{_esc(sr.key_takeaway)}</div>
+<div style="margin:18px 0;">
+  <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:{GOLD};">{_esc(sr.specialist)}</div>
+  <div style="font-family:Inter,Arial,sans-serif;font-size:11px;color:{GOLD_MUTED};text-transform:uppercase;letter-spacing:0.15em;margin-bottom:10px;">{_esc(sr.agent_key)}</div>
+  <div style="font-family:Inter,Arial,sans-serif;font-size:14px;color:{CREAM};line-height:1.6;margin-bottom:12px;">{_esc(sr.key_takeaway)}</div>
+  {picks_table}
   {f'<table style="width:100%;font-family:Inter,Arial,sans-serif;font-size:13px;border-collapse:collapse;margin-bottom:10px;">{covered_rows}</table>' if covered_rows else ''}
   {new_ideas}
   {flags}

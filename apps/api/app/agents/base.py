@@ -81,6 +81,17 @@ Respond with ONLY a single JSON object, no prose outside it, matching exactly:
      }
     }
   ],
+  "picks": [
+    {"ticker": "TICKER",
+     "verdict": "BUY STARTER | BUY ON TRIGGER | HOLD | HOLD INTO PRINT | ADD | "
+                "ADD ON PULLBACK | TRIM | TRIM ON RALLY | RAISE | AVOID | "
+                "WATCH | THEME BENEFICIARY | OWN -- ACCUMULATE | RIDE",
+     "setup": "one-line technical or fundamental setup",
+     "entry": "price level OR trigger condition OR 'current' OR 'pullback to $X'",
+     "stop": "price level OR rule OR 'structural' OR 'weekly close <$X'",
+     "target": "price level OR 'trend' OR '+25%' OR '$245 / $260'",
+     "sizing": "e.g. '2% starter', 'full position', 'trim 30%', '1-2% on trigger'"}
+  ],
   "chart_request": {
     "chart_type": "line | bar | candlestick | scatter | area",
     "data_needed": "the exact series/fields the chart requires",
@@ -94,6 +105,13 @@ Rules:
 - "move_pct" is a number or null. "chart_request" may be null if no chart is warranted.
 - Include 0-8 new_ideas; surface only names you would defend to the PM.
 - "covered_names_commentary" covers names already in your coverage universe.
+- "picks" is the STRUCTURED action table for Brian. Every actionable position
+  call you make in your prose MUST appear here as a row. Verdict vocabulary is
+  controlled — pick the closest from the list above so the email renderer can
+  color-code (BUY family = green, HOLD family = gold, TRIM family = amber,
+  AVOID family = red). 0-10 picks per filing. If your role is non-actionable
+  (multi-style-synthesizer, fundamental-analyst, portfolio-risk-manager,
+  some macro/economist seats) leave picks = [].
 
 PROBABILISTIC FORECAST (mandatory on EVERY new_idea):
 - Replace single-point price targets with a three-scenario distribution. The

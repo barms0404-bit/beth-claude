@@ -156,6 +156,41 @@ class ChartRequest(BaseModel):
     why_this_chart: str
 
 
+class SpecialistPick(BaseModel):
+    """One concrete actionable pick from a specialist — the row format used in
+    the per-specialist picks tables in the report (Ticker / Verdict / Setup /
+    Entry / Stop / Target / Sizing). This is the structured complement to the
+    free-text `new_ideas` and `covered_names_commentary`.
+
+    Verdicts use a constrained vocabulary so the email renderer can color-code:
+      BUY family   (green badge): BUY, BUY STARTER, ADD, ACCUMULATE, OWN, RIDE,
+                                  BUY ON TRIGGER, ADD ON TRIGGER, STARTER
+      HOLD family  (gold badge):  HOLD, HOLD INTO PRINT, HOLD STARTER, WATCH,
+                                  THEME BENEFICIARY, FLOW BACKS
+      TRIM family  (amber badge): TRIM, TRIM ON RALLY, TRIM INTO STRENGTH,
+                                  TRIM IF OVERSIZED, RAISE (for cash)
+      SELL family  (red badge):   AVOID, EXIT, SELL, AVOID -- STAY OUT
+    """
+
+    ticker: str
+    verdict: str = Field(
+        description="One short uppercase phrase. BUY family, HOLD family, "
+                    "TRIM family, or AVOID family per the canonical vocabulary."
+    )
+    setup: str = Field(description="One-line technical/fundamental setup")
+    entry: str | None = Field(
+        default=None,
+        description="Entry rule — price level, trigger condition, or 'current'",
+    )
+    stop: str | None = Field(default=None, description="Stop level or rule")
+    target: str | None = Field(
+        default=None, description="Price target or 'trend' for trailing"
+    )
+    sizing: str | None = Field(
+        default=None, description="Position size — e.g. '2% starter', 'full position'"
+    )
+
+
 class SpecialistReport(BaseModel):
     """Structured result of one specialist run — the canonical contract Beth expects."""
 
@@ -165,6 +200,11 @@ class SpecialistReport(BaseModel):
     key_takeaway: str
     covered_names_commentary: list[CoveredName] = []
     new_ideas: list[NewIdea] = []
+    # NEW (2026-05-23): structured table of concrete picks rendered per the
+    # Market Pulse reference design. Specialists with no actionable picks
+    # for the window (macro, quant, fundamental-analyst, multi-style, etc.)
+    # leave this empty and rely on key_takeaway + covered_names_commentary.
+    picks: list[SpecialistPick] = []
     chart_request: ChartRequest | None = None
     risk_flags: list[str] = []
     compliance_notes: list[str] = []
