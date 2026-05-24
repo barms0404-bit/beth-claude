@@ -8,6 +8,7 @@ import { generateSpecialistResearch, generateAllResearch, getAvailableSpecialist
 import { logRecommendationSupabase, closeRecommendationSupabase, getActiveRecommendationsSupabase, getSpecialistPerformanceSupabase, logAgentRunSupabase, getRecentRunsSupabase, SUPABASE_CONFIG } from "./supabaseClient";
 import { getCryptoData, getCryptoFearGreed } from "./dataSources";
 import { runBacktest, getHindsightSummary, getSpecialistLessons } from "./learningEngine";
+import { getConvictionCalibration, getUpcomingEarnings } from "./autoLogger";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -111,7 +112,7 @@ export const appRouter = router({
     }),
   }),
 
-  // Learning engine — backtesting, hindsight, lessons
+  // Learning engine — backtesting, hindsight, lessons, calibration, earnings
   learning: router({
     // Run backtesting on all active recommendations
     backtest: publicProcedure.mutation(async () => {
@@ -130,6 +131,20 @@ export const appRouter = router({
       .input(z.object({ slug: z.string() }))
       .query(async ({ input }) => {
         return await getSpecialistLessons(input.slug);
+      }),
+
+    // Conviction calibration — how accurate are conviction scores?
+    calibration: publicProcedure
+      .input(z.object({ slug: z.string().optional() }).optional())
+      .query(async ({ input }) => {
+        return await getConvictionCalibration(input?.slug);
+      }),
+
+    // Upcoming earnings for covered stocks
+    earnings: publicProcedure
+      .input(z.object({ tickers: z.array(z.string()).optional() }).optional())
+      .query(async ({ input }) => {
+        return await getUpcomingEarnings(input?.tickers);
       }),
   }),
 

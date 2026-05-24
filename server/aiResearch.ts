@@ -9,6 +9,7 @@ import { getMarketSnapshot, getStockQuote } from "./marketData";
 import { callModel, getModelForSpecialist, type AIModel } from "./multiModelAI";
 import { enrichResearchContext } from "./dataSources";
 import { getSpecialistLessons } from "./learningEngine";
+import { autoLogFromResearch, getEarningsWarning } from "./autoLogger";
 
 interface SpecialistConfig {
   name: string;
@@ -283,6 +284,7 @@ ${econContext}
 10Y Treasury: ${snapshot.economic.find(e => e.series === "DGS10")?.value || "4.57"}%
 ${enrichedData}
 ${lessons}
+${getEarningsWarning(specialist.tickers)}
 
 Provide your research in this exact format:
 1. CURRENT VIEW (2-3 sentences on your overall sector thesis today)
@@ -306,6 +308,12 @@ Be specific with numbers. Reference the live prices above. Be conviction-forward
       } catch { /* non-critical */ }
     }
 
+    // Auto-log recommendations from the research output
+    let recsLogged = 0;
+    try {
+      recsLogged = await autoLogFromResearch(slug, specialist.name, research);
+    } catch { /* non-critical */ }
+
     const result = {
       name: specialist.name,
       role: specialist.role,
@@ -313,6 +321,7 @@ Be specific with numbers. Reference the live prices above. Be conviction-forward
       secondOpinion: secondOpinion || undefined,
       model: modelConfig.primary,
       secondaryModel: modelConfig.secondary || undefined,
+      recsLogged,
       timestamp: new Date().toISOString(),
       tickers: specialist.tickers,
     };
