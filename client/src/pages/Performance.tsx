@@ -14,9 +14,9 @@ const SUPABASE_URL = "https://aufdpgioooxbujzrxacv.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1ZmRwZ2lvb294YnVqenJ4YWN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NDYxNjcsImV4cCI6MjA5NTEyMjE2N30.svfu2nTHxl4J200gok29DqjAGvPn3ax-mVdQbWVBPSo";
 
 export default function Performance() {
-  const { data: stats, refetch: refetchStats } = trpc.performance.stats.useQuery(undefined, { refetchInterval: 30000 });
-  const { data: runs, refetch: refetchRuns } = trpc.performance.runs.useQuery(undefined, { refetchInterval: 15000 });
-  const { data: recs, refetch: refetchRecs } = trpc.performance.recommendations.useQuery(undefined, { refetchInterval: 30000 });
+  const { data: stats, refetch: refetchStats } = trpc.performance.stats.useQuery(undefined, { refetchInterval: 30000 }) as any;
+  const { data: runs, refetch: refetchRuns } = trpc.performance.runs.useQuery(undefined, { refetchInterval: 15000 }) as any;
+  const { data: recs, refetch: refetchRecs } = trpc.performance.recommendations.useQuery(undefined, { refetchInterval: 30000 }) as any;
   const [realtimeConnected, setRealtimeConnected] = useState(false);
 
   // Supabase Realtime subscription for instant updates
@@ -128,7 +128,7 @@ export default function Performance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.map((s, i) => (
+                  {stats.map((s: any, i: number) => (
                     <tr key={s.specialistSlug} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5">
                       <td className="py-2.5 px-3 text-[#8A7548] text-xs">{i + 1}</td>
                       <td className="py-2.5 px-3">
@@ -174,7 +174,7 @@ export default function Performance() {
 
           {recs && recs.length > 0 ? (
             <div className="space-y-2">
-              {recs.map((rec) => (
+              {recs.map((rec: any) => (
                 <div key={rec.id} className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <span className="text-[#C9A961] text-sm font-bold">{rec.ticker}</span>
@@ -219,7 +219,7 @@ export default function Performance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {runs.map((run) => (
+                  {runs.map((run: any) => (
                     <tr key={run.id} className="border-b border-[#1F1A0F]/50 hover:bg-[#C9A961]/5">
                       <td className="py-2 px-3 text-[#C9A961] text-xs font-medium">{run.specialistName}</td>
                       <td className="py-2 px-3 text-center">

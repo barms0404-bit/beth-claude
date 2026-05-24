@@ -60,7 +60,7 @@ export const appRouter = router({
               status: result.research.includes("temporarily unavailable") ? "failed" : "success",
               duration_ms: Date.now() - startTime,
               research_preview: result.research.slice(0, 500),
-              model_used: result.model || "manus",
+              model_used: (result as any).model || "manus",
             });
           } catch { /* non-critical */ }
         }
