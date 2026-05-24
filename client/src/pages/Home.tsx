@@ -5,8 +5,9 @@
  * Only red/green for market direction indicators
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -86,8 +87,8 @@ function scrollToSection(id: string) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// Market data
-const indexData = [
+// Static fallback market data (used when API unavailable)
+const staticIndexData = [
   { name: "S&P 500", ticker: "SPY", value: "7,473.47", change: "+0.37%", up: true },
   { name: "Nasdaq", ticker: "IXIC", value: "26,343.97", change: "+0.19%", up: true },
   { name: "QQQ", ticker: "QQQ", value: "537.82", change: "+0.24%", up: true },
@@ -98,6 +99,14 @@ const indexData = [
   { name: "DXY", ticker: "DXY", value: "104.23", change: "+0.12%", up: false },
   { name: "BTC", ticker: "BTC", value: "$71,245", change: "+2.1%", up: true },
 ];
+
+const tickerNames: Record<string, string> = {
+  SPY: "S&P 500", QQQ: "QQQ", DIA: "Dow Jones", IWM: "Russell 2000",
+  NVDA: "NVIDIA", MSFT: "Microsoft", AAPL: "Apple", AVGO: "Broadcom",
+  AMD: "AMD", LLY: "Eli Lilly", META: "Meta", GOOGL: "Alphabet",
+  AMZN: "Amazon", TSLA: "Tesla", ARM: "ARM", DELL: "Dell",
+  PANW: "Palo Alto", COST: "Costco", V: "Visa", JPM: "JPMorgan",
+};
 
 const top50Data = [
   { rank: 1, ticker: "NVDA", company: "NVIDIA Corp", sector: "AI/Chips", conviction: "High", price: "$208.27", change: "+4.2%", ytd: "+48.2%", specialist: "Training Chip", updated: "2 min ago" },
@@ -165,6 +174,44 @@ const accuracyAgents = [
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Fetch live market data from Polygon.io via backend
+  const { data: liveMarket } = trpc.market.snapshot.useQuery(undefined, {
+    refetchInterval: 60_000, // Refresh every 60 seconds
+    staleTime: 30_000,
+  });
+
+  // Merge live data with static fallback
+  const indexData = useMemo(() => {
+    if (!liveMarket || liveMarket.quotes.length === 0) return staticIndexData;
+    
+    const liveQuotes = liveMarket.quotes.filter(q => 
+      ["SPY", "QQQ", "DIA", "IWM"].includes(q.ticker)
+    ).map(q => ({
+      name: tickerNames[q.ticker] || q.ticker,
+      ticker: q.ticker,
+      value: q.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      change: `${q.changePercent >= 0 ? "+" : ""}${q.changePercent.toFixed(2)}%`,
+      up: q.up,
+    }));
+
+    // Add economic data if available
+    const econCards = [];
+    if (liveMarket.economic.length > 0) {
+      const tenY = liveMarket.economic.find(e => e.series === "DGS10");
+      if (tenY && tenY.value !== ".") {
+        econCards.push({ name: "10Y Treasury", ticker: "TNX", value: `${tenY.value}%`, change: "", up: false });
+      }
+    }
+
+    // If we got live index data, use it; otherwise fall back to static
+    if (liveQuotes.length >= 2) {
+      return [...liveQuotes, ...econCards, ...staticIndexData.filter(s => 
+        !["SPY", "QQQ", "DIA", "IWM", "10Y Treasury"].includes(s.name) && !liveQuotes.find(l => l.ticker === s.ticker)
+      )];
+    }
+    return staticIndexData;
+  }, [liveMarket]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 30000);
