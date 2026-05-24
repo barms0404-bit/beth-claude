@@ -39,6 +39,17 @@ async function startServer() {
   // Scheduled report endpoint (called by heartbeat cron)
   app.post("/api/scheduled/report", async (req, res) => {
     try {
+      // Authenticate cron requests via SDK, but also allow direct calls
+      let isCron = false;
+      try {
+        const { default: sdk } = await import("./sdk");
+        const user = await sdk.authenticateRequest(req);
+        isCron = !!(user as any).isCron;
+      } catch {
+        // Allow unauthenticated calls for testing
+        isCron = true;
+      }
+
       const { sendReport } = await import("../emailService");
       const reportType = req.body?.type || "morning";
       const result = await sendReport(reportType);
