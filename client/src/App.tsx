@@ -10,6 +10,7 @@ import AnalystPage from "./pages/AnalystPage";
 import CnbcNews from "./pages/CnbcNews";
 import Performance from "./pages/Performance";
 import ModelComparison from "./pages/ModelComparison";
+import Backtesting from "./pages/Backtesting";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/cnbc"} component={CnbcNews} />
       <Route path={"/performance"} component={Performance} />
       <Route path={"/compare"} component={ModelComparison} />
+      <Route path={"/backtesting"} component={Backtesting} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

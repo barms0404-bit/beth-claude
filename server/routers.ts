@@ -9,6 +9,7 @@ import { logRecommendationSupabase, closeRecommendationSupabase, getActiveRecomm
 import { getCryptoData, getCryptoFearGreed } from "./dataSources";
 import { runBacktest, getHindsightSummary, getSpecialistLessons } from "./learningEngine";
 import { getConvictionCalibration, getUpcomingEarnings } from "./autoLogger";
+import { getSectorRotation, calculatePositionSize, analyzePortfolioConcentration, getInsiderTransactions } from "./tier2Features";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -146,6 +147,40 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await getUpcomingEarnings(input?.tickers);
       }),
+  }),
+
+  // Tier 2 — Sector rotation, position sizing, insider data
+  intelligence: router({
+    sectorRotation: publicProcedure.query(async () => {
+      return await getSectorRotation();
+    }),
+
+    positionSize: publicProcedure
+      .input(z.object({
+        ticker: z.string(),
+        conviction: z.number(),
+        hitRate: z.number(),
+        avgWinPct: z.number(),
+        avgLossPct: z.number(),
+        portfolioSize: z.number().default(1000000),
+        maxSinglePosition: z.number().default(0.08),
+        correlationToPortfolio: z.number().default(0.5),
+      }))
+      .query(({ input }) => {
+        return calculatePositionSize(input);
+      }),
+
+    insiders: publicProcedure
+      .input(z.object({ ticker: z.string() }))
+      .query(async ({ input }) => {
+        return await getInsiderTransactions(input.ticker);
+      }),
+
+    portfolioHealth: publicProcedure.query(async () => {
+      const recs = await getActiveRecommendationsSupabase();
+      if (!recs) return { level: "LOW", message: "No data", concentrationPct: 0, topSector: "N/A", diversificationScore: 100 };
+      return analyzePortfolioConcentration(recs.map((r: any) => ({ ticker: r.ticker, sector: undefined })));
+    }),
   }),
 
   performance: router({
