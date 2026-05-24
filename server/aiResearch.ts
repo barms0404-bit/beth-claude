@@ -10,6 +10,7 @@ import { callModel, getModelForSpecialist, type AIModel } from "./multiModelAI";
 import { enrichResearchContext } from "./dataSources";
 import { getSpecialistLessons } from "./learningEngine";
 import { autoLogFromResearch, getEarningsWarning } from "./autoLogger";
+import { getInstitutionalContext } from "./institutionalIntel";
 
 interface SpecialistConfig {
   name: string;
@@ -285,6 +286,7 @@ ${econContext}
 ${enrichedData}
 ${lessons}
 ${getEarningsWarning(specialist.tickers)}
+${await getInstitutionalContext(specialist.tickers)}
 
 Provide your research in this exact format:
 1. CURRENT VIEW (2-3 sentences on your overall sector thesis today)

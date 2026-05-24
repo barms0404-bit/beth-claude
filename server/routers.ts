@@ -10,6 +10,7 @@ import { getCryptoData, getCryptoFearGreed } from "./dataSources";
 import { runBacktest, getHindsightSummary, getSpecialistLessons } from "./learningEngine";
 import { getConvictionCalibration, getUpcomingEarnings } from "./autoLogger";
 import { getSectorRotation, calculatePositionSize, analyzePortfolioConcentration, getInsiderTransactions } from "./tier2Features";
+import { getInstitutionalHoldings, getShortInterest, getFedFutures, getRecentFilings, checkContrarianSignals } from "./institutionalIntel";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -180,6 +181,39 @@ export const appRouter = router({
       const recs = await getActiveRecommendationsSupabase();
       if (!recs) return { level: "LOW", message: "No data", concentrationPct: 0, topSector: "N/A", diversificationScore: 100 };
       return analyzePortfolioConcentration(recs.map((r: any) => ({ ticker: r.ticker, sector: undefined })));
+    }),
+
+    // Institutional holdings (13F)
+    holdings: publicProcedure
+      .input(z.object({ ticker: z.string() }))
+      .query(async ({ input }) => {
+        return await getInstitutionalHoldings(input.ticker);
+      }),
+
+    // Short interest
+    shortInterest: publicProcedure
+      .input(z.object({ ticker: z.string() }))
+      .query(async ({ input }) => {
+        return await getShortInterest(input.ticker);
+      }),
+
+    // Fed Funds futures / rate probabilities
+    fedFutures: publicProcedure.query(async () => {
+      return await getFedFutures();
+    }),
+
+    // SEC filings
+    secFilings: publicProcedure
+      .input(z.object({ ticker: z.string() }))
+      .query(async ({ input }) => {
+        return await getRecentFilings(input.ticker);
+      }),
+
+    // Consensus vs Contrarian alerts
+    contrarian: publicProcedure.query(async () => {
+      const recs = await getActiveRecommendationsSupabase();
+      if (!recs || recs.length === 0) return [];
+      return await checkContrarianSignals(recs);
     }),
   }),
 
