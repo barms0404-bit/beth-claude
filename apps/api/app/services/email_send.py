@@ -45,6 +45,40 @@ def _archive_path(report: Report) -> Path:
     return folder / f"{report.slot.value}.html"
 
 
+def _archive_json_path(report: Report) -> Path:
+    """Sidecar JSON for the rendered Report — lets /api/reports/rerender/{slot}
+    survive container restarts (the in-memory _LATEST cache is wiped on every
+    Railway redeploy). Same filename as the HTML, .json extension."""
+    return _archive_path(report).with_suffix(".json")
+
+
+def load_archived_report(slot_value: str, day: str | None = None) -> Report | None:
+    """Load the most-recent archived Report JSON for `slot_value`. When `day`
+    is None, scans all dated subfolders and returns the freshest by mtime.
+    Returns None if no sidecar JSON exists for that slot."""
+    root = archive_root()
+    candidates: list[Path] = []
+    if day:
+        candidates.append(root / day / f"{slot_value}.json")
+    else:
+        for sub in sorted(root.iterdir(), reverse=True):
+            if not sub.is_dir():
+                continue
+            sidecar = sub / f"{slot_value}.json"
+            if sidecar.exists():
+                candidates.append(sidecar)
+                break  # newest dated folder wins
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            return Report.model_validate_json(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            logger.warning("Failed to load archived report %s: %s", path, exc)
+            return None
+    return None
+
+
 async def send_report(report: Report) -> dict:
     """Render -> archive -> send. Returns subject, archive path, sent flag."""
     settings = get_settings()
@@ -72,10 +106,18 @@ async def send_report(report: Report) -> dict:
     html = render_report_email(report=report, snapshot=snapshot, png_data=png_data)
     subject = subject_for(report)
 
-    # 3. Archive to disk (always — regardless of send outcome).
+    # 3a. Archive HTML to disk (always — regardless of send outcome).
     path = _archive_path(report)
     path.write_text(html, encoding="utf-8")
     logger.info("Report archived: %s", path)
+
+    # 3b. Archive Report JSON sidecar — lets /rerender survive Railway redeploys.
+    try:
+        json_path = _archive_json_path(report)
+        json_path.write_text(report.model_dump_json(), encoding="utf-8")
+        logger.info("Report sidecar archived: %s", json_path)
+    except Exception as exc:
+        logger.warning("Failed to archive report sidecar: %s", exc)
 
     # 4. Send via Resend if a key is configured.
     sent = False

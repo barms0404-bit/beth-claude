@@ -307,13 +307,25 @@ async def run_and_send_report(slot: ReportSlot) -> dict:
 async def rerender_latest_report(slot: ReportSlot) -> dict:
     """Re-render the most-recent cached report for `slot` through the current
     HTML template — NO new specialist dispatch, NO Anthropic spend. Useful for
-    iterating on design changes without paying for fresh analysis. Returns
-    archive paths same shape as /run."""
+    iterating on design changes without paying for fresh analysis. Falls back
+    to the on-disk JSON sidecar if memory cache is empty (Railway redeploys
+    wipe _LATEST). Returns archive paths same shape as /run."""
+    from app.services.email_send import load_archived_report
+
     cached = _LATEST.get(slot)
+    if cached is None:
+        # Memory cache cold — try the archived JSON sidecar.
+        cached = load_archived_report(slot.value)
+        if cached is not None:
+            _LATEST[slot] = cached  # warm the cache for subsequent calls
+            logging.getLogger("main").info(
+                "Rerender served from disk sidecar for slot=%s", slot.value
+            )
     if cached is None:
         raise HTTPException(
             404,
-            f"No cached report for slot={slot.value}. Run /api/reports/run/{slot.value} first.",
+            f"No cached report for slot={slot.value} (memory empty AND no on-disk "
+            f"sidecar). Run /api/reports/run/{slot.value} first.",
         )
     return await send_report(cached)
 
