@@ -42,11 +42,11 @@ async function startServer() {
       // Authenticate cron requests via SDK, but also allow direct calls
       let isCron = false;
       try {
-        const { default: sdk } = await import("./sdk");
+        const sdk = await import("./sdk");
         const user = await sdk.authenticateRequest(req);
         isCron = !!(user as any).isCron;
       } catch {
-        // Allow unauthenticated calls for testing
+        // Allow unauthenticated calls for testing/direct calls
         isCron = true;
       }
 

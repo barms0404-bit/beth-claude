@@ -7,7 +7,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ExternalLink, RefreshCw, Clock, Newspaper } from "lucide-react";
+import { ArrowLeft, ExternalLink, RefreshCw, Clock, Newspaper, Bookmark, BookmarkCheck, Archive } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 
@@ -41,6 +41,26 @@ export default function CnbcNews() {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeSource, setActiveSource] = useState("All");
+  const [savedArticles, setSavedArticles] = useState<Article[]>(() => {
+    try {
+      const stored = localStorage.getItem("aa-saved-articles");
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+  const [showArchive, setShowArchive] = useState(false);
+
+  const toggleSave = (article: Article, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSavedArticles(prev => {
+      const exists = prev.find(a => a.link === article.link);
+      const updated = exists ? prev.filter(a => a.link !== article.link) : [...prev, article];
+      localStorage.setItem("aa-saved-articles", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const isArticleSaved = (article: Article) => savedArticles.some(a => a.link === article.link);
 
   const fetchNews = async () => {
     setLoading(true);
@@ -128,6 +148,10 @@ export default function CnbcNews() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => setShowArchive(!showArchive)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded border transition-colors ${showArchive ? "bg-[#C9A961]/20 border-[#C9A961]/50 text-[#C9A961]" : "bg-[#0A0A0A] border-[#1F1A0F] hover:border-[#C9A961]/50"}`}>
+              <Archive className="w-3 h-3 text-[#C9A961]" />
+              <span className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Saved ({savedArticles.length})</span>
+            </button>
             <button onClick={fetchNews} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0A0A0A] rounded border border-[#1F1A0F] hover:border-[#C9A961]/50 transition-colors">
               <RefreshCw className={`w-3 h-3 text-[#C9A961] ${loading ? "animate-spin" : ""}`} />
               <span className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Refresh</span>
@@ -160,6 +184,41 @@ export default function CnbcNews() {
       </header>
 
       <main className="relative z-10 px-4 py-6 max-w-[1200px] mx-auto">
+        {/* Saved Articles Archive */}
+        {showArchive && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[#C9A961] text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Saved Articles ({savedArticles.length})</h2>
+              {savedArticles.length > 0 && (
+                <button onClick={() => { setSavedArticles([]); localStorage.removeItem("aa-saved-articles"); }} className="text-[#8A7548] text-[10px] hover:text-[#EF4444] transition-colors">Clear All</button>
+              )}
+            </div>
+            {savedArticles.length === 0 ? (
+              <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-6 text-center">
+                <Bookmark className="w-6 h-6 text-[#8A7548] mx-auto mb-2" />
+                <p className="text-[#8A7548] text-xs">No saved articles yet. Click the bookmark icon on any article to save it here.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {savedArticles.map((article, i) => (
+                  <div key={i} className="bg-[#0F0F0F] border border-[#C9A961]/20 rounded-lg p-3 flex items-center justify-between gap-3">
+                    <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[#C9A961] text-[9px] uppercase font-bold">{article.source}</span>
+                        <span className="text-[#8A7548] text-[10px]">{formatTime(article.pubDate)}</span>
+                      </div>
+                      <p className="text-[#F5E6C8] text-sm hover:text-[#C9A961] transition-colors">{article.title}</p>
+                    </a>
+                    <button onClick={(e) => toggleSave(article, e)} className="p-1.5 rounded hover:bg-[#EF4444]/10 transition-colors" title="Remove from saved">
+                      <BookmarkCheck className="w-4 h-4 text-[#C9A961] hover:text-[#EF4444]" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {loading && articles.length === 0 ? (
           <div className="text-center py-12">
             <RefreshCw className="w-8 h-8 text-[#C9A961] mx-auto animate-spin mb-3" />
@@ -168,15 +227,9 @@ export default function CnbcNews() {
         ) : (
           <div className="space-y-2">
             {filteredArticles.map((article, i) => (
-              <a
-                key={i}
-                href={article.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 hover:border-[#C9A961]/40 transition-all group"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
+              <div key={i} className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 hover:border-[#C9A961]/40 transition-all group">
+                <div className="flex items-start justify-between gap-3">
+                  <a href={article.link} target="_blank" rel="noopener noreferrer" className="flex-1">
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="text-[#F5E6C8] text-[9px] uppercase tracking-[1px] px-1.5 py-0.5 bg-[#C9A961]/20 rounded font-bold">{article.source}</span>
                       <span className="text-[#8A7548] text-[9px] uppercase tracking-[0.5px]">{article.category.replace(article.source + " ", "")}</span>
@@ -188,10 +241,17 @@ export default function CnbcNews() {
                     {article.description && (
                       <p className="text-[#8A7548] text-xs mt-1.5 line-clamp-2 leading-relaxed">{article.description}</p>
                     )}
+                  </a>
+                  <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+                    <button onClick={(e) => toggleSave(article, e)} className="p-1.5 rounded hover:bg-[#C9A961]/10 transition-colors" title={isArticleSaved(article) ? "Remove from saved" : "Save for later"}>
+                      {isArticleSaved(article) ? <BookmarkCheck className="w-4 h-4 text-[#C9A961]" /> : <Bookmark className="w-4 h-4 text-[#8A7548] hover:text-[#C9A961]" />}
+                    </button>
+                    <a href={article.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="w-4 h-4 text-[#8A7548] group-hover:text-[#C9A961] transition-colors" />
+                    </a>
                   </div>
-                  <ExternalLink className="w-4 h-4 text-[#8A7548] group-hover:text-[#C9A961] transition-colors flex-shrink-0 mt-1" />
                 </div>
-              </a>
+              </div>
             ))}
 
             {filteredArticles.length === 0 && !loading && (
