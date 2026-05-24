@@ -279,6 +279,7 @@ export default function Home() {
           <NavButton icon={<Activity className="w-3 h-3" />} label="CNBC" onClick={() => window.location.href = '/cnbc'} />
           <NavButton icon={<BarChart3 className="w-3 h-3" />} label="Performance" onClick={() => window.location.href = '/performance'} />
           <NavButton icon={<Globe className="w-3 h-3" />} label="Compare" onClick={() => window.location.href = '/compare'} />
+          <NavButton icon={<Shield className="w-3 h-3" />} label="Intelligence" onClick={() => window.location.href = '/intelligence'} />
           <RunAllAgentsButton />
 
           {/* Economists Dropdown */}
