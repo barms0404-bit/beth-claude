@@ -6,8 +6,6 @@
 import { getMarketSnapshot } from "./marketData";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
-// Resend requires verified domain or sending to own email
-// Using verified email until custom domain is set up
 const RECIPIENT = "barms0404@gmail.com";
 
 export async function sendReport(reportType: "morning" | "midday" | "close") {
