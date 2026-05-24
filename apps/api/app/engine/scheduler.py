@@ -1,9 +1,15 @@
-"""APScheduler jobs — Top 50 polling + the three daily report emails.
+"""APScheduler jobs — Top 50 polling + the daily report emails.
 
-Two cadences run on one scheduler:
-
+Cadence (changed 2026-05-23):
   - Top 50 poll: every 15 minutes, market hours only (NYSE 9:30-16:00 ET).
-  - Reports: cron at 7:30 / 11:00 / 13:30 in America/Phoenix (no DST).
+  - Weekday reports (Mon-Fri): cron at 7:30 / 11:00 / 13:30 America/Phoenix.
+  - Sunday pre-market wrap: cron at 7:00 PM America/New_York — one hour
+    after CME Globex futures reopen for the new week (Sun 6 PM ET).
+  - Weekday regime classification: 7:00 AM America/Phoenix (30 min before
+    the morning report so weights are live when Beth dispatches).
+  - Sunday regime classification: 6:30 PM America/New_York (30 min before
+    the Sunday pre-market wrap).
+  - NO reports on Saturday. NO Sunday-morning reports.
 
 The whole scheduler is disabled without an Anthropic key — specialists can't run.
 """
@@ -23,12 +29,19 @@ logger = logging.getLogger("scheduler")
 
 _scheduler: AsyncIOScheduler | None = None
 
-# (slot value, hour, minute) — Arizona time.
-REPORT_SCHEDULE: list[tuple[str, int, int]] = [
+# Weekday reports — (slot value, hour, minute) in Arizona time.
+WEEKDAY_REPORT_SCHEDULE: list[tuple[str, int, int]] = [
     ("market_prep", 7, 30),
     ("mid_day", 11, 0),
     ("market_close", 13, 30),
 ]
+
+# Sunday pre-market wrap — fires 1 hour after CME Globex futures reopen.
+# Futures reopen Sun 6 PM ET; +1 hr = Sun 7 PM ET. Use America/New_York
+# so DST shifts auto-track (no AZ recalc needed when EDT swaps to EST).
+SUNDAY_PREMARKET_HOUR_ET = 19  # 7 PM ET
+SUNDAY_PREMARKET_MINUTE_ET = 0
+SUNDAY_PREMARKET_SLOT = "market_prep"  # reuse market_prep slot — week-ahead is a prep flavor
 
 
 # --- Jobs -----------------------------------------------------------------
@@ -95,30 +108,72 @@ def start_scheduler() -> None:
         coalesce=True,
     )
 
-    for slot_value, hour, minute in REPORT_SCHEDULE:
+    # --- Weekday reports (Mon-Fri only) ---
+    for slot_value, hour, minute in WEEKDAY_REPORT_SCHEDULE:
         _scheduler.add_job(
             _report_job,
-            CronTrigger(hour=hour, minute=minute, timezone=settings.schedule_timezone),
+            CronTrigger(
+                day_of_week="mon-fri",
+                hour=hour,
+                minute=minute,
+                timezone=settings.schedule_timezone,
+            ),
             args=[slot_value],
             id=f"report_{slot_value}",
             max_instances=1,
             coalesce=True,
         )
 
-    # 7:00 AM AZ — regime classification fires 30 min before the prep report
-    # so its specialist_weights are live when Beth dispatches the roster.
+    # --- Sunday pre-market wrap (1 hour after futures reopen) ---
+    _scheduler.add_job(
+        _report_job,
+        CronTrigger(
+            day_of_week="sun",
+            hour=SUNDAY_PREMARKET_HOUR_ET,
+            minute=SUNDAY_PREMARKET_MINUTE_ET,
+            timezone="America/New_York",
+        ),
+        args=[SUNDAY_PREMARKET_SLOT],
+        id="report_sunday_premarket",
+        max_instances=1,
+        coalesce=True,
+    )
+
+    # --- Regime classification — fires 30 min before each report day ---
+    # Weekday: 7:00 AM AZ (30 min before 7:30 AM market_prep).
     _scheduler.add_job(
         _regime_job,
-        CronTrigger(hour=7, minute=0, timezone=settings.schedule_timezone),
-        id="regime_detect",
+        CronTrigger(
+            day_of_week="mon-fri",
+            hour=7,
+            minute=0,
+            timezone=settings.schedule_timezone,
+        ),
+        id="regime_detect_weekday",
+        max_instances=1,
+        coalesce=True,
+    )
+    # Sunday: 6:30 PM ET (30 min before 7:00 PM ET pre-market wrap).
+    _scheduler.add_job(
+        _regime_job,
+        CronTrigger(
+            day_of_week="sun",
+            hour=18,
+            minute=30,
+            timezone="America/New_York",
+        ),
+        id="regime_detect_sunday",
         max_instances=1,
         coalesce=True,
     )
 
     _scheduler.start()
     logger.info(
-        "Scheduler started — Top 50 every 15m (market hours), reports at "
-        "7:30/11:00/13:30 %s, regime detect at 7:00 %s.",
+        "Scheduler started — Top 50 every 15m (market hours), "
+        "weekday reports Mon-Fri at 7:30/11:00/13:30 %s, "
+        "Sunday pre-market at 7:00 PM ET (1hr after Globex reopen), "
+        "regime detect Mon-Fri 7:00 %s + Sun 6:30 PM ET. "
+        "NO Saturday reports. NO Sunday-morning reports.",
         settings.schedule_timezone, settings.schedule_timezone,
     )
 

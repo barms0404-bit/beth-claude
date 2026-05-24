@@ -730,11 +730,41 @@ def render_report_email(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{_esc(subject_for(report))}</title>
+  <!--
+    Typography: real serif (Cormorant Garamond) + Inter sans-serif via Google Fonts.
+    Browsers load these for the web view; email clients that block external CSS
+    silently fall back to the Georgia / Arial declared in inline styles.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Responsive sizing — email clients ignore <style> blocks; browsers honor them.
+       The web reader gets a wide, generously-sized layout; email stays at 640. */
+    @media screen and (min-width: 760px) {{
+      .aa-container {{ width: 920px !important; max-width: 920px !important; }}
+      body {{ font-size: 16px !important; line-height: 1.65 !important; }}
+      .aa-section h1, .aa-section h2 {{ font-size: 30px !important; line-height: 1.25 !important; }}
+      .aa-section h3 {{ font-size: 22px !important; }}
+      .aa-section p, .aa-section li, .aa-section td, .aa-section div {{ font-size: 16px !important; line-height: 1.65 !important; }}
+      .aa-section .meta {{ font-size: 12px !important; }}
+    }}
+    @media screen and (min-width: 1280px) {{
+      .aa-container {{ width: 1100px !important; max-width: 1100px !important; }}
+      body {{ font-size: 17px !important; }}
+      .aa-section h1, .aa-section h2 {{ font-size: 34px !important; }}
+      .aa-section h3 {{ font-size: 23px !important; }}
+      .aa-section p, .aa-section li, .aa-section td, .aa-section div {{ font-size: 17px !important; }}
+    }}
+    /* Better link affordance for the web view */
+    a {{ color: {GOLD}; text-decoration: none; border-bottom: 1px solid rgba(201, 169, 97, 0.4); }}
+    a:hover {{ color: {CREAM}; border-bottom-color: {CREAM}; }}
+  </style>
 </head>
-<body style="margin:0;padding:0;background:{INK};">
+<body style="margin:0;padding:0;background:{INK};font-family:Inter,Arial,sans-serif;color:{CREAM};">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:{INK};">
-    <tr><td align="center">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;background:{INK};">
+    <tr><td align="center" style="padding:0 16px;">
+      <table role="presentation" class="aa-container aa-section" cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;width:100%;background:{INK};">
         {''.join(parts)}
       </table>
     </td></tr>
