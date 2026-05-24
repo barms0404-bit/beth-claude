@@ -5,7 +5,9 @@
 
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bot, TrendingUp, TrendingDown, Target, AlertTriangle, CheckCircle } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { ArrowLeft, Bot, TrendingUp, TrendingDown, Target, AlertTriangle, CheckCircle, RefreshCw, Zap } from "lucide-react";
+import { Streamdown } from "streamdown";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 
@@ -570,6 +572,12 @@ export default function AnalystPage() {
   const slug = params.slug || "";
   const analyst = analystDatabase[slug];
 
+  // Fetch live AI-generated research
+  const { data: liveResearch, isLoading: researchLoading, refetch } = trpc.research.specialist.useQuery(
+    { slug },
+    { enabled: !!analyst, staleTime: 4 * 60 * 60 * 1000 }
+  );
+
   if (!analyst) {
     return (
       <div className="min-h-screen bg-[#000000] flex items-center justify-center">
@@ -640,6 +648,33 @@ export default function AnalystPage() {
             <h2 className="text-[#C9A961] text-lg mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Methodology</h2>
             <p className="text-[#F5E6C8] text-sm leading-relaxed">{analyst.methodology}</p>
           </div>
+        </section>
+
+        {/* Live AI Research */}
+        <section className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 border-l-4 border-l-[#4ADE80]">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-[#4ADE80]" />
+              <h2 className="text-[#4ADE80] text-lg" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Live AI Research — Today's Dispatch</h2>
+            </div>
+            <button onClick={() => refetch()} className="flex items-center gap-1 px-2 py-1 rounded bg-[#0A0A0A] border border-[#1F1A0F] hover:border-[#4ADE80]/50 transition-colors">
+              <RefreshCw className={`w-3 h-3 text-[#4ADE80] ${researchLoading ? "animate-spin" : ""}`} />
+              <span className="text-[#4ADE80] text-[9px] uppercase tracking-[1px]">Regenerate</span>
+            </button>
+          </div>
+          {researchLoading ? (
+            <div className="flex items-center gap-2 py-4">
+              <RefreshCw className="w-4 h-4 text-[#C9A961] animate-spin" />
+              <p className="text-[#8A7548] text-sm">Generating fresh research from {analyst.name}...</p>
+            </div>
+          ) : liveResearch?.research ? (
+            <div className="prose prose-sm prose-invert max-w-none">
+              <div className="text-[#F5E6C8] text-sm leading-relaxed whitespace-pre-wrap"><Streamdown>{liveResearch.research}</Streamdown></div>
+              <p className="text-[#8A7548] text-[10px] mt-3">Generated: {new Date(liveResearch.timestamp).toLocaleString()} | Source: Claude + Polygon.io + FRED</p>
+            </div>
+          ) : (
+            <p className="text-[#8A7548] text-sm">Live research will appear here when generated. Click Regenerate to fetch fresh analysis.</p>
+          )}
         </section>
 
         {/* Current View */}

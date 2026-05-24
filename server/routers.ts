@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { getMarketSnapshot, getStockQuote } from "./marketData";
 import { sendReport } from "./emailService";
+import { generateSpecialistResearch, generateAllResearch, getAvailableSpecialists } from "./aiResearch";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -18,12 +19,9 @@ export const appRouter = router({
   }),
 
   market: router({
-    // Get full market snapshot (all indices + top stocks + economic data)
     snapshot: publicProcedure.query(async () => {
       return await getMarketSnapshot();
     }),
-
-    // Get single stock quote
     quote: publicProcedure
       .input(z.object({ ticker: z.string() }))
       .query(async ({ input }) => {
@@ -32,12 +30,30 @@ export const appRouter = router({
   }),
 
   reports: router({
-    // Manually trigger a report send
     send: publicProcedure
       .input(z.object({ type: z.enum(["morning", "midday", "close"]) }))
       .mutation(async ({ input }) => {
         return await sendReport(input.type);
       }),
+  }),
+
+  research: router({
+    // Get AI-generated research for a specific specialist
+    specialist: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        return await generateSpecialistResearch(input.slug);
+      }),
+
+    // Generate research for all specialists
+    all: publicProcedure.query(async () => {
+      return await generateAllResearch();
+    }),
+
+    // List available specialist slugs
+    available: publicProcedure.query(() => {
+      return getAvailableSpecialists();
+    }),
   }),
 });
 
