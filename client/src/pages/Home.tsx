@@ -348,15 +348,15 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod — 3 Specialists</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-nathan-cole'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Dr. Nathan Cole</span><span className="text-[#8A7548] ml-2 text-[10px]">— Biotech & Small Cap</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY REGN, VRTX | M&A activity accelerating in oncology</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-laura-mitchell'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Dr. Laura Mitchell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Big Pharma & GLP-1</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY LLY (Conv 8) | GLP-1 prescriptions +15% QoQ</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-kevin-zhao'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Dr. Kevin Zhao</span><span className="text-[#8A7548] ml-2 text-[10px]">— Healthcare Tools & CDMOs</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY TMO, DHR | AI drug discovery demand surging</span>
               </DropdownMenuItem>
@@ -376,19 +376,19 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod — 4 Specialists</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/michael-torres'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY MSFT (Conv 8), NOW | Copilot adoption 40%+ seat expansion</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/rachel-kim'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Rachel Kim</span><span className="text-[#8A7548] ml-2 text-[10px]">— Cybersecurity</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY PANW (Conv 9), CRWD | Platformization trend accelerating</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/andrew-walsh'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Andrew Walsh</span><span className="text-[#8A7548] ml-2 text-[10px]">— Internet Platforms</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: HOLD META, GOOGL | AI ad targeting improving ROAS</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/sophia-reyes'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Sophia Reyes</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fintech & Payments</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY V, MA | Cross-border volumes strong, watch delinquencies</span>
               </DropdownMenuItem>
@@ -404,27 +404,27 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[360px]">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod — 6 Specialists</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/marcus-chen'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center Buildout</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY AVGO (Conv 8), DELL | $1T+ infra cycle, Cup & Handle breakout</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/elena-vasquez'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY GEV, VST, CEG | DC power demand tripling by 2030</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/david-park'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: STRONG BUY NVDA (Conv 9), AMD | Golden Cross confirmed, Blackwell ramp</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/sarah-nakamura'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI Software</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY ARM (Conv 7) | Edge AI architecture, royalty model benefits</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/james-okafor'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">James Okafor</span><span className="text-[#8A7548] ml-2 text-[10px]">— Robotics & Physical AI</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: WATCH TSLA (Optimus), ISRG | Physical AI early but accelerating</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/priya-sharma'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Priya Sharma</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantum Computing</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: SPECULATIVE RGTI, QBTS | Max 1-2% allocation, pre-revenue</span>
               </DropdownMenuItem>
@@ -440,15 +440,15 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod — 3 Specialists</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/catherine-brooks'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Catherine Brooks</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consumer & Brands</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY COST, NKE | Trade-down effect favoring value retailers</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/daniel-ortiz'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Daniel Ortiz</span><span className="text-[#8A7548] ml-2 text-[10px]">— Travel & Leisure</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY RCL, MAR | Cruise yields ATH, business travel recovery</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/jessica-huang'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Jessica Huang</span><span className="text-[#8A7548] ml-2 text-[10px]">— E-Commerce</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY MELI, SHOP | LatAm GMV growth +28%, Shopify AI tools</span>
               </DropdownMenuItem>
