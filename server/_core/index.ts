@@ -36,6 +36,18 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Backtesting engine — evaluates all active recommendations
+  app.post("/api/scheduled/backtest", async (req, res) => {
+    try {
+      const { runBacktest } = await import("../learningEngine");
+      const results = await runBacktest();
+      res.json({ ok: true, ...results, timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      console.error("[Backtest] Error:", error);
+      res.status(500).json({ error: error.message, timestamp: new Date().toISOString() });
+    }
+  });
+
   // Weekly auto-close expired recommendations (evaluates 30-day-old picks)
   app.post("/api/scheduled/close-expired", async (req, res) => {
     try {

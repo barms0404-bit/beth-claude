@@ -7,6 +7,7 @@ import { sendReport } from "./emailService";
 import { generateSpecialistResearch, generateAllResearch, getAvailableSpecialists } from "./aiResearch";
 import { logRecommendationSupabase, closeRecommendationSupabase, getActiveRecommendationsSupabase, getSpecialistPerformanceSupabase, logAgentRunSupabase, getRecentRunsSupabase, SUPABASE_CONFIG } from "./supabaseClient";
 import { getCryptoData, getCryptoFearGreed } from "./dataSources";
+import { runBacktest, getHindsightSummary, getSpecialistLessons } from "./learningEngine";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -108,6 +109,28 @@ export const appRouter = router({
       const [prices, fearGreed] = await Promise.all([getCryptoData(), getCryptoFearGreed()]);
       return { prices, fearGreed };
     }),
+  }),
+
+  // Learning engine — backtesting, hindsight, lessons
+  learning: router({
+    // Run backtesting on all active recommendations
+    backtest: publicProcedure.mutation(async () => {
+      return await runBacktest();
+    }),
+
+    // Get hindsight journal for a specialist
+    hindsight: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        return await getHindsightSummary(input.slug);
+      }),
+
+    // Get accumulated lessons for a specialist
+    lessons: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        return await getSpecialistLessons(input.slug);
+      }),
   }),
 
   performance: router({
