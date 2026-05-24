@@ -36,6 +36,55 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Hourly refresh — top 10 specialists during market hours
+  app.post("/api/scheduled/hourly-refresh", async (req, res) => {
+    try {
+      const { generateSpecialistResearch } = await import("../aiResearch");
+      const { autoLogFromResearch } = await import("../autoLogger");
+      const { logAgentRunSupabase } = await import("../supabaseClient");
+
+      const TOP_10 = [
+        "david-park", "marcus-chen", "dr-laura-mitchell", "rachel-kim",
+        "elena-vasquez", "michael-torres", "dr-robert-kessler",
+        "sarah-nakamura", "andrew-walsh", "sophia-reyes"
+      ];
+
+      const results = { success: 0, failed: 0, recsLogged: 0 };
+
+      for (const slug of TOP_10) {
+        try {
+          const startTime = Date.now();
+          const research = await generateSpecialistResearch(slug);
+          if (research && !research.research.includes("temporarily unavailable")) {
+            results.success++;
+            // Auto-log recommendations
+            const logged = await autoLogFromResearch(slug, research.name, research.research);
+            results.recsLogged += logged;
+            // Log the run
+            await logAgentRunSupabase({
+              specialist_slug: slug,
+              specialist_name: research.name,
+              run_type: "scheduled" as any,
+              status: "success",
+              duration_ms: Date.now() - startTime,
+              research_preview: research.research.slice(0, 500),
+              model_used: research.model || "manus",
+            });
+          } else {
+            results.failed++;
+          }
+        } catch {
+          results.failed++;
+        }
+      }
+
+      res.json({ ok: true, ...results, agents: TOP_10.length, timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      console.error("[Hourly Refresh] Error:", error);
+      res.status(500).json({ error: error.message, timestamp: new Date().toISOString() });
+    }
+  });
+
   // Backtesting engine — evaluates all active recommendations
   app.post("/api/scheduled/backtest", async (req, res) => {
     try {
