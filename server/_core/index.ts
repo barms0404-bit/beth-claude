@@ -36,6 +36,19 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Scheduled report endpoint (called by heartbeat cron)
+  app.post("/api/scheduled/report", async (req, res) => {
+    try {
+      const { sendReport } = await import("../emailService");
+      const reportType = req.body?.type || "morning";
+      const result = await sendReport(reportType);
+      res.json({ ok: true, ...result });
+    } catch (error: any) {
+      console.error("[Scheduled Report] Error:", error);
+      res.status(500).json({ error: error.message, timestamp: new Date().toISOString() });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

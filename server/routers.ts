@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { getMarketSnapshot, getStockQuote } from "./marketData";
+import { sendReport } from "./emailService";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -27,6 +28,15 @@ export const appRouter = router({
       .input(z.object({ ticker: z.string() }))
       .query(async ({ input }) => {
         return await getStockQuote(input.ticker);
+      }),
+  }),
+
+  reports: router({
+    // Manually trigger a report send
+    send: publicProcedure
+      .input(z.object({ type: z.enum(["morning", "midday", "close"]) }))
+      .mutation(async ({ input }) => {
+        return await sendReport(input.type);
       }),
   }),
 });
