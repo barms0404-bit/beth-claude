@@ -36,6 +36,42 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  // Weekly auto-close expired recommendations (evaluates 30-day-old picks)
+  app.post("/api/scheduled/close-expired", async (req, res) => {
+    try {
+      const { getActiveRecommendationsSupabase, closeRecommendationSupabase } = await import("../supabaseClient");
+      const { getStockQuote } = await import("../marketData");
+      
+      const activeRecs = await getActiveRecommendationsSupabase();
+      if (!activeRecs || activeRecs.length === 0) {
+        return res.json({ ok: true, message: "No active recommendations to evaluate", closed: 0 });
+      }
+
+      let closed = 0;
+      const now = new Date();
+      
+      for (const rec of activeRecs) {
+        // Check if recommendation is older than 30 days
+        const createdAt = new Date(rec.created_at);
+        const daysSinceRec = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+        
+        if (daysSinceRec >= 30) {
+          // Get current price and close the recommendation
+          const quote = await getStockQuote(rec.ticker);
+          if (quote) {
+            await closeRecommendationSupabase(rec.id, quote.price, rec.price_at_rec, rec.action);
+            closed++;
+          }
+        }
+      }
+
+      res.json({ ok: true, evaluated: activeRecs.length, closed, timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      console.error("[Close Expired] Error:", error);
+      res.status(500).json({ error: error.message, timestamp: new Date().toISOString() });
+    }
+  });
+
   // Scheduled report endpoint (called by heartbeat cron)
   app.post("/api/scheduled/report", async (req, res) => {
     try {

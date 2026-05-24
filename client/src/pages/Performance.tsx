@@ -3,17 +3,68 @@
  * Visual leaderboard, hit rates, recommendation history, agent run logs
  */
 
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trophy, TrendingUp, TrendingDown, Activity, Clock, Target, BarChart3 } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, TrendingDown, Activity, Clock, Target, BarChart3, Wifi } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
+const SUPABASE_URL = "https://aufdpgioooxbujzrxacv.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1ZmRwZ2lvb294YnVqenJ4YWN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NDYxNjcsImV4cCI6MjA5NTEyMjE2N30.svfu2nTHxl4J200gok29DqjAGvPn3ax-mVdQbWVBPSo";
 
 export default function Performance() {
-  const { data: stats } = trpc.performance.stats.useQuery();
-  const { data: runs } = trpc.performance.runs.useQuery();
-  const { data: recs } = trpc.performance.recommendations.useQuery();
+  const { data: stats, refetch: refetchStats } = trpc.performance.stats.useQuery(undefined, { refetchInterval: 30000 });
+  const { data: runs, refetch: refetchRuns } = trpc.performance.runs.useQuery(undefined, { refetchInterval: 15000 });
+  const { data: recs, refetch: refetchRecs } = trpc.performance.recommendations.useQuery(undefined, { refetchInterval: 30000 });
+  const [realtimeConnected, setRealtimeConnected] = useState(false);
+
+  // Supabase Realtime subscription for instant updates
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    try {
+      const wsUrl = SUPABASE_URL.replace("https://", "wss://") + "/realtime/v1/websocket?apikey=" + SUPABASE_KEY + "&vsn=1.0.0";
+      ws = new WebSocket(wsUrl);
+      
+      ws.onopen = () => {
+        setRealtimeConnected(true);
+        // Subscribe to agent_runs table changes
+        const joinMsg = JSON.stringify({
+          topic: "realtime:public:agent_runs",
+          event: "phx_join",
+          payload: { config: { broadcast: { self: true }, presence: { key: "" }, postgres_changes: [{ event: "*", schema: "public", table: "agent_runs" }] } },
+          ref: "1"
+        });
+        ws?.send(joinMsg);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.event === "postgres_changes" || data.event === "INSERT") {
+            // New data arrived — refetch all
+            refetchStats();
+            refetchRuns();
+            refetchRecs();
+          }
+        } catch {}
+      };
+
+      ws.onclose = () => setRealtimeConnected(false);
+      ws.onerror = () => setRealtimeConnected(false);
+
+      // Heartbeat to keep connection alive
+      const heartbeat = setInterval(() => {
+        if (ws?.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ topic: "phoenix", event: "heartbeat", payload: {}, ref: "hb" }));
+        }
+      }, 30000);
+
+      return () => { clearInterval(heartbeat); ws?.close(); };
+    } catch {
+      setRealtimeConnected(false);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#000000] relative">
@@ -36,9 +87,17 @@ export default function Performance() {
               <p className="text-[#8A7548] text-xs">Specialist Leaderboard • Hit Rates • Recommendation Tracking</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-[#C9A961]" />
-            <span className="text-[#C9A961] text-xs">{stats?.length || 0} Specialists Tracked</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <Wifi className={`w-3 h-3 ${realtimeConnected ? "text-[#4ADE80]" : "text-[#8A7548]"}`} />
+              <span className={`text-[10px] uppercase tracking-[1px] ${realtimeConnected ? "text-[#4ADE80]" : "text-[#8A7548]"}`}>
+                {realtimeConnected ? "Live" : "Polling"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Trophy className="w-4 h-4 text-[#C9A961]" />
+              <span className="text-[#C9A961] text-xs">{stats?.length || 0} Specialists Tracked</span>
+            </div>
           </div>
         </div>
       </header>
