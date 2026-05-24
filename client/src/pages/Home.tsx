@@ -715,37 +715,13 @@ export default function Home() {
         {/* AI INFRASTRUCTURE */}
         <section id={SECTIONS.aiInfra}>
           <SectionHeader title="AI Infrastructure Buildout" subtitle="Data Centers • Energy • Networking • Cooling" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              The AI data center buildout represents a <strong className="text-[#C9A961]">$1 trillion+ infrastructure cycle</strong> over the next 5 years. 
-              Key bottlenecks: power availability, cooling technology, and chip supply. Companies solving these constraints are seeing unprecedented demand.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                <p className="text-[#C9A961] text-xs font-semibold mb-1">Power Demand</p>
-                <p className="text-[#F5E6C8] text-xs">US data center power demand projected to triple by 2030. Utilities and independent power producers benefiting.</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                <p className="text-[#C9A961] text-xs font-semibold mb-1">Cooling Tech</p>
-                <p className="text-[#F5E6C8] text-xs">Liquid cooling becoming mandatory for next-gen GPU clusters. Vertiv, nVent leading the transition.</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                <p className="text-[#C9A961] text-xs font-semibold mb-1">Networking</p>
-                <p className="text-[#F5E6C8] text-xs">800G/1.6T optical transceivers in high demand. Broadcom, Marvell, Arista dominant.</p>
-              </div>
-            </div>
-          </div>
+          <AnalystResearchCard name="Marcus Chen" role="AI Data Center Buildout Specialist" conviction={8} action="BUY" tickers="AVGO, DELL, SMCI, MRVL, ANET" thesis="The AI data center buildout represents a $1T+ infrastructure cycle over 5 years. Key bottlenecks: power availability (tripling by 2030), cooling technology (liquid cooling mandatory for next-gen GPUs), and chip supply. Dell's $43B AI backlog is unprecedented. Broadcom's Cup & Handle breakout projects $330-340. Marvell and Arista dominating 800G/1.6T optical networking. Position across the full stack: compute, networking, cooling, power." />
         </section>
 
         {/* ENERGY INFRASTRUCTURE */}
         <section id={SECTIONS.energy}>
           <SectionHeader title="Energy Infrastructure" subtitle="Power Generation for AI • Grid Modernization" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Data center power demand is creating a <strong className="text-[#C9A961]">renaissance in power generation</strong>. Nuclear, natural gas, and renewables all benefiting. 
-              Key names: GE Vernova (GEV), Vistra (VST), Constellation Energy (CEG), NRG Energy (NRG). Grid infrastructure: Quanta Services (PWR), EATON (ETN).
-            </p>
-          </div>
+          <AnalystResearchCard name="Elena Vasquez" role="Energy Infrastructure Specialist" conviction={8} action="BUY" tickers="GEV, VST, CEG, NRG, PWR, ETN" thesis="Data center power demand creating a renaissance in power generation. US DC power demand projected to triple by 2030. Nuclear (CEG, SMRs), natural gas (GEV turbines), and renewables all benefiting. GE Vernova is the top pick — only pure-play power equipment company at scale. Vistra and Constellation benefiting from nuclear premium. Grid infrastructure (Quanta, EATON) seeing record backlogs for transmission upgrades." />
         </section>
 
         {/* ENTERPRISE SAAS */}
@@ -843,63 +819,48 @@ export default function Home() {
         {/* CONSUMER */}
         <section id={SECTIONS.consumer}>
           <SectionHeader title="Consumer Discretionary & Brands" subtitle="Brand Heat • Athletic Share • Trade-Down Effect" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Mixed signals. High-end retail resilient, but <strong className="text-[#C9A961]">trade-down effect</strong> accelerating. 
-              Walmart and Costco gaining share. Consumer sentiment at new lows creates cautious outlook.
-            </p>
-            <div className="grid grid-cols-3 gap-3">
-              <MetricCard label="Consumer Sentiment" value="New Low" status="danger" />
-              <MetricCard label="WMT Traffic" value="+4.2%" status="success" />
-              <MetricCard label="COST Comps" value="+6.8%" status="success" />
-            </div>
+          <AnalystResearchCard name="Catherine Brooks" role="Consumer Discretionary & Brands Specialist" conviction={6} action="BUY" tickers="COST, NKE, WMT" thesis="Mixed signals in consumer spending. High-end retail resilient but trade-down effect accelerating as consumer sentiment hits new lows. Costco comps +6.8% and Walmart foot traffic +4.2% confirm value-seeking behavior. Nike benefiting from athletic/wellness trend amplified by GLP-1 adoption. Avoid food-heavy names facing portion headwinds. Position in value retailers and athletic brands." />
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <MetricCard label="Consumer Sentiment" value="New Low" status="danger" />
+            <MetricCard label="WMT Traffic" value="+4.2%" status="success" />
+            <MetricCard label="COST Comps" value="+6.8%" status="success" />
           </div>
         </section>
 
         {/* TRAVEL & LEISURE */}
         <section id={SECTIONS.travel}>
           <SectionHeader title="Travel, Leisure & Restaurants" subtitle="TSA Throughput • RevPAR • Cruise Yields" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Travel demand remains above 2019 levels. <strong className="text-[#C9A961]">Cruise net yields</strong> at all-time highs. 
-              Restaurant industry seeing GLP-1 headwinds on portion sizes. Hotels benefiting from business travel recovery.
-            </p>
-          </div>
+          <AnalystResearchCard name="Daniel Ortiz" role="Travel, Leisure & Restaurants Specialist" conviction={7} action="BUY" tickers="RCL, MAR, HLT" thesis="Travel demand remains above 2019 levels with TSA throughput +8% vs pre-pandemic. Cruise net yields at all-time highs — Royal Caribbean (RCL) pricing power exceptional. Hotels benefiting from business travel recovery with RevPAR +5% YoY. Restaurant industry facing GLP-1 headwinds on portion sizes — avoid casual dining. Favor experiences over consumption: cruises, luxury hotels, live entertainment." />
         </section>
 
         {/* E-COMMERCE */}
         <section id={SECTIONS.ecommerce}>
           <SectionHeader title="E-Commerce & Marketplaces" subtitle="GMV Growth • Take Rates • Geographic Expansion" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StockMini ticker="AMZN" price="$266" change="-0.8%" />
-              <StockMini ticker="SHOP" price="$112" change="+1.4%" />
-              <StockMini ticker="MELI" price="$2,180" change="+2.1%" />
-              <StockMini ticker="SE" price="$142" change="+3.8%" />
-            </div>
+          <AnalystResearchCard name="Jessica Huang" role="E-Commerce & Marketplaces Specialist" conviction={7} action="BUY" tickers="MELI, SHOP, AMZN" thesis="MercadoLibre (MELI) is the top pick — LatAm GMV growth +28% with fintech (Mercado Pago) adding high-margin revenue. Shopify benefiting from AI-powered merchant tools driving higher take rates. Amazon retail seeing margin expansion from advertising and logistics optimization. Temu/Shein disruption a headwind for mid-market but not premium platforms. Geographic diversification key." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <StockMini ticker="AMZN" price="$266" change="-0.8%" />
+            <StockMini ticker="SHOP" price="$112" change="+1.4%" />
+            <StockMini ticker="MELI" price="$2,180" change="+2.1%" />
+            <StockMini ticker="SE" price="$142" change="+3.8%" />
           </div>
         </section>
 
         {/* FIXED INCOME */}
         <section id={SECTIONS.fixedIncome}>
           <SectionHeader title="Fixed Income Analysis" subtitle="Yield Curve • Credit Spreads • Fed Path" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              <MetricCard label="2Y Yield" value="4.52%" status="neutral" />
-              <MetricCard label="10Y Yield" value="4.87%" status="danger" />
-              <MetricCard label="30Y Yield" value="5.12%" status="danger" />
-              <MetricCard label="IG OAS" value="~90bps" status="success" />
-            </div>
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Yield curve normalized with 2s10s at +35bps. Long-end yields near 2007 levels signal persistent inflation expectations. 
-              Credit markets remain healthy with tight IG spreads, though HY has widened to ~350bps.
-            </p>
+          <AnalystResearchCard name="Claire Donovan" role="Fixed Income Specialist" conviction={7} action="BARBELL" tickers="TLT, SHY, LQD, HYG" thesis="Treasury yields near 2007 levels with 10Y at 4.87% and 30Y at 5.12%. The 2s10s spread normalized at +35bps after longest inversion in history. IG credit spreads tight at ~90bps OAS — not yet signaling stress. HY widened to ~350bps, worth monitoring. Recommendation: Barbell strategy — short-duration T-bills (5%+ yield with no duration risk) combined with high-quality IG corporate credit (lock in 5.5-6% yields). Avoid long duration until Fed signals clear pivot." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <MetricCard label="2Y Yield" value="4.52%" status="neutral" />
+            <MetricCard label="10Y Yield" value="4.87%" status="danger" />
+            <MetricCard label="30Y Yield" value="5.12%" status="danger" />
+            <MetricCard label="IG OAS" value="~90bps" status="success" />
           </div>
         </section>
 
         {/* DIVIDEND & INCOME */}
         <section id={SECTIONS.dividend}>
           <SectionHeader title="Dividend Aristocrat & Income" subtitle="25+ Year Streak • Defensive Allocation" />
+          <AnalystResearchCard name="Richard Callahan" role="Dividend Aristocrat & Income Specialist" conviction={7} action="ACCUMULATE" tickers="JNJ, PG, KO, PEP, MMM" thesis="In the current environment of elevated yields and market uncertainty, dividend aristocrats provide a defensive anchor. Recommend allocating 10-15% of portfolio to high-quality dividend growers with 25+ year track records. JNJ (3.2% yield, 62-year streak) and PG (2.4%, 68-year streak) are core holdings. These names provide downside protection if the consumer sentiment/equity divergence resolves negatively. Reinvested dividends compound significantly in volatile markets." />
           <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -937,34 +898,28 @@ export default function Home() {
         {/* VALUE INVESTOR */}
         <section id={SECTIONS.value}>
           <SectionHeader title="Value Investor" subtitle="Deep Value • Margin of Safety • Mean Reversion" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Value factor underperforming in current growth-led regime. However, <strong className="text-[#C9A961]">select deep value opportunities</strong> emerging 
-              in energy, financials, and healthcare where earnings growth is mispriced. Regime Detection suggests maintaining reduced value allocation until factor rotation signals appear.
-            </p>
-          </div>
+          <AnalystResearchCard name="Gregory Ashford" role="Value Investor Specialist" conviction={6} action="CAUTION" tickers="BRK.B, JPM, XOM, CVX" thesis="Value factor underperforming in current growth-led regime (hit rate 41% last 6 months, weight reduced to 0.8x). However, select deep value opportunities emerging in energy (XOM, CVX at 10x earnings), financials (JPM at 12x), and healthcare where earnings growth is mispriced. NVDA at 45x forward prices perfection — any miss triggers 20-30% correction. Regime Detection suggests maintaining reduced value allocation until factor rotation signals appear. Berkshire Hathaway's $400B cash pile is the ultimate value signal." />
         </section>
 
         {/* GEOPOLITICAL */}
         <section id={SECTIONS.geopolitical}>
           <SectionHeader title="Geopolitical Strategy" subtitle="Global Risk Assessment • Event-Driven Analysis" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <div className="space-y-3">
-              {[
-                { event: "U.S.-Iran Peace Negotiations", impact: "Potential Strait of Hormuz reopening could ease oil supply", risk: "Medium" },
-                { event: "China Semiconductor Restrictions", impact: "Export controls tightening; domestic AI chip makers benefiting", risk: "High" },
-                { event: "EU Energy Transition", impact: "Accelerating renewable policy; positive for clean energy equities", risk: "Low" },
-                { event: "Russia-Ukraine Conflict", impact: "Frozen conflict scenario; European defense spending elevated", risk: "Medium" },
-              ].map((geo) => (
-                <div key={geo.event} className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
-                  <div className="flex justify-between items-start">
-                    <p className="text-[#C9A961] text-sm font-medium">{geo.event}</p>
-                    <RiskBadge risk={geo.risk} />
-                  </div>
-                  <p className="text-[#F5E6C8]/70 text-xs mt-1">{geo.impact}</p>
+          <AnalystResearchCard name="Victoria Sterling" role="Geopolitical Strategist" conviction={7} action="MONITOR" tickers="XOM, LMT, RTX, CEG" thesis="Four key geopolitical developments impacting markets: (1) U.S.-Iran peace negotiations progressing — Strait of Hormuz reopening could ease oil supply 1-2M bbl/day, bearish for oil names. (2) China semiconductor export restrictions tightening further — benefiting domestic AI chip makers, creating supply uncertainty for US companies with China exposure. (3) Russia-Ukraine frozen conflict — European defense spending elevated, positive for LMT, RTX. (4) SpaceX IPO at $1.75T creating potential index fund liquidity squeeze." />
+          <div className="space-y-3 mt-4">
+            {[
+              { event: "U.S.-Iran Peace Negotiations", impact: "Potential Strait of Hormuz reopening could ease oil supply 1-2M bbl/day", risk: "Medium" },
+              { event: "China Semiconductor Restrictions", impact: "Export controls tightening; domestic AI chip makers benefiting", risk: "High" },
+              { event: "EU Energy Transition", impact: "Accelerating renewable policy; positive for clean energy equities", risk: "Low" },
+              { event: "Russia-Ukraine Conflict", impact: "Frozen conflict scenario; European defense spending elevated", risk: "Medium" },
+            ].map((geo) => (
+              <div key={geo.event} className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
+                <div className="flex justify-between items-start">
+                  <p className="text-[#C9A961] text-sm font-medium">{geo.event}</p>
+                  <RiskBadge risk={geo.risk} />
                 </div>
-              ))}
-            </div>
+                <p className="text-[#F5E6C8]/70 text-xs mt-1">{geo.impact}</p>
+              </div>
+            ))}
           </div>
         </section>
 
