@@ -6,6 +6,7 @@
 
 import { invokeLLM } from "./_core/llm";
 import { getMarketSnapshot, getStockQuote } from "./marketData";
+import { callModel, getModelForSpecialist, type AIModel } from "./multiModelAI";
 
 interface SpecialistConfig {
   name: string;
@@ -264,10 +265,7 @@ export async function generateSpecialistResearch(slug: string): Promise<{
     : "";
 
   try {
-    const response = await invokeLLM({
-      messages: [
-        { role: "system", content: specialist.systemPrompt },
-        { role: "user", content: `Generate your daily research dispatch for Brian (Portfolio Manager). Today's date: ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
+    const userPrompt = `Generate your daily research dispatch for Brian (Portfolio Manager). Today's date: ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
 
 LIVE MARKET DATA FOR YOUR COVERAGE:
 ${marketContext}
@@ -284,17 +282,27 @@ Provide your research in this exact format:
 5. KEY RISKS (3-4 specific risks)
 6. SECONDARY PICKS (1-2 other tickers with brief thesis)
 
-Be specific with numbers. Reference the live prices above. Be conviction-forward.` }
-      ],
-    });
+Be specific with numbers. Reference the live prices above. Be conviction-forward.`;
 
-    const rawContent = response.choices?.[0]?.message?.content;
-    const research = typeof rawContent === "string" ? rawContent : "Research generation temporarily unavailable.";
+    // Use multi-model routing
+    const modelConfig = getModelForSpecialist(slug);
+    const research = await callModel(modelConfig.primary, specialist.systemPrompt, userPrompt);
+    
+    // Get second opinion if configured
+    let secondOpinion: string | undefined;
+    if (modelConfig.secondary) {
+      try {
+        secondOpinion = await callModel(modelConfig.secondary, specialist.systemPrompt + "\n\nProvide a brief 2-3 sentence second opinion or contrarian view.", userPrompt);
+      } catch { /* non-critical */ }
+    }
 
     const result = {
       name: specialist.name,
       role: specialist.role,
       research,
+      secondOpinion: secondOpinion || undefined,
+      model: modelConfig.primary,
+      secondaryModel: modelConfig.secondary || undefined,
       timestamp: new Date().toISOString(),
       tickers: specialist.tickers,
     };
