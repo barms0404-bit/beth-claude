@@ -11,12 +11,19 @@ import { ArrowLeft, ExternalLink, RefreshCw, Clock, Newspaper } from "lucide-rea
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 
-// CNBC RSS feeds parsed via a public RSS-to-JSON service
-const CNBC_FEEDS = [
-  { name: "Top News", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114" },
-  { name: "Markets", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258" },
-  { name: "Technology", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=19854910" },
-  { name: "Finance", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664" },
+// News RSS feeds — CNBC, Reuters, Bloomberg
+const NEWS_FEEDS = [
+  // CNBC
+  { name: "CNBC Top News", source: "CNBC", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114" },
+  { name: "CNBC Markets", source: "CNBC", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258" },
+  { name: "CNBC Technology", source: "CNBC", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=19854910" },
+  { name: "CNBC Finance", source: "CNBC", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664" },
+  // Reuters
+  { name: "Reuters Business", source: "Reuters", url: "https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best" },
+  { name: "Reuters Markets", source: "Reuters", url: "https://www.reutersagency.com/feed/?best-topics=markets&post_type=best" },
+  { name: "Reuters Tech", source: "Reuters", url: "https://www.reutersagency.com/feed/?best-topics=tech&post_type=best" },
+  // Yahoo Finance (public RSS)
+  { name: "Yahoo Finance", source: "Yahoo", url: "https://finance.yahoo.com/news/rssindex" },
 ];
 
 interface Article {
@@ -25,6 +32,7 @@ interface Article {
   pubDate: string;
   description: string;
   category: string;
+  source: string;
 }
 
 export default function CnbcNews() {
@@ -32,12 +40,13 @@ export default function CnbcNews() {
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeSource, setActiveSource] = useState("All");
 
   const fetchNews = async () => {
     setLoading(true);
     const allArticles: Article[] = [];
 
-    for (const feed of CNBC_FEEDS) {
+    for (const feed of NEWS_FEEDS) {
       try {
         // Use a public RSS-to-JSON proxy
         const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
@@ -52,6 +61,7 @@ export default function CnbcNews() {
                 pubDate: item.pubDate || "",
                 description: (item.description || "").replace(/<[^>]*>/g, "").slice(0, 200),
                 category: feed.name,
+                source: feed.source,
               });
             }
           }
@@ -75,9 +85,11 @@ export default function CnbcNews() {
     return () => clearInterval(interval);
   }, []);
 
-  const filteredArticles = activeCategory === "All"
-    ? articles
-    : articles.filter(a => a.category === activeCategory);
+  const filteredArticles = articles.filter(a => {
+    if (activeSource !== "All" && a.source !== activeSource) return false;
+    if (activeCategory !== "All" && a.category !== activeCategory) return false;
+    return true;
+  });
 
   const formatTime = (dateStr: string) => {
     try {
@@ -111,8 +123,8 @@ export default function CnbcNews() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-[#C9A961] text-xl font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>CNBC News Feed</h1>
-              <p className="text-[#8A7548] text-xs">Pro Subscriber Access — Auto-refreshes hourly</p>
+              <h1 className="text-[#C9A961] text-xl font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Market News</h1>
+              <p className="text-[#8A7548] text-xs">CNBC Pro • Reuters • Yahoo Finance — Auto-refreshes hourly</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -129,19 +141,19 @@ export default function CnbcNews() {
           </div>
         </div>
 
-        {/* Category Tabs */}
+        {/* Source Tabs */}
         <div className="flex items-center gap-1 px-4 py-2 border-t border-[#1F1A0F] overflow-x-auto">
-          {["All", ...CNBC_FEEDS.map(f => f.name)].map(cat => (
+          {["All", "CNBC", "Reuters", "Yahoo"].map(src => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3 py-1 rounded text-[10px] uppercase tracking-[1px] font-semibold whitespace-nowrap transition-all ${
-                activeCategory === cat
+              key={src}
+              onClick={() => { setActiveSource(src); setActiveCategory("All"); }}
+              className={`px-3 py-1.5 rounded text-[10px] uppercase tracking-[1px] font-semibold whitespace-nowrap transition-all ${
+                activeSource === src
                   ? "bg-[#C9A961]/20 text-[#C9A961] border border-[#C9A961]/50"
                   : "text-[#8A7548] hover:text-[#C9A961] hover:bg-[#C9A961]/5"
               }`}
             >
-              {cat}
+              {src}
             </button>
           ))}
         </div>
@@ -166,7 +178,8 @@ export default function CnbcNews() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[#C9A961] text-[9px] uppercase tracking-[1px] px-1.5 py-0.5 bg-[#C9A961]/10 rounded">{article.category}</span>
+                      <span className="text-[#F5E6C8] text-[9px] uppercase tracking-[1px] px-1.5 py-0.5 bg-[#C9A961]/20 rounded font-bold">{article.source}</span>
+                      <span className="text-[#8A7548] text-[9px] uppercase tracking-[0.5px]">{article.category.replace(article.source + " ", "")}</span>
                       <span className="text-[#8A7548] text-[10px]">{formatTime(article.pubDate)}</span>
                     </div>
                     <h3 className="text-[#F5E6C8] text-sm font-medium leading-snug group-hover:text-[#C9A961] transition-colors">
