@@ -691,15 +691,21 @@ export default function Home() {
         <section id={SECTIONS.tech}>
           <SectionHeader title="Technology & AI" subtitle="Training Chips • Inference • AI Data Center • Software" />
           <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5 mb-4">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
+            <img src={NVDA_CHART} alt="NVIDIA Chart" className="w-full rounded mb-4" />
+            <p className="text-[#F5E6C8] text-sm leading-relaxed">
               The <strong className="text-[#C9A961]">"AI 11"</strong> has replaced the Magnificent 7 as the core performance driver. Semiconductor and AI infrastructure buildout continues at unprecedented pace.
             </p>
-            <img src={NVDA_CHART} alt="NVIDIA Chart" className="w-full rounded" />
+          </div>
+          {/* Specialist Research Cards */}
+          <div className="space-y-4 mb-4">
+            <AnalystResearchCard name="David Park" role="Training Chip Specialist" conviction={9} action="STRONG BUY" tickers="NVDA, AMD" thesis="NVIDIA remains undisputed leader in AI training silicon. Blackwell ramp executing ahead of schedule. $5.5T valuation reflects 80%+ capture of AI training compute spend. Golden Cross pattern confirmed — historically leads to 18-30% additional upside over 6 months. AMD MI300X gaining as credible #2 alternative." />
+            <AnalystResearchCard name="Sarah Nakamura" role="Inference & AI Software" conviction={7} action="BUY" tickers="ARM, NVDA" thesis="Inference market more competitive than training. AMD MI300X and custom ASICs challenging NVIDIA's inference moat. ARM's royalty model benefits from AI-everywhere trend. Edge AI deployment accelerating with on-device models. Watch inference cost curves — declining faster than expected." />
+            <AnalystResearchCard name="Marcus Chen" role="AI Data Center Buildout" conviction={8} action="BUY" tickers="AVGO, DELL, SMCI" thesis="$1T+ infrastructure cycle over 5 years. Dell's record $43B AI backlog confirms enterprise demand. Broadcom up 106% YoY on custom ASIC + networking. Cup & Handle breakout pattern on AVGO projects target $330-340. Key bottlenecks: power, cooling, chip supply." />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <StockCard ticker="NVDA" name="NVIDIA" price="$208.27" change="+4.2%" note="$5.5T market cap. Most valuable company globally. AI chip demand unprecedented." />
-            <StockCard ticker="AVGO" name="Broadcom" price="$289.45" change="+2.8%" note="Up 106% YoY. Network infrastructure for AI data centers. Custom ASIC leader." />
-            <StockCard ticker="AMD" name="AMD" price="$467.51" change="+3.9%" note="AI GPU competition intensifying. MI300X gaining enterprise traction." />
+            <StockCard ticker="NVDA" name="NVIDIA" price="$208.27" change="+4.2%" note="$5.5T market cap. Golden Cross confirmed. AI chip demand unprecedented." />
+            <StockCard ticker="AVGO" name="Broadcom" price="$289.45" change="+2.8%" note="Cup & Handle breakout. Network infrastructure for AI data centers." />
+            <StockCard ticker="AMD" name="AMD" price="$467.51" change="+3.9%" note="Double Bottom breakout. MI300X gaining enterprise traction." />
             <StockCard ticker="ARM" name="ARM Holdings" price="$245.80" change="+2.1%" note="Mobile AI chip architecture. Royalty model benefits from AI everywhere." />
             <StockCard ticker="DELL" name="Dell Technologies" price="$178.90" change="+12.4%" note="Record $43B AI backlog. AI revenues to double to $50B in FY2027." />
             <StockCard ticker="SMCI" name="Super Micro" price="$52.30" change="+5.6%" note="AI server leader. Liquid cooling advantage. High growth, volatile." />
@@ -745,68 +751,48 @@ export default function Home() {
         {/* ENTERPRISE SAAS */}
         <section id={SECTIONS.saas}>
           <SectionHeader title="Enterprise SaaS" subtitle="Net Revenue Retention • Rule of 40 • AI Exposure" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Enterprise software seeing bifurcation: <strong className="text-[#C9A961]">AI-enabled platforms</strong> (ServiceNow, Workday, Salesforce) accelerating, 
-              while legacy SaaS facing compression. Key metric: AI revenue contribution as % of ARR.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StockMini ticker="NOW" price="$1,045" change="+8.8%" />
-              <StockMini ticker="WDAY" price="$312" change="+4.2%" />
-              <StockMini ticker="CRM" price="$348" change="+1.1%" />
-              <StockMini ticker="MSFT" price="$419" change="-0.1%" />
-            </div>
+          <AnalystResearchCard name="Michael Torres" role="Enterprise SaaS Specialist" conviction={8} action="BUY" tickers="MSFT, NOW, WDAY" thesis="Microsoft Copilot integration represents largest enterprise AI monetization opportunity. 40%+ seat expansion in enterprise accounts. ServiceNow jumped 8.8% on AI platform launch. Ascending Triangle breakout on MSFT above $420 resistance projects $445 target. Key metric: AI revenue as % of ARR separating winners from losers." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <StockMini ticker="NOW" price="$1,045" change="+8.8%" />
+            <StockMini ticker="WDAY" price="$312" change="+4.2%" />
+            <StockMini ticker="CRM" price="$348" change="+1.1%" />
+            <StockMini ticker="MSFT" price="$419" change="-0.1%" />
           </div>
         </section>
 
         {/* CYBERSECURITY */}
         <section id={SECTIONS.cyber}>
           <SectionHeader title="Cybersecurity" subtitle="Platformization • Zero Trust • AI-Powered Defense" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Cybersecurity spending remains resilient as AI-powered threats escalate. <strong className="text-[#C9A961]">Platformization trend</strong> favoring 
-              Palo Alto Networks and CrowdStrike as enterprises consolidate vendors.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StockMini ticker="PANW" price="$413" change="+1.8%" />
-              <StockMini ticker="CRWD" price="$398" change="+2.1%" />
-              <StockMini ticker="ZS" price="$181" change="+5.9%" />
-              <StockMini ticker="FTNT" price="$134" change="+3.5%" />
-            </div>
+          <AnalystResearchCard name="Rachel Kim" role="Cybersecurity Specialist" conviction={9} action="BUY" tickers="PANW, CRWD, ZS" thesis="Cybersecurity spending resilient as AI-powered threats escalate. Platformization trend strongly favoring Palo Alto Networks (Conv 9) and CrowdStrike as enterprises consolidate from 40+ vendors to 3-5 platforms. PANW's NRR at 25% with 4-quarter visibility. Zscaler benefiting from zero-trust adoption. AI-native defense tools creating new category." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <StockMini ticker="PANW" price="$413" change="+1.8%" />
+            <StockMini ticker="CRWD" price="$398" change="+2.1%" />
+            <StockMini ticker="ZS" price="$181" change="+5.9%" />
+            <StockMini ticker="FTNT" price="$134" change="+3.5%" />
           </div>
         </section>
 
         {/* INTERNET PLATFORMS */}
         <section id={SECTIONS.internet}>
           <SectionHeader title="Internet Platforms & Digital Advertising" subtitle="Ad Revenue • AI Integration • Engagement" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Digital advertising recovery continues with AI-driven ad targeting improving ROAS. <strong className="text-[#C9A961]">Meta and Alphabet</strong> leading 
-              with AI-powered creative tools and automated campaign optimization.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StockMini ticker="META" price="$642" change="+0.8%" />
-              <StockMini ticker="GOOGL" price="$192" change="+0.5%" />
-              <StockMini ticker="SNAP" price="$18.40" change="+3.2%" />
-              <StockMini ticker="TTD" price="$128" change="+1.9%" />
-            </div>
+          <AnalystResearchCard name="Andrew Walsh" role="Internet Platforms Specialist" conviction={7} action="HOLD" tickers="META, GOOGL, TTD" thesis="Digital advertising recovery continues with AI-driven ad targeting improving ROAS 15-20%. Meta leading with AI-powered creative tools — Advantage+ campaigns now 50% of ad spend. Alphabet's AI search integration driving higher-value queries. Bing gaining share for first time in decade. TTD benefiting from CTV shift. Watch for regulatory headwinds in EU." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <StockMini ticker="META" price="$642" change="+0.8%" />
+            <StockMini ticker="GOOGL" price="$192" change="+0.5%" />
+            <StockMini ticker="SNAP" price="$18.40" change="+3.2%" />
+            <StockMini ticker="TTD" price="$128" change="+1.9%" />
           </div>
         </section>
 
         {/* FINTECH */}
         <section id={SECTIONS.fintech}>
           <SectionHeader title="Fintech & Payments" subtitle="Payment Volume • Credit Quality • Digital Banking" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed mb-4">
-              Payment volumes remain healthy despite consumer sentiment weakness. <strong className="text-[#C9A961]">Visa and Mastercard</strong> cross-border volumes 
-              strong. Watch consumer credit delinquencies for early warning signs.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StockMini ticker="V" price="$319" change="+0.4%" />
-              <StockMini ticker="MA" price="$542" change="+0.6%" />
-              <StockMini ticker="SQ" price="$89" change="+2.3%" />
-              <StockMini ticker="PYPL" price="$78" change="+1.1%" />
-            </div>
+          <AnalystResearchCard name="Sophia Reyes" role="Fintech & Payments Specialist" conviction={7} action="BUY" tickers="V, MA" thesis="Payment volumes healthy despite consumer sentiment weakness. Visa and Mastercard cross-border volumes growing 12%+ on international travel recovery. Consumer credit delinquencies ticking up but from historic lows — not yet alarming. Square benefiting from SMB AI tools. Watch 30-day delinquency rates for early warning. Fintech valuations reasonable at 25-30x forward earnings." />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <StockMini ticker="V" price="$319" change="+0.4%" />
+            <StockMini ticker="MA" price="$542" change="+0.6%" />
+            <StockMini ticker="SQ" price="$89" change="+2.3%" />
+            <StockMini ticker="PYPL" price="$78" change="+1.1%" />
           </div>
         </section>
 
@@ -831,38 +817,27 @@ export default function Home() {
         {/* BIOTECH */}
         <section id={SECTIONS.biotech}>
           <SectionHeader title="Biotech & Small Cap Biotech" subtitle="Clinical Catalysts • M&A • Pipeline" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Small-cap biotech seeing resurgence as <strong className="text-[#C9A961]">M&A activity picks up</strong> in oncology. Big pharma patent cliffs driving 
-              acquisition appetite. Key catalysts: PDUFA dates, Phase 3 readouts, and FDA advisory committees.
-            </p>
-          </div>
+          <AnalystResearchCard name="Dr. Nathan Cole" role="Biotech & Small Cap Specialist" conviction={7} action="BUY" tickers="REGN, VRTX, IONS" thesis="Small-cap biotech seeing resurgence as M&A activity accelerates in oncology. Big pharma patent cliffs ($200B+ revenue at risk 2025-2030) driving acquisition appetite. Regeneron's pipeline depth underappreciated. Vertex expanding beyond CF into pain and kidney. Key catalysts: 14 PDUFA dates in next 60 days, 8 Phase 3 readouts pending. Position in quality names ahead of M&A wave." />
         </section>
 
         {/* BIG PHARMA */}
         <section id={SECTIONS.pharma}>
           <SectionHeader title="Big Pharma & Specialty Pharma" subtitle="Patent Cliffs • Pipeline Value • M&A" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <StockMini ticker="LLY" price="$892" change="+1.4%" />
-              <StockMini ticker="NVO" price="$143" change="+0.9%" />
-              <StockMini ticker="MRK" price="$128" change="+0.3%" />
-              <StockMini ticker="ABBV" price="$198" change="+0.7%" />
-              <StockMini ticker="PFE" price="$28" change="-0.4%" />
-              <StockMini ticker="JNJ" price="$162" change="+0.2%" />
-            </div>
+          <AnalystResearchCard name="Dr. Laura Mitchell" role="Big Pharma & GLP-1 Specialist" conviction={8} action="BUY" tickers="LLY, NVO, ABBV" thesis="Eli Lilly's GLP-1 franchise is the most important drug launch in pharma history. Weekly US prescriptions growing 15%+ QoQ with manufacturing as only constraint. Bull Flag pattern on LLY projects $950+ target. Oral GLP-1 (orforglipron) could expand TAM 3-5x. Novo Nordisk supply improving. AbbVie's Humira biosimilar headwinds priced in — pipeline undervalued." />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+            <StockMini ticker="LLY" price="$892" change="+1.4%" />
+            <StockMini ticker="NVO" price="$143" change="+0.9%" />
+            <StockMini ticker="MRK" price="$128" change="+0.3%" />
+            <StockMini ticker="ABBV" price="$198" change="+0.7%" />
+            <StockMini ticker="PFE" price="$28" change="-0.4%" />
+            <StockMini ticker="JNJ" price="$162" change="+0.2%" />
           </div>
         </section>
 
         {/* HEALTH TOOLS */}
         <section id={SECTIONS.healthTools}>
           <SectionHeader title="Healthcare Tools & Life Sciences" subtitle="CDMOs • Diagnostics • Lab Equipment" />
-          <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-5">
-            <p className="text-[#F5E6C8] text-sm leading-relaxed">
-              Life sciences tools seeing recovery after destocking cycle. <strong className="text-[#C9A961]">AI drug discovery</strong> driving demand for 
-              high-throughput screening and genomics platforms. CDMOs benefiting from GLP-1 manufacturing demand.
-            </p>
-          </div>
+          <AnalystResearchCard name="Dr. Kevin Zhao" role="Healthcare Tools & CDMOs Specialist" conviction={7} action="BUY" tickers="TMO, DHR, A" thesis="Life sciences tools recovering after 18-month destocking cycle. AI drug discovery driving demand for high-throughput screening and genomics platforms. CDMOs (Catalent, Samsung Biologics) benefiting massively from GLP-1 manufacturing demand — Lilly's $20B+ capacity expansion creating multi-year tailwind. Thermo Fisher and Danaher well-positioned for recovery. Agilent gaining in biopharma analytics." />
         </section>
 
         {/* CONSUMER */}
@@ -1469,5 +1444,34 @@ function RiskBadge({ risk }: { risk: string }) {
     <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-[0.5px] font-semibold ${styles[risk] || styles.Medium}`}>
       {risk} Risk
     </span>
+  );
+}
+
+function AnalystResearchCard({ name, role, conviction, action, tickers, thesis }: { name: string; role: string; conviction: number; action: string; tickers: string; thesis: string }) {
+  return (
+    <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-[#1F1A0F] bg-[#0A0A0A] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot className="w-3.5 h-3.5 text-[#C9A961]" />
+          <span className="text-[#C9A961] text-sm font-semibold">{name}</span>
+          <span className="text-[#8A7548] text-[10px]">— {role}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-[0.5px] font-bold ${
+            conviction >= 8 ? "bg-[#C9A961]/20 text-[#C9A961]" : conviction >= 6 ? "bg-[#8A7548]/20 text-[#8A7548]" : "bg-[#EF4444]/20 text-[#EF4444]"
+          }`}>Conv: {conviction}/10</span>
+          <span className={`px-2 py-0.5 rounded text-[9px] uppercase tracking-[0.5px] font-bold ${
+            action.includes("STRONG") ? "bg-[#4ADE80]/20 text-[#4ADE80]" : action.includes("BUY") ? "bg-[#C9A961]/20 text-[#C9A961]" : action.includes("HOLD") ? "bg-[#8A7548]/20 text-[#8A7548]" : "bg-[#F59E0B]/20 text-[#F59E0B]"
+          }`}>{action}</span>
+        </div>
+      </div>
+      <div className="px-4 py-3">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[#8A7548] text-[10px] uppercase tracking-[1px]">Tickers:</span>
+          <span className="text-[#C9A961] text-xs font-semibold">{tickers}</span>
+        </div>
+        <p className="text-[#F5E6C8] text-sm leading-relaxed">{thesis}</p>
+      </div>
+    </div>
   );
 }
