@@ -6,6 +6,7 @@ import { getMarketSnapshot, getStockQuote } from "./marketData";
 import { sendReport } from "./emailService";
 import { generateSpecialistResearch, generateAllResearch, getAvailableSpecialists } from "./aiResearch";
 import { logRecommendationSupabase, closeRecommendationSupabase, getActiveRecommendationsSupabase, getSpecialistPerformanceSupabase, logAgentRunSupabase, getRecentRunsSupabase, SUPABASE_CONFIG } from "./supabaseClient";
+import { getCryptoData, getCryptoFearGreed } from "./dataSources";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -98,6 +99,14 @@ export const appRouter = router({
 
     available: publicProcedure.query(() => {
       return getAvailableSpecialists();
+    }),
+  }),
+
+  // Live crypto and enriched data
+  data: router({
+    crypto: publicProcedure.query(async () => {
+      const [prices, fearGreed] = await Promise.all([getCryptoData(), getCryptoFearGreed()]);
+      return { prices, fearGreed };
     }),
   }),
 

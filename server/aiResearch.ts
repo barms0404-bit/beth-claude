@@ -7,6 +7,7 @@
 import { invokeLLM } from "./_core/llm";
 import { getMarketSnapshot, getStockQuote } from "./marketData";
 import { callModel, getModelForSpecialist, type AIModel } from "./multiModelAI";
+import { enrichResearchContext } from "./dataSources";
 
 interface SpecialistConfig {
   name: string;
@@ -264,6 +265,9 @@ export async function generateSpecialistResearch(slug: string): Promise<{
     ? snapshot.economic.map(e => `${e.series}: ${e.value}% (${e.date})`).join("\n")
     : "";
 
+  // Get enriched data from additional sources (CoinGecko, Alpha Vantage, etc.)
+  const enrichedData = await enrichResearchContext(specialist.tickers);
+
   try {
     const userPrompt = `Generate your daily research dispatch for Brian (Portfolio Manager). Today's date: ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.
 
@@ -273,6 +277,7 @@ ${marketContext}
 ECONOMIC CONTEXT:
 ${econContext}
 10Y Treasury: ${snapshot.economic.find(e => e.series === "DGS10")?.value || "4.57"}%
+${enrichedData}
 
 Provide your research in this exact format:
 1. CURRENT VIEW (2-3 sentences on your overall sector thesis today)
