@@ -5,7 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { getMarketSnapshot, getStockQuote } from "./marketData";
 import { sendReport } from "./emailService";
 import { generateSpecialistResearch, generateAllResearch, getAvailableSpecialists } from "./aiResearch";
-import { logRecommendation, closeRecommendation, logAgentRun, getSpecialistStats, getRecentRuns, getActiveRecommendations } from "./performanceTracker";
+import { logRecommendationSupabase, closeRecommendationSupabase, getActiveRecommendationsSupabase, getSpecialistPerformanceSupabase, logAgentRunSupabase, getRecentRunsSupabase, SUPABASE_CONFIG } from "./supabaseClient";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -45,16 +45,17 @@ export const appRouter = router({
         const startTime = Date.now();
         const result = await generateSpecialistResearch(input.slug);
         
-        // Log the agent run
+        // Log the agent run to Supabase
         if (result) {
           try {
-            await logAgentRun({
-              specialistSlug: input.slug,
-              specialistName: result.name,
-              runType: "manual",
+            await logAgentRunSupabase({
+              specialist_slug: input.slug,
+              specialist_name: result.name,
+              run_type: "manual",
               status: result.research.includes("temporarily unavailable") ? "failed" : "success",
-              durationMs: Date.now() - startTime,
-              researchPreview: result.research.slice(0, 500),
+              duration_ms: Date.now() - startTime,
+              research_preview: result.research.slice(0, 500),
+              model_used: result.model || "manus",
             });
           } catch { /* non-critical */ }
         }
@@ -62,24 +63,24 @@ export const appRouter = router({
         return result;
       }),
 
-    // Run ALL agents at once
     runAll: publicProcedure.mutation(async () => {
       const startTime = Date.now();
       const results = await generateAllResearch();
       const slugs = Object.keys(results);
       
-      // Log all runs
+      // Log all runs to Supabase
       for (const slug of slugs) {
         const r = results[slug];
         if (r) {
           try {
-            await logAgentRun({
-              specialistSlug: slug,
-              specialistName: r.name,
-              runType: "batch",
+            await logAgentRunSupabase({
+              specialist_slug: slug,
+              specialist_name: r.name,
+              run_type: "batch",
               status: r.research?.includes("temporarily unavailable") ? "failed" : "success",
-              durationMs: Math.round((Date.now() - startTime) / slugs.length),
-              researchPreview: r.research?.slice(0, 500) || "",
+              duration_ms: Math.round((Date.now() - startTime) / slugs.length),
+              research_preview: r.research?.slice(0, 500) || "",
+              model_used: r.model || "manus",
             });
           } catch { /* non-critical */ }
         }
@@ -101,51 +102,49 @@ export const appRouter = router({
   }),
 
   performance: router({
-    // Get all specialist stats
+    // Get all specialist stats from Supabase
     stats: publicProcedure.query(async () => {
-      return await getSpecialistStats();
+      return await getSpecialistPerformanceSupabase() || [];
     }),
 
-    // Get stats for one specialist
-    specialist: publicProcedure
-      .input(z.object({ slug: z.string() }))
-      .query(async ({ input }) => {
-        return await getSpecialistStats(input.slug);
-      }),
-
-    // Get recent agent runs
+    // Get recent agent runs from Supabase
     runs: publicProcedure.query(async () => {
-      return await getRecentRuns();
+      return await getRecentRunsSupabase() || [];
     }),
 
-    // Get active recommendations
+    // Get active recommendations from Supabase
     recommendations: publicProcedure.query(async () => {
-      return await getActiveRecommendations();
+      return await getActiveRecommendationsSupabase() || [];
     }),
 
-    // Log a new recommendation
+    // Log a new recommendation to Supabase
     logRec: publicProcedure
       .input(z.object({
-        specialistSlug: z.string(),
-        specialistName: z.string(),
+        specialist_slug: z.string(),
+        specialist_name: z.string(),
         ticker: z.string(),
         action: z.string(),
         conviction: z.number(),
-        priceAtRec: z.number(),
-        priceTarget: z.string().optional(),
-        timeHorizon: z.string().optional(),
+        price_at_rec: z.number(),
+        price_target: z.string().optional(),
+        time_horizon: z.string().optional(),
         thesis: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        return await logRecommendation(input);
+        return await logRecommendationSupabase(input);
       }),
 
-    // Close a recommendation
+    // Close a recommendation in Supabase
     closeRec: publicProcedure
-      .input(z.object({ id: z.number(), currentPrice: z.number() }))
+      .input(z.object({ id: z.number(), currentPrice: z.number(), originalPrice: z.number(), action: z.string() }))
       .mutation(async ({ input }) => {
-        return await closeRecommendation(input.id, input.currentPrice);
+        return await closeRecommendationSupabase(input.id, input.currentPrice, input.originalPrice, input.action);
       }),
+
+    // Get Supabase config for frontend real-time subscriptions
+    config: publicProcedure.query(() => {
+      return SUPABASE_CONFIG;
+    }),
   }),
 });
 

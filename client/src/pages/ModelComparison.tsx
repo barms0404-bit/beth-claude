@@ -41,14 +41,17 @@ export default function ModelComparison() {
   const [selectedPair, setSelectedPair] = useState(COMPARISON_TICKERS[0]);
 
   // Fetch research from both specialists in the pair
-  const { data: research1, isLoading: loading1, refetch: refetch1 } = trpc.research.specialist.useQuery(
+  const { data: research1Raw, isLoading: loading1, refetch: refetch1 } = trpc.research.specialist.useQuery(
     { slug: selectedPair.specialists[0] },
     { staleTime: 4 * 60 * 60 * 1000 }
   );
-  const { data: research2, isLoading: loading2, refetch: refetch2 } = trpc.research.specialist.useQuery(
+  const { data: research2Raw, isLoading: loading2, refetch: refetch2 } = trpc.research.specialist.useQuery(
     { slug: selectedPair.specialists[1] },
     { staleTime: 4 * 60 * 60 * 1000 }
   );
+
+  const research1 = research1Raw as any;
+  const research2 = research2Raw as any;
 
   const loading = loading1 || loading2;
 
