@@ -8,6 +8,13 @@
       "when": 1779589563185,
       "tag": "0000_groovy_doomsday",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779592843301,
+      "tag": "0001_unique_star_brand",
+      "breakpoints": true
     }
   ]
 }

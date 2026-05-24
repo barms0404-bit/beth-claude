@@ -8,6 +8,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -276,6 +277,7 @@ export default function Home() {
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
           <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
           <NavButton icon={<Activity className="w-3 h-3" />} label="CNBC" onClick={() => window.location.href = '/cnbc'} />
+          <RunAllAgentsButton />
 
           {/* Economists Dropdown */}
           <DropdownMenu>
@@ -1476,5 +1478,38 @@ function AnalystResearchCard({ name, role, conviction, action, tickers, thesis }
         <p className="text-[#F5E6C8] text-sm leading-relaxed">{thesis}</p>
       </div>
     </div>
+  );
+}
+
+function RunAllAgentsButton() {
+  const runAll = trpc.research.runAll.useMutation({
+    onSuccess: (data) => {
+      toast.success(`All agents dispatched: ${data.successful}/${data.totalAgents} successful (${Math.round(data.durationMs / 1000)}s)`);
+    },
+    onError: (error) => {
+      toast.error(`Agent dispatch failed: ${error.message}`);
+    },
+  });
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => runAll.mutate()}
+      disabled={runAll.isPending}
+      className="bg-[#4ADE80]/10 border-[#4ADE80]/40 text-[#4ADE80] hover:bg-[#4ADE80]/20 hover:border-[#4ADE80] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5"
+    >
+      {runAll.isPending ? (
+        <>
+          <Activity className="w-3 h-3 animate-spin" />
+          <span className="ml-1">Running...</span>
+        </>
+      ) : (
+        <>
+          <Zap className="w-3 h-3" />
+          <span className="ml-1">Run All Agents</span>
+        </>
+      )}
+    </Button>
   );
 }
