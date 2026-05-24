@@ -4,6 +4,7 @@
  */
 
 import { getMarketSnapshot } from "./marketData";
+import { generateSpecialistResearch } from "./aiResearch";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 const RECIPIENT = "barms0404@gmail.com";
@@ -14,6 +15,18 @@ export async function sendReport(reportType: "morning" | "midday" | "close") {
 
   // Get live market data
   const market = await getMarketSnapshot();
+
+  // Generate AI research from key specialists
+  const keySpecialists = ["david-park", "marcus-chen", "dr-laura-mitchell", "dr-robert-kessler"];
+  const aiResearchSections: string[] = [];
+  for (const slug of keySpecialists) {
+    try {
+      const research = await generateSpecialistResearch(slug);
+      if (research && research.research !== "Research generation temporarily unavailable.") {
+        aiResearchSections.push(`<h4 style="color:#C9A961;margin:12px 0 6px;">${research.name} — ${research.role}</h4><pre style="color:#F5E6C8;font-size:12px;line-height:1.6;white-space:pre-wrap;font-family:Georgia,serif;">${research.research.slice(0, 800)}</pre>`);
+      }
+    } catch { /* skip failed research */ }
+  }
 
   const subjects: Record<string, string> = {
     morning: `AA Research | Morning Prep | ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
@@ -56,6 +69,11 @@ export async function sendReport(reportType: "morning" | "midday" | "close") {
       <h3 style="color:#C9A961;font-size:14px;margin:0 0 12px;letter-spacing:2px;">TREASURY YIELDS (FRED)</h3>
       <pre style="color:#F5E6C8;font-size:13px;line-height:1.8;margin:0;font-family:monospace;">${econSummary || "Economic data unavailable"}</pre>
     </div>
+
+    ${aiResearchSections.length > 0 ? `<div style="background:#0A0A0A;border:1px solid #1F1A0F;border-radius:8px;padding:16px;margin-bottom:20px;">
+      <h3 style="color:#4ADE80;font-size:14px;margin:0 0 12px;letter-spacing:2px;">AI SPECIALIST RESEARCH (LIVE)</h3>
+      ${aiResearchSections.join("<hr style='border:none;border-top:1px solid #1F1A0F;margin:12px 0;'>")} 
+    </div>` : ""}
 
     <div style="background:#0A0A0A;border:1px solid #1F1A0F;border-radius:8px;padding:16px;margin-bottom:20px;">
       <h3 style="color:#C9A961;font-size:14px;margin:0 0 12px;letter-spacing:2px;">DASHBOARD</h3>
