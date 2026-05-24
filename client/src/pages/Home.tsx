@@ -340,55 +340,158 @@ export default function Home() {
           </DropdownMenu>
 
           {/* Healthcare Dropdown */}
-          <NavDropdown icon={<Heart className="w-3 h-3" />} label="Healthcare">
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Biotech & Small Cap</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Big Pharma & Specialty</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Healthcare Tools & Life Sciences</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthcare)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">GLP-1 Tracker</DropdownMenuItem>
-          </NavDropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Heart className="w-3 h-3" /><span className="ml-1">Healthcare</span><ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod — 3 Specialists</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Dr. Nathan Cole</span><span className="text-[#8A7548] ml-2 text-[10px]">— Biotech & Small Cap</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY REGN, VRTX | M&A activity accelerating in oncology</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Dr. Laura Mitchell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Big Pharma & GLP-1</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY LLY (Conv 8) | GLP-1 prescriptions +15% QoQ</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Dr. Kevin Zhao</span><span className="text-[#8A7548] ml-2 text-[10px]">— Healthcare Tools & CDMOs</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY TMO, DHR | AI drug discovery demand surging</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthcare)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
+                <span className="font-medium">GLP-1 Megacycle Tracker</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Technology Dropdown */}
-          <NavDropdown icon={<Cpu className="w-3 h-3" />} label="Technology">
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Enterprise SaaS</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Cybersecurity</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Internet & Digital Ad</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fintech & Payments</DropdownMenuItem>
-          </NavDropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Cpu className="w-3 h-3" /><span className="ml-1">Technology</span><ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod — 4 Specialists</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY MSFT (Conv 8), NOW | Copilot adoption 40%+ seat expansion</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Rachel Kim</span><span className="text-[#8A7548] ml-2 text-[10px]">— Cybersecurity</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY PANW (Conv 9), CRWD | Platformization trend accelerating</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Andrew Walsh</span><span className="text-[#8A7548] ml-2 text-[10px]">— Internet Platforms</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: HOLD META, GOOGL | AI ad targeting improving ROAS</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Sophia Reyes</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fintech & Payments</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY V, MA | Cross-border volumes strong, watch delinquencies</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* AI Infrastructure Dropdown */}
-          <NavDropdown icon={<Zap className="w-3 h-3" />} label="AI Infra">
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">AI Data Center Buildout</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Energy Infrastructure</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Training Chips</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inference & AI Software</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Robotics & Physical AI</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Quantum Computing</DropdownMenuItem>
-          </NavDropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Zap className="w-3 h-3" /><span className="ml-1">AI Infra</span><ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[360px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod — 6 Specialists</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center Buildout</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY AVGO (Conv 8), DELL | $1T+ infra cycle, Cup & Handle breakout</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY GEV, VST, CEG | DC power demand tripling by 2030</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: STRONG BUY NVDA (Conv 9), AMD | Golden Cross confirmed, Blackwell ramp</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI Software</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY ARM (Conv 7) | Edge AI architecture, royalty model benefits</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">James Okafor</span><span className="text-[#8A7548] ml-2 text-[10px]">— Robotics & Physical AI</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: WATCH TSLA (Optimus), ISRG | Physical AI early but accelerating</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Priya Sharma</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantum Computing</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: SPECULATIVE RGTI, QBTS | Max 1-2% allocation, pre-revenue</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Consumer Dropdown */}
-          <NavDropdown icon={<ShoppingBag className="w-3 h-3" />} label="Consumer">
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Discretionary & Brands</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Travel, Leisure & Restaurants</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">E-Commerce & Marketplaces</DropdownMenuItem>
-          </NavDropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <ShoppingBag className="w-3 h-3" /><span className="ml-1">Consumer</span><ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod — 3 Specialists</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Catherine Brooks</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consumer & Brands</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY COST, NKE | Trade-down effect favoring value retailers</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Daniel Ortiz</span><span className="text-[#8A7548] ml-2 text-[10px]">— Travel & Leisure</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY RCL, MAR | Cruise yields ATH, business travel recovery</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Jessica Huang</span><span className="text-[#8A7548] ml-2 text-[10px]">— E-Commerce</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY MELI, SHOP | LatAm GMV growth +28%, Shopify AI tools</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* More Dropdown */}
-          <NavDropdown icon={<Briefcase className="w-3 h-3" />} label="More">
-            <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style & Factor</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Dividends & Income</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Value Investor</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Fixed Income</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-            <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Geopolitical Strategy</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">China Economist</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.inflation)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Inflation Specialist</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Labor Economist</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">FX & Commodities</DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-            <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">Reports Archive</DropdownMenuItem>
-          </NavDropdown>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Briefcase className="w-3 h-3" /><span className="ml-1">More</span><ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px] max-h-[400px] overflow-y-auto">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style & Factor Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Richard Callahan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Dividend & Income</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY JNJ, PG, KO | 10-15% defensive allocation recommended</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Gregory Ashford</span><span className="text-[#8A7548] ml-2 text-[10px]">— Value Investor</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: CAUTION on growth valuations | NVDA prices perfection at 45x fwd</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Claire Donovan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fixed Income</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: Barbell strategy | Short T-bills + HQ corporate credit</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Functional Pod</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Dr. Alan Whitfield</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantitative Analyst</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Factor screen: Momentum + Quality outperforming, Value lagging</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
+                <div><span className="font-medium">Natasha Volkov</span><span className="text-[#8A7548] ml-2 text-[10px]">— Alt Data</span></div>
+                <span className="text-[#8A7548] text-[10px] mt-0.5">Signal: COST foot traffic +6.8%, WMT web traffic surging</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]">
+                <span className="font-medium">Reports Archive</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         {/* Mobile Navigation */}
