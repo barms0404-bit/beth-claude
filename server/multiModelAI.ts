@@ -42,6 +42,8 @@ export const MODEL_ASSIGNMENTS: Record<string, { primary: AIModel; secondary?: A
   "richard-callahan": { primary: "claude" },
   "gregory-ashford": { primary: "openai", secondary: "claude" },
   "claire-donovan": { primary: "gemini", secondary: "claude" },
+  // Space & Aerospace
+  "colonel-derek-hayes": { primary: "claude", secondary: "openai" },
 };
 
 export async function callModel(model: AIModel, systemPrompt: string, userPrompt: string): Promise<string> {
