@@ -11,6 +11,18 @@ import { Streamdown } from "streamdown";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
 
+const AVATARS: Record<string, string> = {
+  beth: "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/beth_harrington-eefyyv3PyfDNFpDqkJcWp2.webp",
+  "david-park": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/david_park-GfyxzgF7nqqhnPR7Sm8pYo.webp",
+  "dr-laura-mitchell": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_laura_mitchell-kpRxAXFsm4zDg73Ssx8GFD.webp",
+  "rachel-kim": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/rachel_kim-atV4SxMm6vDvfrJh875rCU.webp",
+  "dr-marcus-webb": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_marcus_webb-D5thLykYzUWaa4k4poz36o.webp",
+  "colonel-derek-hayes": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/col_hayes-cT249rdbUHvJR4DXj7cbuV.webp",
+  "ryan-tanaka": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/ryan_tanaka-3xY7cuWNbsRocHnpAyttys.webp",
+  "victoria-chen": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/victoria_chen-69uLU3S3DvECeZMchn79SS.webp",
+  "dr-robert-kessler": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_kessler-bXaQGQagALzn8gKcFycmGN.webp",
+};
+
 interface StockRec {
   ticker: string;
   name: string;
