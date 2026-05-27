@@ -42,6 +42,19 @@ import {
 } from "lucide-react";
 
 const LOGO_URL = "/manus-storage/aa-logo_4d0e4c30.png";
+
+// Avatar URLs
+const AVATARS: Record<string, string> = {
+  beth: "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/beth_harrington-eefyyv3PyfDNFpDqkJcWp2.webp",
+  "david-park": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/david_park-GfyxzgF7nqqhnPR7Sm8pYo.webp",
+  "dr-laura-mitchell": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_laura_mitchell-kpRxAXFsm4zDg73Ssx8GFD.webp",
+  "rachel-kim": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/rachel_kim-atV4SxMm6vDvfrJh875rCU.webp",
+  "dr-marcus-webb": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_marcus_webb-D5thLykYzUWaa4k4poz36o.webp",
+  "colonel-derek-hayes": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/col_hayes-cT249rdbUHvJR4DXj7cbuV.webp",
+  "ryan-tanaka": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/ryan_tanaka-3xY7cuWNbsRocHnpAyttys.webp",
+  "victoria-chen": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/victoria_chen-69uLU3S3DvECeZMchn79SS.webp",
+  "dr-robert-kessler": "https://d2xsxph8kpxj0f.cloudfront.net/310519663669730376/QkF2q886KBnon8A4LfPzKc/dr_kessler-bXaQGQagALzn8gKcFycmGN.webp",
+};
 const SPY_CHART = "/manus-storage/spy_chart_699a562f.png";
 const DOW_CHART = "/manus-storage/dow_chart_889b99c5.png";
 const NASDAQ_CHART = "/manus-storage/nasdaq_chart_b9493ce4.png";
@@ -128,7 +141,7 @@ const top50Data = [
 ];
 
 const specialistAgents = [
-  { name: "Beth Harrington", role: "Chief of Staff Orchestrator", status: "active", lastDispatch: "2 min ago", model: "claude-opus-4-7" },
+  { name: "Beth", role: "Chief of Staff Orchestrator", status: "active", lastDispatch: "2 min ago", model: "claude-opus-4-7" },
   { name: "Marcus Chen", role: "AI Data Center Buildout", status: "active", lastDispatch: "5 min ago", model: "claude-opus-4-7" },
   { name: "Elena Vasquez", role: "Energy Infrastructure", status: "active", lastDispatch: "12 min ago", model: "claude-opus-4-7" },
   { name: "David Park", role: "Training Chip Specialist", status: "active", lastDispatch: "3 min ago", model: "claude-opus-4-7" },
@@ -319,13 +332,13 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[320px] max-h-[480px] overflow-y-auto">
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Chief of Staff</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Beth Harrington</span><span className="text-[#8A7548] ml-2 text-[10px]">— Orchestrator</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/beth'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS.beth} className="w-5 h-5 rounded-full mr-2" /><span className="font-medium">Beth</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief of Staff</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.aiInfra)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.energy)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.tech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI Software</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/analyst/marcus-chen"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/analyst/elena-vasquez"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/analyst/david-park"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "/analyst/david-park"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI Software</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">James Okafor</span><span className="text-[#8A7548] ml-2 text-[10px]">— Robotics & Physical AI</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Priya Sharma</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantum Computing</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
@@ -1124,7 +1137,7 @@ export default function Home() {
             <p className="text-[#8A7548] text-xs mb-3">Each specialist analyst has a dedicated Chart Specialist sub-agent for data visualization.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 max-h-[300px] overflow-y-auto">
               {[
-                { name: "Liam Crawford", parent: "Beth Harrington" },
+                { name: "Liam Crawford", parent: "Beth" },
                 { name: "Aisha Patel", parent: "Marcus Chen" },
                 { name: "Carlos Mendez", parent: "Elena Vasquez" },
                 { name: "Yuna Choi", parent: "David Park" },
@@ -1196,7 +1209,7 @@ export default function Home() {
 
         {/* BETH'S OPERATIONAL STATUS */}
         <section id="beth-status">
-          <SectionHeader title="Beth Harrington — Chief of Staff" subtitle="Orchestration Status • Decision Framework • Pipeline Health" />
+          <SectionHeader title="Beth — Chief of Staff" subtitle="Orchestration Status • Decision Framework • Pipeline Health" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4 border-l-4 border-l-[#4ADE80]">
               <h4 className="text-[#C9A961] text-sm font-semibold mb-2">Daily Decision Loops</h4>
@@ -1237,9 +1250,9 @@ export default function Home() {
               {[
                 { layer: "1", name: "Data Validation", agent: "Dr. Isaac Thornton", status: "1,247 checks", desc: "Multi-source verification" },
                 { layer: "2", name: "Citation Enforcement", agent: "Angela Moretti", status: "892 scans", desc: "No uncited claims" },
-                { layer: "3", name: "Cross-Specialist", agent: "Beth Harrington", status: "18 reconciled", desc: "Consistency check" },
+                { layer: "3", name: "Cross-Specialist", agent: "Beth", status: "18 reconciled", desc: "Consistency check" },
                 { layer: "4", name: "Primary Source", agent: "Dr. Fiona Blackwell", status: "12 verified", desc: "SEC, FDA, USPTO" },
-                { layer: "5", name: "Reality Check", agent: "Beth Harrington", status: "Active", desc: "Breaking news scan" },
+                { layer: "5", name: "Reality Check", agent: "Beth", status: "Active", desc: "Breaking news scan" },
               ].map((l) => (
                 <div key={l.layer} className="p-3 bg-[#0A0A0A] rounded border border-[#1F1A0F] text-center">
                   <p className="text-[#C9A961] text-lg font-bold">L{l.layer}</p>

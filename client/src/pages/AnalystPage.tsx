@@ -628,6 +628,23 @@ const analystDatabase: Record<string, AnalystData> = {
       { ticker: "LLY", name: "Eli Lilly — Covered Call", price: "$891.40", change: "+0.8%", conviction: 8, action: "SELL COVERED CALL", why: "LLY has no earnings for 6 weeks. IV at 28% (50th percentile) — fair value, slightly rich. Sell the June 27 $950 calls (6.5% OTM) for ~$8.50 premium. This generates 0.95% income in 30 days (11.4% annualized) with 6.5% upside room before being called away. Dr. Mitchell's target is $950-1000, so being called at $950 is acceptable.", how: "Sell LLY Jun 27 $950 Calls. Premium: ~$8.50. Breakeven: $882.90. Max profit: $67.10/share if called at $950. Probability of profit: ~78%. Roll if stock approaches $940 before expiry.", risks: "GLP-1 news catalyst could gap stock above $950, missing the move to $1000+. Mitigate by rolling up and out if stock hits $930.", target: "$8.50 premium (0.95% monthly)", timeHorizon: "30 days" }
     ]
   },
+  "beth": {
+    name: "Beth",
+    role: "Chief of Staff",
+    pod: "Executive",
+    model: "claude-opus-4-7",
+    temp: "0.1",
+    trackRecord: "Active since inception",
+    hitRate: "N/A (orchestrator)",
+    weight: "N/A (decision authority)",
+    bio: "Beth is the Chief of Staff and central nervous system of the entire 76-agent research operation. She reports directly to Brian (Portfolio Manager) and is responsible for orchestrating all 36 specialists, managing the 5-layer accuracy pipeline, resolving conflicts between specialists, and synthesizing all inputs into actionable intelligence. She makes hundreds of calls per day about what to research, who to dispatch, what to trust, and how to present it. Her fundamental obligation: protect Brian's time and capital with intellectual honesty.",
+    methodology: "Beth's decision framework: (1) Market Regime Detection at 6:00 AM, (2) Specialist Dispatch Sequencing based on day type, (3) Conflict Resolution when specialists disagree, (4) Quality Control via 5-layer accuracy pipeline, (5) Theme Coordination across 7 cross-pod intelligence channels, (6) Weight Management applying specialist track records to recommendations.",
+    currentView: "Markets at all-time highs. AI supercycle accelerating into NVDA earnings. Key risk: 10Y approaching 5%. Portfolio positioned correctly at 62% tech/AI. Binary event risk Wednesday requires tactical trim. All 36 specialists operational. Theme Coordinator active. Learning loop accumulating data.",
+    recommendations: [
+      { ticker: "NVDA", name: "NVIDIA — Beth's Synthesis", price: "$208.27", change: "+4.2%", conviction: 9, action: "HOLD + TRIM 20%", why: "David Park (Conv 9) + Chart Specialist (Golden Cross) + Marcus Chen (supply chain confirms) all align bullish. Earnings Wednesday creates binary risk on 8% of portfolio. Trim 20% pre-earnings to cap downside at 1.6% of NAV.", how: "Per Ryan Tanaka: sell 20% Tuesday 2:00-3:30 PM via limit orders. Per Victoria Chen: sell covered calls Thursday post-IV-crush for 2.2% monthly income.", risks: "Missing full upside if NVDA gaps +15% on earnings. Mitigated by holding 80% and re-entry plan ready for Thursday.", target: "$250-270 (David Park)", timeHorizon: "Hold core indefinitely, tactical trim this week" },
+      { ticker: "PANW", name: "Palo Alto — Beth's Synthesis", price: "$412.80", change: "+1.2%", conviction: 9, action: "ADD", why: "Rachel Kim Conv 9. Platformization confirmed. No earnings risk 6 weeks. Low correlation to AI cluster (diversification). Ryan Tanaka execution plan ready.", how: "Staged entry: 50% today, 50% tomorrow via VWAP 11AM-1PM. Target 4.5% position.", risks: "Valuation at 55x forward. Mitigated by 90% gross margins.", target: "$500-520", timeHorizon: "12-18 months" }
+    ]
+  },
 };
 
 // Generate slug from analyst name
@@ -673,6 +690,7 @@ export default function AnalystPage() {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-4">
             <Link href="/"><Button variant="outline" size="sm" className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 text-xs"><ArrowLeft className="w-3 h-3 mr-1" /> Terminal</Button></Link>
+            {AVATARS[slug] && <img src={AVATARS[slug]} alt={analyst.name} className="w-10 h-10 rounded-full border-2 border-[#C9A961]/50" />}
             <div>
               <h1 className="text-[#C9A961] text-xl font-semibold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>{analyst.name}</h1>
               <p className="text-[#8A7548] text-xs">{analyst.role} — {analyst.pod}</p>

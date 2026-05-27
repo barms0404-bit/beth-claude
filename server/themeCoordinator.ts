@@ -29,21 +29,21 @@ export const THEMES: Theme[] = [
     id: "ai-supercycle",
     name: "AI Supercycle",
     description: "AI infrastructure buildout — chips, data centers, energy, software, inference",
-    members: ["david-park", "marcus-chen", "elena-vasquez", "sarah-nakamura", "michael-torres", "james-okafor"],
+    members: ["david-park", "marcus-chen", "elena-vasquez", "sarah-nakamura", "michael-torres", "james-okafor", "ryan-tanaka", "victoria-chen"],
     signalKeywords: ["GPU", "data center", "power demand", "inference", "training", "Blackwell", "H100", "capex", "hyperscaler", "cloud spend", "AI revenue", "token", "model"],
   },
   {
     id: "healthcare-mega",
     name: "Healthcare Megacycle",
     description: "GLP-1 revolution, biotech M&A wave, consumer health behavior shift",
-    members: ["dr-laura-mitchell", "dr-nathan-cole", "dr-kevin-zhao", "catherine-brooks", "daniel-ortiz"],
+    members: ["dr-laura-mitchell", "dr-nathan-cole", "dr-kevin-zhao", "catherine-brooks", "daniel-ortiz", "ryan-tanaka", "victoria-chen"],
     signalKeywords: ["GLP-1", "Mounjaro", "Ozempic", "obesity", "weight loss", "restaurant", "food", "consumer spending", "healthcare", "FDA", "clinical trial", "M&A", "patent cliff"],
   },
   {
     id: "geopolitical-defense",
     name: "Geopolitical & Defense",
     description: "US-China, space militarization, cyber warfare, energy security",
-    members: ["victoria-sterling", "colonel-derek-hayes", "alexander-petrov", "rachel-kim", "elena-vasquez"],
+    members: ["victoria-sterling", "colonel-derek-hayes", "alexander-petrov", "rachel-kim", "elena-vasquez", "dr-marcus-webb"],
     signalKeywords: ["China", "Taiwan", "defense", "DoD", "Space Force", "NATO", "sanctions", "cyber", "zero-trust", "nuclear", "uranium", "oil", "OPEC", "Iran"],
   },
   {
@@ -70,8 +70,8 @@ export const THEMES: Theme[] = [
   {
     id: "risk-execution",
     name: "Risk & Execution",
-    description: "Portfolio risk management, trade execution, options overlay",
-    members: ["dr-marcus-webb", "ryan-tanaka", "victoria-chen", "claire-donovan", "gregory-ashford"],
+    description: "Portfolio risk management, trade execution, options overlay — sees ALL specialist output",
+    members: ["dr-marcus-webb", "ryan-tanaka", "victoria-chen", "claire-donovan", "gregory-ashford", "david-park", "marcus-chen", "dr-laura-mitchell", "rachel-kim", "colonel-derek-hayes", "dr-robert-kessler"],
     signalKeywords: ["VaR", "drawdown", "correlation", "hedge", "stop-loss", "VWAP", "execution", "slippage", "options", "covered call", "put", "volatility", "IV", "Greeks", "delta", "gamma"],
   },
 ];
