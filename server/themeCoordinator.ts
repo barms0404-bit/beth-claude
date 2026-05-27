@@ -177,7 +177,7 @@ export function getThemeSynthesis(): Array<{
     const signals = signalStore.get(theme.id) || [];
     if (signals.length === 0) continue;
 
-    const uniqueSpecialists = [...new Set(signals.map(s => s.specialistName))];
+    const uniqueSpecialists = Array.from(new Set(signals.map(s => s.specialistName)));
     const latestSignals = signals.slice(0, 3).map(s => `${s.specialistName}: ${s.content.slice(0, 150)}`);
 
     // Determine consensus direction
