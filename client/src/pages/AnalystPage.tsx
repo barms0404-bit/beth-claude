@@ -577,6 +577,57 @@ const analystDatabase: Record<string, AnalystData> = {
       }
     ]
   },
+  "dr-marcus-webb": {
+    name: "Dr. Marcus Webb",
+    role: "Portfolio Risk Manager",
+    pod: "Risk & Execution Pod",
+    model: "claude-opus-4-7",
+    temp: "0.1",
+    trackRecord: "New specialist — inaugural dispatch",
+    hitRate: "N/A (risk, not directional)",
+    weight: "1.5x (risk override authority)",
+    bio: "Dr. Marcus Webb holds a PhD in Financial Engineering from MIT and spent 15 years on Goldman Sachs' risk desk before becoming Head of Quantitative Risk at Citadel. CFA and FRM certified. He is the guardian of capital preservation — his job is to ensure the portfolio survives any scenario, including ones nobody is talking about.",
+    methodology: "Dr. Webb's framework: (1) Value at Risk (VaR) — 1-day 95%, 5-day 99%, 30-day stress scenarios, (2) Correlation Analysis — identifying hidden correlations between positions, (3) Concentration Risk — flagging when any position >10% or sector >40%, (4) Drawdown Monitoring — alerts at -3%, -5%, -10% levels, (5) Tail Risk — Black Swan stress tests (COVID, rate shock, GFC), (6) Greeks Exposure — portfolio-level delta, gamma, vega.",
+    currentView: "Portfolio VaR (1-day 95%) estimated at 1.8% given current positioning. Primary risk: 62% technology concentration creates correlation risk — if AI narrative breaks, 5+ positions move against you simultaneously. Secondary risk: 10Y at 4.87% approaching 5% threshold where growth multiples historically compress 10-15%. Recommended action: maintain SPY put spread hedge ($2.50 cost for $15 protection), keep 5% cash, and consider reducing NVDA by 20% pre-earnings to manage binary event risk.",
+    recommendations: [
+      { ticker: "SPY", name: "SPDR S&P 500 ETF (Put Spread Hedge)", price: "$749.02", change: "+0.37%", conviction: 9, action: "HEDGE", why: "With VIX at 13.82 (historically low), put protection is cheap. A 5% OTM put spread (buy $710 put, sell $680 put) costs ~$2.50 per share and protects $30 of downside. At current portfolio size, this is insurance that costs 0.3% of NAV annually but protects against a 5-10% drawdown. The risk/reward of NOT hedging at VIX 13 is asymmetric.", how: "Buy SPY Jun 710 Put, Sell SPY Jun 680 Put. Cost: ~$2.50/share. Max protection: $30/share (4% of SPY). Roll monthly. This is portfolio insurance, not a trade. Size: protect 50% of equity exposure.", risks: "Cost of carry (0.3% annually), missing upside if market rallies through strikes, roll risk if VIX spikes making replacement expensive.", target: "N/A (insurance)", timeHorizon: "Rolling monthly" },
+      { ticker: "VIX", name: "CBOE Volatility Index (Monitor)", price: "13.82", change: "-0.45", conviction: 8, action: "MONITOR", why: "VIX at 13.82 is in the 15th percentile historically — meaning volatility is cheaper than 85% of all trading days. This is the time to BUY protection, not sell it. When VIX is below 14, the expected 30-day forward return of owning VIX calls is positive. Complacency = opportunity to hedge cheaply.", how: "Do not trade VIX directly. Use it as a signal: when VIX <14, buy portfolio hedges (SPY puts, UVXY calls). When VIX >25, sell hedges and deploy cash. Current signal: BUY PROTECTION.", risks: "VIX can stay low for extended periods (2017 stayed below 12 for months), carrying hedges has a cost.", target: "Alert at VIX >18 (reduce hedges), VIX >25 (sell hedges aggressively)", timeHorizon: "Ongoing" }
+    ]
+  },
+  "ryan-tanaka": {
+    name: "Ryan Tanaka",
+    role: "Execution Strategist",
+    pod: "Risk & Execution Pod",
+    model: "gpt-4o",
+    temp: "0.2",
+    trackRecord: "New specialist — inaugural dispatch",
+    hitRate: "N/A (execution, not directional)",
+    weight: "1.0x",
+    bio: "Ryan Tanaka was head of electronic trading at Morgan Stanley for 12 years, building algorithmic execution systems that handled $50B+ daily volume. BS Computer Science from Stanford, MS Financial Engineering from Berkeley. He optimizes HOW and WHEN to enter and exit positions — turning research recommendations into executable trade plans with minimal slippage.",
+    methodology: "Ryan's framework: (1) Volume Profile Analysis — identifying high-volume nodes where institutional buyers/sellers cluster, (2) Optimal Execution Strategy — VWAP, TWAP, Implementation Shortfall based on urgency and liquidity, (3) Timing Analysis — intraday patterns, day-of-week effects, (4) Liquidity Assessment — bid-ask spread, ADV, market impact estimation, (5) Slippage Minimization — splitting large orders across time/venues, (6) Event-Aware Execution — adjusting around earnings, FOMC, OpEx.",
+    currentView: "Current execution environment: liquidity is excellent with VIX at 13.82 and spreads tight. For NVDA (earnings Wednesday), recommend completing any position adjustments by Tuesday close — do NOT trade during the earnings window. For PANW add, use VWAP over 2 hours during mid-day (11 AM - 1 PM) when spreads are tightest. For AVGO accumulation, stage over 3 days at 25%/25%/50% to avoid moving the stock.",
+    recommendations: [
+      { ticker: "NVDA", name: "NVIDIA — Execution Plan", price: "$208.27", change: "+4.2%", conviction: 9, action: "EXECUTION PLAN", why: "NVDA trades $25B+ daily volume — zero liquidity concerns. However, with earnings Wednesday, execution timing is critical. The 20% trim (recommended by David Park for binary risk management) should be executed Tuesday between 2:00-3:30 PM when institutional volume peaks. Do NOT use market orders — use limit orders at the bid or VWAP. Post-earnings, if guidance is strong, re-enter the trimmed 20% using VWAP over Thursday morning.", how: "Tuesday 2:00-3:30 PM: Sell 20% of NVDA position via limit orders at bid. Target: fill within 2 cents of NBBO. Wednesday: NO TRADING (earnings after close). Thursday (if beat): Re-enter 20% via VWAP 9:45-11:00 AM. Thursday (if miss): Hold cash, reassess Friday.", risks: "Slippage on Tuesday sell if market is moving fast (estimate: 1-3 bps), gap risk overnight Wednesday if earnings surprise.", target: "Execution quality: <5 bps slippage", timeHorizon: "This week" },
+      { ticker: "PANW", name: "Palo Alto Networks — Entry Plan", price: "$412.80", change: "+1.2%", conviction: 9, action: "STAGED ENTRY", why: "PANW trades $3.5B daily — good liquidity but not infinite. Rachel Kim's ADD recommendation (3% to 4.5%) means buying ~$15K-$25K depending on portfolio size. Execute via VWAP between 11:00 AM - 1:00 PM when spreads are tightest (typically 3-5 cents). Avoid the opening 30 minutes (wide spreads) and the close (momentum algos).", how: "Stage 1 (Today): Buy 50% of target position via VWAP 11:00 AM - 1:00 PM. Stage 2 (Tomorrow): Buy remaining 50% same window. Limit: do not pay more than $415. If stock gaps above $415, wait for pullback to $410 area.", risks: "Stock running away if sector momentum continues, opportunity cost of staging vs all-at-once.", target: "Average fill within 5 bps of VWAP", timeHorizon: "2 days" }
+    ]
+  },
+  "victoria-chen": {
+    name: "Victoria Chen",
+    role: "Options Strategist",
+    pod: "Risk & Execution Pod",
+    model: "claude-opus-4-7",
+    temp: "0.2",
+    trackRecord: "New specialist — inaugural dispatch",
+    hitRate: "N/A (options overlay)",
+    weight: "1.0x",
+    bio: "Victoria Chen was an options market maker at Susquehanna International Group (SIG) for 8 years, then head of derivatives strategy at Two Sigma. MS Quantitative Finance from Carnegie Mellon. She uses options to enhance returns via covered calls, protect against downside via puts, and hedge portfolio-level tail risk cheaply.",
+    methodology: "Victoria's framework: (1) Covered Call Screen — sell OTM calls 30-45 DTE on high-conviction longs for 1-3% monthly income, (2) Protective Put Strategy — buy puts before binary events, (3) Bull Call Spreads — defined-risk directional plays, (4) Portfolio Hedges — cheap SPY put spreads when VIX <15, (5) Volatility Analysis — IV percentile to determine buy vs sell, (6) Greeks Management — portfolio delta, gamma, vega within bounds.",
+    currentView: "VIX at 13.82 = 15th percentile. This is the cheapest volatility has been in 18 months. Implied vol is BELOW realized vol on most names — meaning options are underpriced. Strategy: (1) DO NOT sell covered calls this week (NVDA earnings will spike IV — wait to sell calls AFTER earnings when IV crushes), (2) BUY protective puts now while cheap, (3) SPY put spread hedge costs only $2.50 for $30 protection. Weekly income target: $3,000-5,000 from covered call overlay on non-earnings positions.",
+    recommendations: [
+      { ticker: "NVDA", name: "NVIDIA — Options Strategy", price: "$208.27", change: "+4.2%", conviction: 9, action: "POST-EARNINGS COVERED CALL", why: "NVDA IV is elevated at 55% (vs 35% realized) ahead of Wednesday earnings. After earnings, IV will crush 15-20 points regardless of direction. Strategy: WAIT until Thursday, then sell June 27 $230 calls (10% OTM) for ~$4.50-5.00 premium. This generates 2.2% income in 30 days (26% annualized) while giving 10% upside room. If called away at $230, you've made 10% + 2.2% = 12.2% in a month.", how: "Thursday after earnings (assuming stock stays above $195): Sell NVDA Jun 27 $230 Calls. Premium: ~$4.50-5.00. Breakeven: $212.77 (current price + premium received). Max profit: $26.23/share if called at $230. Probability of profit: ~72%.", risks: "Stock gaps above $230 and you miss upside beyond that level, stock drops below $195 and premium doesn't offset loss, early assignment risk near ex-dividend.", target: "$4.50-5.00 premium (2.2% monthly income)", timeHorizon: "30 days" },
+      { ticker: "LLY", name: "Eli Lilly — Covered Call", price: "$891.40", change: "+0.8%", conviction: 8, action: "SELL COVERED CALL", why: "LLY has no earnings for 6 weeks. IV at 28% (50th percentile) — fair value, slightly rich. Sell the June 27 $950 calls (6.5% OTM) for ~$8.50 premium. This generates 0.95% income in 30 days (11.4% annualized) with 6.5% upside room before being called away. Dr. Mitchell's target is $950-1000, so being called at $950 is acceptable.", how: "Sell LLY Jun 27 $950 Calls. Premium: ~$8.50. Breakeven: $882.90. Max profit: $67.10/share if called at $950. Probability of profit: ~78%. Roll if stock approaches $940 before expiry.", risks: "GLP-1 news catalyst could gap stock above $950, missing the move to $1000+. Mitigate by rolling up and out if stock hits $930.", target: "$8.50 premium (0.95% monthly)", timeHorizon: "30 days" }
+    ]
+  },
 };
 
 // Generate slug from analyst name

@@ -243,8 +243,8 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <img src={LOGO_URL} alt="Armstrong Arikat" className="h-9 w-auto" />
             <div>
-              <h1 className="text-[#C9A961] text-sm font-semibold tracking-[4px] uppercase" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-                Research Terminal
+              <h1 className="text-[#C9A961] text-sm font-semibold tracking-[3px] uppercase" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                Armstrong Arikat
               </h1>
               <p className="text-[#8A7548] text-[10px] tracking-[2px] uppercase">Private Wealth Group</p>
             </div>
