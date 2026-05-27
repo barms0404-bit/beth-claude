@@ -50,7 +50,7 @@ export const THEMES: Theme[] = [
     id: "rate-sensitivity",
     name: "Rate Sensitivity & Macro",
     description: "Fed policy, yields, duration, value vs growth rotation",
-    members: ["dr-robert-kessler", "claire-donovan", "gregory-ashford", "richard-callahan", "thomas-brennan"],
+    members: ["dr-robert-kessler", "claire-donovan", "gregory-ashford", "richard-callahan", "thomas-brennan", "dr-marcus-webb"],
     signalKeywords: ["Fed", "FOMC", "rate", "yield", "Treasury", "inflation", "CPI", "PCE", "duration", "value", "growth", "multiple", "P/E", "risk premium", "recession"],
   },
   {
@@ -66,6 +66,13 @@ export const THEMES: Theme[] = [
     description: "E-commerce, fintech, digital advertising, consumer behavior",
     members: ["catherine-brooks", "jessica-huang", "andrew-walsh", "sophia-reyes", "daniel-ortiz"],
     signalKeywords: ["consumer", "spending", "retail", "e-commerce", "GMV", "payments", "digital ad", "ROAS", "travel", "cruise", "hotel"],
+  },
+  {
+    id: "risk-execution",
+    name: "Risk & Execution",
+    description: "Portfolio risk management, trade execution, options overlay",
+    members: ["dr-marcus-webb", "ryan-tanaka", "victoria-chen", "claire-donovan", "gregory-ashford"],
+    signalKeywords: ["VaR", "drawdown", "correlation", "hedge", "stop-loss", "VWAP", "execution", "slippage", "options", "covered call", "put", "volatility", "IV", "Greeks", "delta", "gamma"],
   },
 ];
 
