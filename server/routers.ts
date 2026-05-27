@@ -11,6 +11,7 @@ import { runBacktest, getHindsightSummary, getSpecialistLessons } from "./learni
 import { getConvictionCalibration, getUpcomingEarnings } from "./autoLogger";
 import { getSectorRotation, calculatePositionSize, analyzePortfolioConcentration, getInsiderTransactions } from "./tier2Features";
 import { getInstitutionalHoldings, getShortInterest, getFedFutures, getRecentFilings, checkContrarianSignals } from "./institutionalIntel";
+import { getAllThemes, getThemeSynthesis } from "./themeCoordinator";
 import { z } from "zod";
 
 export const appRouter = router({
@@ -148,6 +149,16 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await getUpcomingEarnings(input?.tickers);
       }),
+  }),
+
+  // Theme Coordinator — cross-pod intelligence
+  themes: router({
+    list: publicProcedure.query(() => {
+      return getAllThemes();
+    }),
+    synthesis: publicProcedure.query(() => {
+      return getThemeSynthesis();
+    }),
   }),
 
   // Tier 2 — Sector rotation, position sizing, insider data

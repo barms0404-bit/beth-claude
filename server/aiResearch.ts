@@ -11,6 +11,7 @@ import { enrichResearchContext } from "./dataSources";
 import { getSpecialistLessons } from "./learningEngine";
 import { autoLogFromResearch, getEarningsWarning } from "./autoLogger";
 import { getInstitutionalContext } from "./institutionalIntel";
+import { extractAndStoreSignals, getCrossPodIntelligence } from "./themeCoordinator";
 
 interface SpecialistConfig {
   name: string;
@@ -314,6 +315,7 @@ ${enrichedData}
 ${lessons}
 ${getEarningsWarning(specialist.tickers)}
 ${await getInstitutionalContext(specialist.tickers)}
+${getCrossPodIntelligence(slug)}
 
 Provide your research in this exact format:
 1. CURRENT VIEW (2-3 sentences on your overall sector thesis today)
@@ -336,6 +338,11 @@ Be specific with numbers. Reference the live prices above. Be conviction-forward
         secondOpinion = await callModel(modelConfig.secondary, specialist.systemPrompt + "\n\nProvide a brief 2-3 sentence second opinion or contrarian view.", userPrompt);
       } catch { /* non-critical */ }
     }
+
+    // Store signals for cross-pod intelligence sharing
+    try {
+      extractAndStoreSignals(slug, specialist.name, research);
+    } catch { /* non-critical */ }
 
     // Auto-log recommendations from the research output
     let recsLogged = 0;
