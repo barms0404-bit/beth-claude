@@ -391,8 +391,8 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* OLD Analysts Dropdown - REMOVED, moved to after Top 50 */}
-          {false && <DropdownMenu>
+          {/* OLD Analysts Dropdown - REMOVED */}
+          {false && (<DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm"
                 className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
@@ -452,7 +452,7 @@ export default function Home() {
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Alan Whitfield</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantitative Analyst</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Natasha Volkov</span><span className="text-[#8A7548] ml-2 text-[10px]">— Alt Data</span></DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>)}
 
           {/* Agents Dropdown REMOVED */}
 
