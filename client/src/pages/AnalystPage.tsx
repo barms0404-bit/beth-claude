@@ -90,7 +90,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "david-park": {
     name: "David Park",
     role: "Training Chip Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -131,7 +131,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "marcus-chen": {
     name: "Marcus Chen",
     role: "AI Data Center Buildout Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -172,7 +172,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "dr-laura-mitchell": {
     name: "Dr. Laura Mitchell",
     role: "Big Pharma & GLP-1 Specialist",
-    pod: "Healthcare Pod",
+    pod: "Healthcare Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -213,7 +213,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "rachel-kim": {
     name: "Rachel Kim",
     role: "Cybersecurity Specialist",
-    pod: "Technology Pod",
+    pod: "Technology Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -241,7 +241,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "elena-vasquez": {
     name: "Elena Vasquez",
     role: "Energy Infrastructure Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -258,7 +258,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "sarah-nakamura": {
     name: "Sarah Nakamura",
     role: "Inference & AI Software Stack Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -274,7 +274,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "james-okafor": {
     name: "James Okafor",
     role: "Robotics & Physical AI Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -290,7 +290,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "priya-sharma": {
     name: "Priya Sharma",
     role: "Quantum Computing Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -306,7 +306,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "michael-torres": {
     name: "Michael Torres",
     role: "Enterprise Software & SaaS Specialist",
-    pod: "Technology Pod",
+    pod: "Technology Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -322,7 +322,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "andrew-walsh": {
     name: "Andrew Walsh",
     role: "Internet Platforms & Digital Advertising Specialist",
-    pod: "Technology Pod",
+    pod: "Technology Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -338,7 +338,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "sophia-reyes": {
     name: "Sophia Reyes",
     role: "Fintech & Payments Specialist",
-    pod: "Technology Pod",
+    pod: "Technology Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -354,7 +354,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "dr-nathan-cole": {
     name: "Dr. Nathan Cole",
     role: "Biotech & Small Cap Biotech Specialist",
-    pod: "Healthcare Pod",
+    pod: "Healthcare Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -370,7 +370,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "dr-kevin-zhao": {
     name: "Dr. Kevin Zhao",
     role: "Healthcare Tools, CDMOs & Life Sciences Specialist",
-    pod: "Healthcare Pod",
+    pod: "Healthcare Desk",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -386,7 +386,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "catherine-brooks": {
     name: "Catherine Brooks",
     role: "Consumer Discretionary & Brands Specialist",
-    pod: "Consumer Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -402,7 +402,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "daniel-ortiz": {
     name: "Daniel Ortiz",
     role: "Travel, Leisure & Restaurants Specialist",
-    pod: "Consumer Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -418,7 +418,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "jessica-huang": {
     name: "Jessica Huang",
     role: "E-Commerce & Marketplaces Specialist",
-    pod: "Consumer Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -434,7 +434,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "dr-robert-kessler": {
     name: "Dr. Robert Kessler",
     role: "Chief Economist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -450,7 +450,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "wei-lin": {
     name: "Wei Lin",
     role: "China Economist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -466,7 +466,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "thomas-brennan": {
     name: "Thomas Brennan",
     role: "Inflation Specialist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -482,7 +482,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "patricia-duval": {
     name: "Patricia Duval",
     role: "Fiscal Policy & Political Economy Specialist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -498,7 +498,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "alexander-petrov": {
     name: "Alexander Petrov",
     role: "Global FX & Commodities Strategist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -514,7 +514,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "maria-santos": {
     name: "Maria Santos",
     role: "Labor Economist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -530,7 +530,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "richard-callahan": {
     name: "Richard Callahan",
     role: "Dividend Aristocrat & Income Specialist",
-    pod: "Style / Factor Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -546,7 +546,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "gregory-ashford": {
     name: "Gregory Ashford",
     role: "Value Investor Specialist",
-    pod: "Style / Factor Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -562,7 +562,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "claire-donovan": {
     name: "Claire Donovan",
     role: "Fixed Income Specialist",
-    pod: "Style / Factor Pod",
+    pod: "Client Wealth Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -578,7 +578,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "colonel-derek-hayes": {
     name: "Col. Derek Hayes (Ret.)",
     role: "Space & Aerospace Specialist",
-    pod: "AI / Thematic Pod",
+    pod: "Investment Research Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "New specialist — inaugural dispatch",
@@ -598,7 +598,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "victoria-sterling": {
     name: "Victoria Sterling",
     role: "Geopolitical Strategist",
-    pod: "Economic Advisory Pod",
+    pod: "Economic Strategy Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "6 months active",
@@ -626,7 +626,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "dr-marcus-webb": {
     name: "Dr. Marcus Webb",
     role: "Portfolio Risk Manager",
-    pod: "Risk & Execution Pod",
+    pod: "Risk & Trading Division",
     model: "claude-opus-4-7",
     temp: "0.1",
     trackRecord: "New specialist — inaugural dispatch",
@@ -643,7 +643,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "ryan-tanaka": {
     name: "Ryan Tanaka",
     role: "Execution Strategist",
-    pod: "Risk & Execution Pod",
+    pod: "Risk & Trading Division",
     model: "gpt-4o",
     temp: "0.2",
     trackRecord: "New specialist — inaugural dispatch",
@@ -660,7 +660,7 @@ const analystDatabase: Record<string, AnalystData> = {
   "victoria-chen": {
     name: "Victoria Chen",
     role: "Options Strategist",
-    pod: "Risk & Execution Pod",
+    pod: "Risk & Trading Division",
     model: "claude-opus-4-7",
     temp: "0.2",
     trackRecord: "New specialist — inaugural dispatch",

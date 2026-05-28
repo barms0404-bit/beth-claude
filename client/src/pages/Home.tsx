@@ -359,7 +359,7 @@ export default function Home() {
 
           <NavButton icon={<Shield className="w-3 h-3" />} label="Tactical" onClick={() => scrollToSection(SECTIONS.tactical)} />
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
-          <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
+
           <NavButton icon={<Activity className="w-3 h-3" />} label="CNBC" onClick={() => window.location.href = '/cnbc'} />
           <NavButton icon={<BarChart3 className="w-3 h-3" />} label="Performance" onClick={() => window.location.href = '/performance'} />
           <NavButton icon={<Globe className="w-3 h-3" />} label="Compare" onClick={() => window.location.href = '/compare'} />
@@ -377,7 +377,7 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[300px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Strategy Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Robert Kessler</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief Economist</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Victoria Sterling</span><span className="text-[#8A7548] ml-2 text-[10px]">— Geopolitical Strategist</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Wei Lin</span><span className="text-[#8A7548] ml-2 text-[10px]">— China Economist</span></DropdownMenuItem>
@@ -405,7 +405,7 @@ export default function Home() {
               <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Chief of Staff</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = '/analyst/beth'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS.beth} className="w-5 h-5 rounded-full mr-2" /><span className="font-medium">Beth</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief of Staff</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Investment Research Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = "/analyst/marcus-chen"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => window.location.href = "/analyst/elena-vasquez"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => window.location.href = "/analyst/david-park"} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></DropdownMenuItem>
@@ -413,23 +413,23 @@ export default function Home() {
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.robotics)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">James Okafor</span><span className="text-[#8A7548] ml-2 text-[10px]">— Robotics & Physical AI</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.quantum)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Priya Sharma</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantum Computing</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Desk</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.saas)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.cyber)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Rachel Kim</span><span className="text-[#8A7548] ml-2 text-[10px]">— Cybersecurity</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.internet)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Andrew Walsh</span><span className="text-[#8A7548] ml-2 text-[10px]">— Internet Platforms</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fintech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Sophia Reyes</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fintech & Payments</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Desk</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.biotech)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Nathan Cole</span><span className="text-[#8A7548] ml-2 text-[10px]">— Biotech & Small Cap</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.pharma)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Laura Mitchell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Big Pharma & GLP-1</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.healthTools)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Kevin Zhao</span><span className="text-[#8A7548] ml-2 text-[10px]">— Healthcare Tools & CDMOs</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Client Wealth Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.consumer)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Catherine Brooks</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consumer & Brands</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.travel)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Daniel Ortiz</span><span className="text-[#8A7548] ml-2 text-[10px]">— Travel & Leisure</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.ecommerce)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Jessica Huang</span><span className="text-[#8A7548] ml-2 text-[10px]">— E-Commerce</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Advisory Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Economic Strategy Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.macro)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Robert Kessler</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief Economist</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.geopolitical)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Victoria Sterling</span><span className="text-[#8A7548] ml-2 text-[10px]">— Geopolitical</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.chinaEcon)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Wei Lin</span><span className="text-[#8A7548] ml-2 text-[10px]">— China Economist</span></DropdownMenuItem>
@@ -438,7 +438,7 @@ export default function Home() {
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fxCommod)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Alexander Petrov</span><span className="text-[#8A7548] ml-2 text-[10px]">— FX & Commodities</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.labor)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Maria Santos</span><span className="text-[#8A7548] ml-2 text-[10px]">— Labor Economist</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Style / Factor Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Client Wealth Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.dividend)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Richard Callahan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Dividend & Income</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.value)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Gregory Ashford</span><span className="text-[#8A7548] ml-2 text-[10px]">— Value Investor</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.fixedIncome)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Claire Donovan</span><span className="text-[#8A7548] ml-2 text-[10px]">— Fixed Income</span></DropdownMenuItem>
@@ -448,7 +448,7 @@ export default function Home() {
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Samantha Liu</span><span className="text-[#8A7548] ml-2 text-[10px]">— Mid-Day Tactical</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.reports)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Christopher Vance</span><span className="text-[#8A7548] ml-2 text-[10px]">— Market Close</span></DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Functional Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Compliance & Quality Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Alan Whitfield</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantitative Analyst</span></DropdownMenuItem>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Natasha Volkov</span><span className="text-[#8A7548] ml-2 text-[10px]">— Alt Data</span></DropdownMenuItem>
             </DropdownMenuContent>
@@ -464,7 +464,7 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Pod — 3 Specialists</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Desk — 3 Specialists</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-nathan-cole'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Dr. Nathan Cole</span><span className="text-[#8A7548] ml-2 text-[10px]">— Biotech & Small Cap</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY REGN, VRTX | M&A activity accelerating in oncology</span>
@@ -492,7 +492,7 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Pod — 4 Specialists</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Desk — 4 Specialists</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = '/analyst/michael-torres'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY MSFT (Conv 8), NOW | Copilot adoption 40%+ seat expansion</span>
@@ -520,7 +520,7 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[360px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">AI / Thematic Pod — 6 Specialists</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Investment Research Division — 6 Specialists</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = '/analyst/marcus-chen'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center Buildout</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY AVGO (Conv 8), DELL | $1T+ infra cycle, Cup & Handle breakout</span>
@@ -556,7 +556,7 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[340px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Consumer Pod — 3 Specialists</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Client Wealth Division — 3 Specialists</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.location.href = '/analyst/catherine-brooks'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Catherine Brooks</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consumer & Brands</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: BUY COST, NKE | Trade-down effect favoring value retailers</span>
@@ -594,7 +594,7 @@ export default function Home() {
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Rec: Barbell strategy | Short T-bills + HQ corporate credit</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-[#1F1A0F]" />
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Functional Pod</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Compliance & Quality Division</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961] flex-col items-start py-2">
                 <div><span className="font-medium">Dr. Alan Whitfield</span><span className="text-[#8A7548] ml-2 text-[10px]">— Quantitative Analyst</span></div>
                 <span className="text-[#8A7548] text-[10px] mt-0.5">Factor screen: Momentum + Quality outperforming, Value lagging</span>
@@ -730,7 +730,7 @@ export default function Home() {
 
         {/* MACROECONOMIC ADVISORY */}
         <section id={SECTIONS.macro}>
-          <SectionHeader title="Macroeconomic Advisory" subtitle="Economic Advisory Pod — 7 Specialists" />
+          <SectionHeader title="Macroeconomic Advisory" subtitle="Economic Strategy Division — 7 Specialists" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <AgentCard title="Chief Economist" agent="Dr. Robert Kessler" content="Divergence between stock market performance and consumer sentiment. University of Michigan May Survey hit new lows. Fed funds rate steady at 3.50-3.75% with 37% probability of hikes in late 2026." highlight="Growth equity implication: Cautious on rate-sensitive sectors. Favor quality growth with pricing power." />
             <AgentCard title="Fixed Income Strategy" agent="Claire Donovan" content="Treasury yields elevated near 2007 levels. 10Y at 4.87%, 2s10s spread normalized at +35bps. IG spreads tight at ~90bps OAS. HY widened to ~350bps." highlight="Recommendation: Barbell strategy — short-duration T-bills + high-quality corporate credit." />
@@ -1158,7 +1158,7 @@ export default function Home() {
 
             {/* Accuracy Agents */}
             <div className="bg-[#0F0F0F] border border-[#1F1A0F] rounded-lg p-4">
-              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">7 Accuracy Infrastructure Agents</h4>
+              <h4 className="text-[#C9A961] text-sm font-semibold uppercase tracking-[1px] mb-3">7 Compliance & Quality Division Agents</h4>
               <div className="space-y-2">
                 {accuracyAgents.map((agent) => (
                   <div key={agent.name} className="p-2.5 bg-[#0A0A0A] rounded border border-[#1F1A0F]">
