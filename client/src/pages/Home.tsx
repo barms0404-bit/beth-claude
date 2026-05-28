@@ -320,6 +320,43 @@ export default function Home() {
         <nav className="hidden md:flex items-center gap-1 px-4 py-1.5 overflow-x-auto">
           <NavButton icon={<Activity className="w-3 h-3" />} label="Dashboard" onClick={() => scrollToSection(SECTIONS.snapshot)} />
           <NavButton icon={<BarChart3 className="w-3 h-3" />} label="Top 50" onClick={() => scrollToSection(SECTIONS.top50)} />
+
+          {/* Analysts Dropdown — moved next to Top 50 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm"
+                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
+                <Users className="w-3 h-3" />
+                <span className="ml-1">Analysts</span>
+                <ChevronDown className="w-2.5 h-2.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[320px] max-h-[480px] overflow-y-auto">
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Executive</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/beth'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS.beth} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Beth</span><span className="text-[#8A7548] ml-2 text-[10px]">— Chief of Staff</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/omar-hamze'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["omar-hamze"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Omar Hamze</span><span className="text-[#8A7548] ml-2 text-[10px]">— Advisor in Training</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Investment Research Division</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/david-park'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["david-park"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">David Park</span><span className="text-[#8A7548] ml-2 text-[10px]">— Training Chips</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/marcus-chen'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["marcus-chen"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Marcus Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— AI Data Center</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/elena-vasquez'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["elena-vasquez"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Elena Vasquez</span><span className="text-[#8A7548] ml-2 text-[10px]">— Energy Infrastructure</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/sarah-nakamura'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["sarah-nakamura"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Sarah Nakamura</span><span className="text-[#8A7548] ml-2 text-[10px]">— Inference & AI</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/colonel-derek-hayes'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["colonel-derek-hayes"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Col. Derek Hayes</span><span className="text-[#8A7548] ml-2 text-[10px]">— Space & Aerospace</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Technology Desk</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/michael-torres'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["michael-torres"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Michael Torres</span><span className="text-[#8A7548] ml-2 text-[10px]">— Enterprise SaaS</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/rachel-kim'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["rachel-kim"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Rachel Kim</span><span className="text-[#8A7548] ml-2 text-[10px]">— Cybersecurity</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Healthcare Desk</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-laura-mitchell'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["dr-laura-mitchell"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Dr. Laura Mitchell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Big Pharma & GLP-1</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-[#1F1A0F]" />
+              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Risk & Trading Division</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/dr-marcus-webb'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["dr-marcus-webb"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Dr. Marcus Webb</span><span className="text-[#8A7548] ml-2 text-[10px]">— Risk Manager</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/ryan-tanaka'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["ryan-tanaka"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Ryan Tanaka</span><span className="text-[#8A7548] ml-2 text-[10px]">— Execution</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/analyst/victoria-chen'} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><img src={AVATARS["victoria-chen"]} className="w-5 h-5 rounded-full mr-2 object-cover" /><span className="font-medium">Victoria Chen</span><span className="text-[#8A7548] ml-2 text-[10px]">— Options</span></DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <NavButton icon={<Shield className="w-3 h-3" />} label="Tactical" onClick={() => scrollToSection(SECTIONS.tactical)} />
           <NavButton icon={<Globe className="w-3 h-3" />} label="Economics" onClick={() => scrollToSection(SECTIONS.macro)} />
           <NavButton icon={<Bot className="w-3 h-3" />} label="Agents" onClick={() => scrollToSection(SECTIONS.agentStatus)} />
@@ -354,8 +391,8 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Analysts Dropdown — All Specialists with Real Names */}
-          <DropdownMenu>
+          {/* OLD Analysts Dropdown - REMOVED, moved to after Top 50 */}
+          {false && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm"
                 className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
@@ -417,27 +454,7 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Agents Dropdown — 7 Accuracy Infrastructure Agents */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm"
-                className="bg-transparent border-[#C9A961]/30 text-[#C9A961] hover:bg-[#C9A961]/10 hover:border-[#C9A961] text-[10px] font-semibold tracking-[1px] uppercase whitespace-nowrap transition-all duration-100 active:scale-[0.97] h-7 px-2.5">
-                <Shield className="w-3 h-3" />
-                <span className="ml-1">Agents</span>
-                <ChevronDown className="w-2.5 h-2.5 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0A0A0A] border-[#C9A961]/30 min-w-[320px]">
-              <DropdownMenuLabel className="text-[#C9A961] text-[10px] uppercase tracking-[1px]">Accuracy Infrastructure Agents</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Isaac Thornton</span><span className="text-[#8A7548] ml-2 text-[10px]">— Data Validation (SENTINEL)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Angela Moretti</span><span className="text-[#8A7548] ml-2 text-[10px]">— Citation Enforcement (VERITAS)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dominic Hale</span><span className="text-[#8A7548] ml-2 text-[10px]">— Red Team (ADVERSARY)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Fiona Blackwell</span><span className="text-[#8A7548] ml-2 text-[10px]">— Primary Source (ORACLE)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Martin Hsu</span><span className="text-[#8A7548] ml-2 text-[10px]">— Track Record (SCOREKEEPER)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Dr. Yuki Tanaka</span><span className="text-[#8A7548] ml-2 text-[10px]">— Regime Detection (COMPASS)</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => scrollToSection(SECTIONS.agentStatus)} className="text-[#F5E6C8] focus:bg-[#C9A961]/10 focus:text-[#C9A961]"><span className="font-medium">Stefan Novak</span><span className="text-[#8A7548] ml-2 text-[10px]">— Consensus & Crowding (CROWDWATCH)</span></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Agents Dropdown REMOVED */}
 
           {/* Healthcare Dropdown */}
           <DropdownMenu>
