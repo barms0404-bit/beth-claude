@@ -12,6 +12,7 @@ import Performance from "./pages/Performance";
 import ModelComparison from "./pages/ModelComparison";
 import Backtesting from "./pages/Backtesting";
 import Intelligence from "./pages/Intelligence";
+import Team from "./pages/Team";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/compare"} component={ModelComparison} />
       <Route path={"/backtesting"} component={Backtesting} />
       <Route path={"/intelligence"} component={Intelligence} />
+      <Route path={"/team"} component={Team} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
